@@ -34,21 +34,21 @@ const Index = () => {
 
       <section className="container mx-auto py-10 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="hover-scale">
+          <Card className="hover:scale-105 transition-transform duration-200">
             <CardContent className="pt-6">
               <MessageSquare className="size-6 text-primary" />
               <h2 className="mt-3 font-semibold text-xl">AI Assistant "Auri"</h2>
               <p className="mt-2 text-muted-foreground">Safe, multi‑turn Q&A for behavior strategies, routines, and emergency guidance.</p>
             </CardContent>
           </Card>
-          <Card className="hover-scale">
+          <Card className="hover:scale-105 transition-transform duration-200">
             <CardContent className="pt-6">
               <LineChart className="size-6 text-primary" />
               <h2 className="mt-3 font-semibold text-xl">Therapy Tracker</h2>
               <p className="mt-2 text-muted-foreground">Log sessions and visualize milestones across skills with exportable summaries.</p>
             </CardContent>
           </Card>
-          <Card className="hover-scale">
+          <Card className="hover:scale-105 transition-transform duration-200">
             <CardContent className="pt-6">
               <CalendarCheck2 className="size-6 text-primary" />
               <h2 className="mt-3 font-semibold text-xl">Daily Visual Scheduler</h2>
@@ -57,7 +57,7 @@ const Index = () => {
           </Card>
         </div>
         <div className="mt-10 text-center">
-          <Link to="/features" className="story-link">Explore all features</Link>
+          <Link to="/about" className="text-primary hover:underline">Explore all features</Link>
         </div>
       </section>
 
