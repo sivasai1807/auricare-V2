@@ -32,7 +32,6 @@ const PatientDashboard = () => {
     if (!user) return;
 
     try {
-      // First get patient record
       const { data: patientData, error: patientError } = await supabase
         .from('patients')
         .select('id')
@@ -40,7 +39,6 @@ const PatientDashboard = () => {
         .single();
 
       if (patientError || !patientData) {
-        // Create sample progress data if no patient record exists
         const sampleProgress: PatientProgress[] = [
           {
             id: '1',
@@ -72,7 +70,7 @@ const PatientDashboard = () => {
         .limit(5);
 
       if (progressError) throw progressError;
-      
+
       setProgress(progressData || []);
     } catch (error) {
       console.error('Error fetching patient progress:', error);
@@ -100,7 +98,7 @@ const PatientDashboard = () => {
   };
 
   const latestProgress = progress[0];
-  const averageHealthScore = progress.length > 0 
+  const averageHealthScore = progress.length > 0
     ? Math.round(progress.reduce((sum, p) => sum + p.health_score, 0) / progress.length)
     : 0;
 
@@ -150,34 +148,51 @@ const PatientDashboard = () => {
                     </span>
                   </div>
                 </div>
-                View your scheduled appointments and history
+              </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
                 <Activity className="size-12 mx-auto mb-4 opacity-50" />
-              <Link to="/patient/appointments">
-                <Button variant="outline" className="w-full border-blue-200 hover:bg-blue-50">
-                  View Appointments
+                <p>No progress data available</p>
+              </div>
             )}
           </CardContent>
         </Card>
       </motion.div>
 
-      <motion.div
-        variants={containerVariants}
-        className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
-      >
+      {/* Action Cards */}
+      <motion.div variants={containerVariants} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <motion.div variants={itemVariants}>
+          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+            <CardHeader>
               <CardTitle className="flex items-center gap-2 text-purple-600">
                 <MessageSquare className="size-5" />
                 AI Health Assistant
-              <CardTitle className="flex items-center gap-2 text-blue-600">
-                <Calendar className="size-5" />
-                Get personalized health guidance
               </CardTitle>
-              <CardDescription>
-                View your scheduled appointments and history
+              <CardDescription>Get personalized health guidance</CardDescription>
+            </CardHeader>
+            <CardContent>
               <Link to="/patient/chatbot">
                 <Button variant="glow" className="w-full">
                   Chat Now
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-600">
+                <Calendar className="size-5" />
+                Appointments
+              </CardTitle>
+              <CardDescription>View your scheduled appointments and history</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link to="/patient/appointments">
+                <Button variant="outline" className="w-full border-blue-200 hover:bg-blue-50">
+                  View Appointments
                 </Button>
               </Link>
             </CardContent>
@@ -191,9 +206,7 @@ const PatientDashboard = () => {
                 <Activity className="size-5" />
                 Health Metrics
               </CardTitle>
-              <CardDescription>
-                Monitor your vital signs and health data
-              </CardDescription>
+              <CardDescription>Monitor your vital signs and health data</CardDescription>
             </CardHeader>
             <CardContent>
               <Button variant="outline" className="w-full border-orange-200 hover:bg-orange-50">
@@ -242,41 +255,13 @@ const PatientDashboard = () => {
           </CardContent>
         </Card>
       </motion.div>
-    </motion.div>
-  );
-};
 
-export default PatientDashboard;
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div variants={itemVariants}>
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-orange-600">
-                <Activity className="size-5" />
-                Health Metrics
-              </CardTitle>
-              <CardDescription>
-                Monitor your vital signs and health data
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full border-orange-200 hover:bg-orange-50">
-                View Metrics
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </motion.div>
-
+      {/* Reports & Notifications */}
       <motion.div variants={itemVariants}>
         <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
+              <FileText className="size-5 text-gray-600" />
               Recent Reports & Notifications
             </CardTitle>
           </CardHeader>
