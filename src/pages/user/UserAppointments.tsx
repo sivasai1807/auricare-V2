@@ -41,9 +41,7 @@ const UserAppointments = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      fetchAppointments();
-    }
+    if (user) fetchAppointments();
   }, [user]);
 
   const fetchAppointments = async () => {
@@ -52,29 +50,26 @@ const UserAppointments = () => {
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .select('*')
+        .select(`
+          *,
+          patients!appointments_patient_id_fkey(patient_name, username)
+        `)
         .eq('family_id', user.id)
         .order('appointment_date', { ascending: true });
 
       if (error) throw error;
-      
-      const transformedData = (data || []).map(apt => ({
+
+      const transformedData = (data || []).map((apt: any) => ({
         id: apt.id,
-        patient_name: apt.notes?.includes('Patient: ') 
-          ? apt.notes.split('Patient: ')[1]?.split('\n')[0] || 'Unknown Patient'
-          : 'Unknown Patient',
-        username: apt.notes?.includes('Username: ')
-          ? apt.notes.split('Username: ')[1]?.split('\n')[0] || 'unknown'
-          : 'unknown',
+        patient_name: apt.patients?.patient_name || 'Unknown Patient',
+        username: apt.patients?.username || 'unknown',
         appointment_date: apt.appointment_date,
         notes: apt.notes || 'No details provided',
         status: apt.status || 'pending',
         created_at: apt.created_at,
-        doctor_name: apt.notes?.includes('Doctor: ') 
-          ? apt.notes.split('Doctor: ')[1]?.split('\n')[0] 
-          : 'Healthcare Provider'
+        doctor_name: apt.notes?.match(/Doctor: (.*)/)?.[1] || 'Healthcare Provider'
       }));
-      
+
       setAppointments(transformedData);
     } catch (error) {
       console.error('Error fetching appointments:', error);
@@ -83,10 +78,8 @@ const UserAppointments = () => {
 
   const formatDateTime = (date: string, time: string) => {
     try {
-      const combined = new Date(`${date}T${time}:00`);
-      return combined.toISOString();
-    } catch (error) {
-      console.error('Date formatting error:', error);
+      return new Date(`${date}T${time}:00`).toISOString();
+    } catch {
       return new Date().toISOString();
     }
   };
@@ -94,18 +87,15 @@ const UserAppointments = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    
-    setLoading(true);
 
+    setLoading(true);
     try {
       const selectedDoctor = doctors.find(d => d.id === formData.doctorId);
-      if (!selectedDoctor) {
-        throw new Error('Please select a doctor');
-      }
+      if (!selectedDoctor) throw new Error('Please select a doctor');
 
       const appointmentDateTime = formatDateTime(formData.appointmentDate, formData.appointmentTime);
-      
-      // First, create or update patient record
+
+      // Upsert patient
       const { data: patientData, error: patientError } = await supabase
         .from('patients')
         .upsert({
@@ -113,25 +103,22 @@ const UserAppointments = () => {
           patient_name: formData.patientName,
           username: formData.username,
           medical_history: formData.details
-        }, {
-          onConflict: 'user_id'
-        })
+        }, { onConflict: 'user_id' })
         .select()
         .single();
 
-      if (patientError) {
-        console.error('Patient creation error:', patientError);
-        // Continue with appointment creation even if patient creation fails
-      }
+      if (patientError) console.error('Patient creation error:', patientError);
 
+      // Insert appointment
       const { data: appointmentData, error: appointmentError } = await supabase
         .from('appointments')
         .insert([{
           family_id: user.id,
           therapist_id: selectedDoctor.id,
           appointment_date: appointmentDateTime,
-          duration_minutes: 60,
+          duration_minutes: 60, // <-- integer, fixed
           status: 'scheduled',
+          patient_id: patientData?.id || null,
           notes: `Patient: ${formData.patientName}
 Username: ${formData.username}
 Details: ${formData.details}
@@ -140,13 +127,11 @@ Doctor: ${selectedDoctor.name} (${selectedDoctor.specialization})`
         .select()
         .single();
 
-      if (appointmentError) {
-        throw new Error(`Failed to create appointment: ${appointmentError.message}`);
-      }
+      if (appointmentError) throw appointmentError;
 
       toast({
         title: 'Appointment Booked!',
-        description: `Your appointment with ${selectedDoctor.name} has been scheduled successfully.`,
+        description: `Your appointment with ${selectedDoctor.name} has been scheduled successfully.`
       });
 
       setFormData({
@@ -157,14 +142,14 @@ Doctor: ${selectedDoctor.name} (${selectedDoctor.specialization})`
         details: '',
         doctorId: ''
       });
-      
+
       fetchAppointments();
 
     } catch (error: any) {
       toast({
         title: 'Error',
         description: error.message || 'Failed to book appointment',
-        variant: 'destructive',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -174,26 +159,16 @@ Doctor: ${selectedDoctor.name} (${selectedDoctor.specialization})`
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-      case 'scheduled':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'scheduled': return 'bg-green-100 text-green-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'completed': return 'bg-blue-100 text-blue-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-6xl mx-auto space-y-8"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto space-y-8">
       <div className="text-center">
         <h1 className="text-3xl font-heading font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Book Appointment
@@ -202,151 +177,90 @@ Doctor: ${selectedDoctor.name} (${selectedDoctor.specialization})`
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
+        {/* New Appointment Form */}
         <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Plus className="size-5 text-blue-600" />
-              New Appointment
-            </CardTitle>
-            <CardDescription>
-              Fill in your details to book an appointment
-            </CardDescription>
+            <CardTitle className="flex items-center gap-2"><Plus className="size-5 text-blue-600" />New Appointment</CardTitle>
+            <CardDescription>Fill in your details to book an appointment</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Patient Name / Username */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="patientName">Patient Name</Label>
-                  <Input
-                    id="patientName"
-                    value={formData.patientName}
-                    onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
-                    className="bg-white/50"
-                    required
-                  />
+                  <Input id="patientName" value={formData.patientName} onChange={e => setFormData({ ...formData, patientName: e.target.value })} className="bg-white/50" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    value={formData.username}
-                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className="bg-white/50"
-                    required
-                  />
+                  <Input id="username" value={formData.username} onChange={e => setFormData({ ...formData, username: e.target.value })} className="bg-white/50" required />
                 </div>
               </div>
 
+              {/* Doctor Selection */}
               <div className="space-y-2">
                 <Label htmlFor="doctor">Select Doctor</Label>
-                <Select value={formData.doctorId} onValueChange={(value) => setFormData({ ...formData, doctorId: value })}>
-                  <SelectTrigger className="bg-white/50">
-                    <SelectValue placeholder="Choose a doctor" />
-                  </SelectTrigger>
+                <Select value={formData.doctorId} onValueChange={v => setFormData({ ...formData, doctorId: v })}>
+                  <SelectTrigger className="bg-white/50"><SelectValue placeholder="Choose a doctor" /></SelectTrigger>
                   <SelectContent>
-                    {doctors.map((doctor) => (
-                      <SelectItem key={doctor.id} value={doctor.id}>
-                        <div className="flex items-center gap-2">
-                          <User className="size-4" />
-                          {doctor.name} - {doctor.specialization}
-                        </div>
+                    {doctors.map(d => (
+                      <SelectItem key={d.id} value={d.id}>
+                        <div className="flex items-center gap-2"><User className="size-4" />{d.name} - {d.specialization}</div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
+              {/* Date / Time */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="appointmentDate">Appointment Date</Label>
-                  <Input
-                    id="appointmentDate"
-                    type="date"
-                    value={formData.appointmentDate}
-                    onChange={(e) => setFormData({ ...formData, appointmentDate: e.target.value })}
-                    className="bg-white/50"
-                    min={new Date().toISOString().split('T')[0]}
-                    required
-                  />
+                  <Input type="date" id="appointmentDate" value={formData.appointmentDate} onChange={e => setFormData({ ...formData, appointmentDate: e.target.value })} className="bg-white/50" min={new Date().toISOString().split('T')[0]} required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="appointmentTime">Appointment Time</Label>
-                  <Input
-                    id="appointmentTime"
-                    type="time"
-                    value={formData.appointmentTime}
-                    onChange={(e) => setFormData({ ...formData, appointmentTime: e.target.value })}
-                    className="bg-white/50"
-                    required
-                  />
+                  <Input type="time" id="appointmentTime" value={formData.appointmentTime} onChange={e => setFormData({ ...formData, appointmentTime: e.target.value })} className="bg-white/50" required />
                 </div>
               </div>
 
+              {/* Details */}
               <div className="space-y-2">
                 <Label htmlFor="details">Details / Reason for Visit</Label>
-                <Textarea
-                  id="details"
-                  value={formData.details}
-                  onChange={(e) => setFormData({ ...formData, details: e.target.value })}
-                  placeholder="Please describe your symptoms or reason for the appointment..."
-                  className="bg-white/50 min-h-[100px]"
-                  required
-                />
+                <Textarea id="details" value={formData.details} onChange={e => setFormData({ ...formData, details: e.target.value })} placeholder="Please describe your symptoms..." className="bg-white/50 min-h-[100px]" required />
               </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                disabled={loading}
-              >
+              <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" disabled={loading}>
                 {loading ? 'Booking...' : 'Book Appointment'}
               </Button>
             </form>
           </CardContent>
         </Card>
 
+        {/* Appointments List */}
         <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="size-5 text-green-600" />
-              Your Appointments
-            </CardTitle>
-            <CardDescription>
-              View your scheduled appointments
-            </CardDescription>
+            <CardTitle className="flex items-center gap-2"><Calendar className="size-5 text-green-600" />Your Appointments</CardTitle>
+            <CardDescription>View your scheduled appointments</CardDescription>
           </CardHeader>
           <CardContent>
             {appointments.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <Clock className="size-12 mx-auto mb-4 opacity-50" />
                 <p>No appointments scheduled</p>
-                <p className="text-sm mt-2">Your booked appointments will appear here</p>
               </div>
             ) : (
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {appointments.map((appointment) => (
-                  <motion.div
-                    key={appointment.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200"
-                  >
+                {appointments.map(apt => (
+                  <motion.div key={apt.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-semibold text-blue-800">{appointment.doctor_name}</h4>
-                      <Badge className={getStatusColor(appointment.status)}>
-                        {appointment.status}
-                      </Badge>
+                      <h4 className="font-semibold text-blue-800">{apt.doctor_name}</h4>
+                      <Badge className={getStatusColor(apt.status)}>{apt.status}</Badge>
                     </div>
-                    <p className="text-sm text-gray-700 mb-3">Patient: {appointment.patient_name}</p>
+                    <p className="text-sm text-gray-700 mb-3">Patient: {apt.patient_name}</p>
                     <div className="flex items-center gap-4 text-xs text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="size-3" />
-                        {new Date(appointment.appointment_date).toLocaleDateString()}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="size-3" />
-                        {new Date(appointment.appointment_date).toLocaleTimeString()}
-                      </div>
+                      <div className="flex items-center gap-1"><Calendar className="size-3" />{new Date(apt.appointment_date).toLocaleDateString()}</div>
+                      <div className="flex items-center gap-1"><Clock className="size-3" />{new Date(apt.appointment_date).toLocaleTimeString()}</div>
                     </div>
                   </motion.div>
                 ))}
