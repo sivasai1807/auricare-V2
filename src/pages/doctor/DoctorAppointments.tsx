@@ -43,7 +43,7 @@ const DoctorAppointments = () => {
     const { data: doctorData, error: doctorError } = await supabase
       .from('doctors')
       .select('id, name, specialization')
-      .eq('doctor_id', user.username) // 'doc1', 'doc2' etc
+      .eq('doctor_id', user.user_metadata?.doctor_id) // 'doc1', 'doc2' etc
       .single();
 
     if (doctorError || !doctorData) throw new Error('Doctor not found');
