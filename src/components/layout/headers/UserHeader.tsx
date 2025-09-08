@@ -9,6 +9,7 @@ const navItems = [
   { to: "/user/dashboard", label: "Dashboard" },
   { to: "/user/appointments", label: "Appointments" },
   { to: "/user/chatbot", label: "Chatbot" },
+  { to: "/user/schedule", label: "Schedule" },
   { to: "/about", label: "About" },
   { to: "/news", label: "News" },
 ];

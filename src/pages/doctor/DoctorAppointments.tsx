@@ -32,19 +32,32 @@ const DoctorAppointments = () => {
 
   const fetchAppointments = async () => {
     try {
-      const { data: appointmentsData, error } = await supabase
+      const { data: appointmentsData, error: appointmentsError } = await supabase
         .from('appointments')
-        .select('*')
+        .select(`
+          *,
+          profiles!appointments_family_id_fkey(first_name, last_name)
+        `)
         .order('appointment_date', { ascending: true });
 
-      if (error) throw error;
+      if (appointmentsError) {
+        console.error('Error fetching appointments:', appointmentsError);
+        // Fallback to basic query without joins
+        const { data: basicAppointments, error: basicError } = await supabase
+          .from('appointments')
+          .select('*')
+          .order('appointment_date', { ascending: true });
+        
+        if (basicError) throw basicError;
+        appointmentsData = basicAppointments;
+      }
       
       if (appointmentsData && appointmentsData.length > 0) {
         const appointmentsWithPatients = appointmentsData.map(apt => {
           const notes = apt.notes || '';
           const patientName = notes.includes('Patient: ') 
             ? notes.split('Patient: ')[1]?.split('\n')[0] || 'Unknown Patient'
-            : 'Unknown Patient';
+            : apt.profiles?.first_name ? `${apt.profiles.first_name} ${apt.profiles.last_name || ''}`.trim() : 'Unknown Patient';
           const username = notes.includes('Username: ')
             ? notes.split('Username: ')[1]?.split('\n')[0] || 'unknown'
             : 'unknown';
@@ -68,23 +81,11 @@ const DoctorAppointments = () => {
         
         setAppointments(appointmentsWithPatients);
       } else {
-        const mockAppointments: Appointment[] = [
-          {
-            id: '1',
-            patient_id: 'PAT001',
-            patient_name: 'John Doe',
-            username: 'johndoe',
-            details: 'Regular checkup and blood pressure monitoring',
-            appointment_date: '2024-01-25T10:00:00',
-            status: 'scheduled',
-            created_at: '2024-01-20T08:00:00',
-            doctor_name: 'Dr. Sarah Johnson'
-          }
-        ];
-        setAppointments(mockAppointments);
+        setAppointments([]);
       }
     } catch (error) {
       console.error('Error fetching appointments:', error);
+      setAppointments([]);
     } finally {
       setLoading(false);
     }

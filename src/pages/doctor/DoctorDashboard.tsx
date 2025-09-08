@@ -28,6 +28,11 @@ const DoctorDashboard = () => {
         .from('patients')
         .select('*');
 
+      // Get learning videos count
+      const { data: videos } = await supabase
+        .from('learning_videos')
+        .select('*');
+
       setAppointmentCount(appointments?.length || 0);
       setPatientCount(patients?.length || 0);
     } catch (error) {

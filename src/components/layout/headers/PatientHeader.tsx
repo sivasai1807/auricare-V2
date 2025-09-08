@@ -10,6 +10,7 @@ const navItems = [
   { to: "/patient/progress", label: "Progress" },
   { to: "/patient/appointments", label: "Appointments" },
   { to: "/patient/chatbot", label: "Chatbot" },
+  { to: "/patient/schedule", label: "Schedule" },
   { to: "/about", label: "About" },
   { to: "/news", label: "News" },
 ];

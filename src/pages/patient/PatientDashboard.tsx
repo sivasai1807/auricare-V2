@@ -1,12 +1,86 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Activity, Calendar, MessageSquare, TrendingUp, Heart, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRoleAuth } from '@/hooks/useRoleAuth';
+import { supabase } from '@/integrations/supabase/client';
+
+interface PatientProgress {
+  id: string;
+  week_number: number;
+  health_score: number;
+  symptom_count: number;
+  notes: string;
+  recorded_date: string;
+}
 
 const PatientDashboard = () => {
   const { user } = useRoleAuth();
+  const [progress, setProgress] = useState<PatientProgress[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchPatientProgress();
+    }
+  }, [user]);
+
+  const fetchPatientProgress = async () => {
+    if (!user) return;
+
+    try {
+      // First get patient record
+      const { data: patientData, error: patientError } = await supabase
+        .from('patients')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (patientError || !patientData) {
+        // Create sample progress data if no patient record exists
+        const sampleProgress: PatientProgress[] = [
+          {
+            id: '1',
+            week_number: 1,
+            health_score: 75,
+            symptom_count: 3,
+            notes: 'Initial assessment completed',
+            recorded_date: new Date().toISOString().split('T')[0]
+          },
+          {
+            id: '2',
+            week_number: 2,
+            health_score: 82,
+            symptom_count: 2,
+            notes: 'Improvement in overall health',
+            recorded_date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+          }
+        ];
+        setProgress(sampleProgress);
+        setLoading(false);
+        return;
+      }
+
+      const { data: progressData, error: progressError } = await supabase
+        .from('patient_progress')
+        .select('*')
+        .eq('patient_id', patientData.id)
+        .order('week_number', { ascending: false })
+        .limit(5);
+
+      if (progressError) throw progressError;
+      
+      setProgress(progressData || []);
+    } catch (error) {
+      console.error('Error fetching patient progress:', error);
+      setProgress([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -25,6 +99,11 @@ const PatientDashboard = () => {
     }
   };
 
+  const latestProgress = progress[0];
+  const averageHealthScore = progress.length > 0 
+    ? Math.round(progress.reduce((sum, p) => sum + p.health_score, 0) / progress.length)
+    : 0;
+
   return (
     <motion.div
       variants={containerVariants}
@@ -39,25 +118,66 @@ const PatientDashboard = () => {
         <p className="text-gray-600 mt-2">Track your health progress and manage your care</p>
       </motion.div>
 
+      {/* Health Progress Overview */}
+      <motion.div variants={itemVariants}>
+        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="size-5 text-green-600" />
+              Health Progress Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="text-center py-4">Loading progress...</div>
+            ) : progress.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <h4 className="font-semibold mb-2">Current Health Score</h4>
+                  <div className="flex items-center gap-3">
+                    <Progress value={latestProgress?.health_score || 0} className="flex-1" />
+                    <span className="text-2xl font-bold text-green-600">
+                      {latestProgress?.health_score || 0}%
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2">Average Health Score</h4>
+                  <div className="flex items-center gap-3">
+                    <Progress value={averageHealthScore} className="flex-1" />
+                    <span className="text-2xl font-bold text-blue-600">
+                      {averageHealthScore}%
+                    </span>
+                  </div>
+                </div>
+                View your scheduled appointments and history
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Activity className="size-12 mx-auto mb-4 opacity-50" />
+              <Link to="/patient/appointments">
+                <Button variant="outline" className="w-full border-blue-200 hover:bg-blue-50">
+                  View Appointments
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+
       <motion.div
         variants={containerVariants}
         className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
       >
-        <motion.div variants={itemVariants}>
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-purple-600">
+                <MessageSquare className="size-5" />
+                AI Health Assistant
               <CardTitle className="flex items-center gap-2 text-blue-600">
                 <Calendar className="size-5" />
-                My Appointments
+                Get personalized health guidance
               </CardTitle>
               <CardDescription>
                 View your scheduled appointments and history
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link to="/patient/appointments">
-                <Button variant="outline" className="w-full border-blue-200 hover:bg-blue-50">
-                  View Appointments
+              <Link to="/patient/chatbot">
+                <Button variant="glow" className="w-full">
+                  Chat Now
                 </Button>
               </Link>
             </CardContent>
@@ -67,18 +187,66 @@ const PatientDashboard = () => {
         <motion.div variants={itemVariants}>
           <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-purple-600">
-                <MessageSquare className="size-5" />
-                AI Health Assistant
+              <CardTitle className="flex items-center gap-2 text-orange-600">
+                <Activity className="size-5" />
+                Health Metrics
               </CardTitle>
               <CardDescription>
-                Get personalized health guidance
+                Monitor your vital signs and health data
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link to="/patient/chatbot">
-                <Button variant="glow" className="w-full">
-                  Chat Now
+              <Button variant="outline" className="w-full border-orange-200 hover:bg-orange-50">
+                View Metrics
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
+
+      {/* Recent Progress */}
+      <motion.div variants={itemVariants}>
+        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="size-5 text-green-600" />
+              Recent Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="text-center py-4">Loading recent progress...</div>
+            ) : progress.length > 0 ? (
+              <div className="space-y-4">
+                {progress.slice(0, 3).map((progressItem) => (
+                  <div key={progressItem.id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div>
+                      <p className="font-medium">Week {progressItem.week_number}</p>
+                      <p className="text-sm text-gray-600">{progressItem.notes}</p>
+                      <p className="text-xs text-gray-500">{new Date(progressItem.recorded_date).toLocaleDateString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-green-600">{progressItem.health_score}%</p>
+                      <p className="text-xs text-gray-500">{progressItem.symptom_count} symptoms</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <FileText className="size-12 mx-auto mb-4 opacity-50" />
+                <p>No recent progress data</p>
+                <p className="text-sm mt-2">Your health progress updates will appear here</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+export default PatientDashboard;
                 </Button>
               </Link>
             </CardContent>

@@ -34,10 +34,7 @@ const PatientAppointments = () => {
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .select(`
-          *,
-          doctors!appointments_therapist_id_fkey(name, specialization)
-        `)
+        .select('*')
         .eq('family_id', user.id)
         .order('appointment_date', { ascending: true });
 
@@ -55,6 +52,12 @@ const PatientAppointments = () => {
         const details = notes.includes('Details: ')
           ? notes.split('Details: ')[1]?.split('\n')[0] || 'No details provided'
           : notes || 'No details provided';
+        const doctorName = notes.includes('Doctor: ') 
+          ? notes.split('Doctor: ')[1]?.split('\n')[0] || 'Healthcare Provider'
+          : 'Healthcare Provider';
+        const specialization = doctorName.includes('(') 
+          ? doctorName.split('(')[1]?.replace(')', '') || 'General Medicine'
+          : 'General Medicine';
 
         return {
           id: apt.id,
@@ -65,14 +68,15 @@ const PatientAppointments = () => {
           appointment_date: apt.appointment_date,
           status: apt.status || 'scheduled',
           created_at: apt.created_at,
-          doctor_name: apt.doctors?.name,
-          specialization: apt.doctors?.specialization
+          doctor_name: doctorName.split('(')[0]?.trim() || 'Healthcare Provider',
+          specialization: specialization
         };
       });
       
       setAppointments(transformedData);
     } catch (error) {
       console.error('Error fetching appointments:', error);
+      setAppointments([]);
     } finally {
       setLoading(false);
     }

@@ -8,8 +8,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 const navItems = [
   { to: "/doctor/dashboard", label: "Dashboard" },
   { to: "/doctor/appointments", label: "Appointments" },
-  { to: "/doctor/patients", label: "Patients" },
-  { to: "/doctor/schedule", label: "Schedule" },
   { to: "/doctor/learning", label: "Learning Hub" },
   { to: "/doctor/chatbot", label: "AI Assistant" },
 ];

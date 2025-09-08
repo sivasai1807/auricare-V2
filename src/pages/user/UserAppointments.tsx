@@ -105,13 +105,32 @@ const UserAppointments = () => {
 
       const appointmentDateTime = formatDateTime(formData.appointmentDate, formData.appointmentTime);
       
+      // First, create or update patient record
+      const { data: patientData, error: patientError } = await supabase
+        .from('patients')
+        .upsert({
+          user_id: user.id,
+          patient_name: formData.patientName,
+          username: formData.username,
+          medical_history: formData.details
+        }, {
+          onConflict: 'user_id'
+        })
+        .select()
+        .single();
+
+      if (patientError) {
+        console.error('Patient creation error:', patientError);
+        // Continue with appointment creation even if patient creation fails
+      }
+
       const { data: appointmentData, error: appointmentError } = await supabase
         .from('appointments')
         .insert([{
           family_id: user.id,
-          therapist_id: formData.doctorId,
+          therapist_id: selectedDoctor.id,
           appointment_date: appointmentDateTime,
-          duration_minutes: "01:00",
+          duration_minutes: 60,
           status: 'scheduled',
           notes: `Patient: ${formData.patientName}
 Username: ${formData.username}
@@ -124,16 +143,6 @@ Doctor: ${selectedDoctor.name} (${selectedDoctor.specialization})`
       if (appointmentError) {
         throw new Error(`Failed to create appointment: ${appointmentError.message}`);
       }
-
-      // Create or update patient record
-      await supabase
-        .from('patients')
-        .upsert({
-          user_id: user.id,
-          patient_name: formData.patientName,
-          username: formData.username,
-          medical_history: formData.details
-        });
 
       toast({
         title: 'Appointment Booked!',
