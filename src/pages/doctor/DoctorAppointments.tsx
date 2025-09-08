@@ -34,57 +34,57 @@ const DoctorAppointments = () => {
     if (user) fetchAppointments();
   }, [user]);
 
-  const fetchAppointments = async () => {
-    if (!user) return;
-    setLoading(true);
+ const fetchAppointments = async () => {
+  if (!user) return;
+  setLoading(true);
 
-    try {
-      // 1️⃣ Get doctor UUID if user.id is not the actual UUID
-      const { data: doctorData, error: doctorError } = await supabase
-        .from('doctors')
-        .select('id, name, specialization')
-        .eq('doctor_id', user.username) // assuming user.username = 'doc1' or 'doc2'
-        .single();
+  try {
+    // Get the doctor's UUID first
+    const { data: doctorData, error: doctorError } = await supabase
+      .from('doctors')
+      .select('id, name, specialization')
+      .eq('doctor_id', user.username) // 'doc1', 'doc2' etc
+      .single();
 
-      if (doctorError) throw doctorError;
-      const doctorUuid = doctorData?.id;
-      if (!doctorUuid || !isValidUUID(doctorUuid)) throw new Error('Invalid doctor UUID');
+    if (doctorError || !doctorData) throw new Error('Doctor not found');
+    const doctorUuid = doctorData.id;
 
-      // 2️⃣ Fetch appointments for this doctor, including patient info
-      const { data, error } = await supabase
-        .from('appointments')
-        .select(`
-          *,
-          patients!appointments_patient_id_fkey(id, patient_name, username)
-        `)
-        .eq('therapist_id', doctorUuid)
-        .order('appointment_date', { ascending: true });
+    // Fetch appointments with patients
+    const { data, error } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        patients!appointments_patient_id_fkey(id, patient_name, username)
+      `)
+      .eq('therapist_id', doctorUuid) // must be UUID
+      .order('appointment_date', { ascending: true });
 
-      if (error) throw error;
+    if (error) throw error;
 
-      const appointmentsWithPatients = (data || []).map((apt: any) => ({
-        id: apt.id,
-        patient_id: apt.patient_id,
-        patient_name: apt.patients?.patient_name || 'Unknown',
-        username: apt.patients?.username || 'unknown',
-        details: apt.notes || '',
-        appointment_date: apt.appointment_date,
-        status: apt.status || 'scheduled',
-        created_at: apt.created_at,
-        doctor_name: doctorData?.name || 'Doctor',
-        specialization: doctorData?.specialization || 'General Medicine'
-      }));
+    const appointmentsWithPatients = (data || []).map((apt: any) => ({
+      id: apt.id,
+      patient_id: apt.patient_id,
+      patient_name: apt.patients?.patient_name || 'Unknown',
+      username: apt.patients?.username || 'unknown',
+      details: apt.notes || '',
+      appointment_date: apt.appointment_date,
+      status: apt.status || 'scheduled',
+      created_at: apt.created_at,
+      doctor_name: doctorData.name,
+      specialization: doctorData.specialization
+    }));
 
-      setAppointments(appointmentsWithPatients);
+    setAppointments(appointmentsWithPatients);
 
-    } catch (error) {
-      console.error('Error fetching appointments:', error);
-      toast({ title: 'Error', description: 'Failed to fetch appointments', variant: 'destructive' });
-      setAppointments([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error: any) {
+    console.error('Error fetching appointments:', error.message || error);
+    toast({ title: 'Error', description: 'Failed to fetch appointments', variant: 'destructive' });
+    setAppointments([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: string) => {
     try {
