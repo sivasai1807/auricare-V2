@@ -111,7 +111,7 @@ const UserAppointments = () => {
           family_id: user.id,
           therapist_id: formData.doctorId,
           appointment_date: appointmentDateTime,
-          duration_minutes: 60,
+          duration_minutes: "01:00",
           status: 'scheduled',
           notes: `Patient: ${formData.patientName}
 Username: ${formData.username}
