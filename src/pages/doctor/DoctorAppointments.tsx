@@ -26,6 +26,10 @@ const DoctorAppointments = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Helper: Validate UUID
+  const isValidUUID = (value: string) =>
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(value);
+
   useEffect(() => {
     if (user) fetchAppointments();
   }, [user]);
@@ -35,14 +39,25 @@ const DoctorAppointments = () => {
     setLoading(true);
 
     try {
-      // Fetch appointments along with related patients
+      // 1️⃣ Get doctor UUID if user.id is not the actual UUID
+      const { data: doctorData, error: doctorError } = await supabase
+        .from('doctors')
+        .select('id, name, specialization')
+        .eq('doctor_id', user.username) // assuming user.username = 'doc1' or 'doc2'
+        .single();
+
+      if (doctorError) throw doctorError;
+      const doctorUuid = doctorData?.id;
+      if (!doctorUuid || !isValidUUID(doctorUuid)) throw new Error('Invalid doctor UUID');
+
+      // 2️⃣ Fetch appointments for this doctor, including patient info
       const { data, error } = await supabase
         .from('appointments')
         .select(`
           *,
           patients!appointments_patient_id_fkey(id, patient_name, username)
         `)
-        .eq('therapist_id', user.id) // Only this doctor's appointments
+        .eq('therapist_id', doctorUuid)
         .order('appointment_date', { ascending: true });
 
       if (error) throw error;
@@ -56,13 +71,15 @@ const DoctorAppointments = () => {
         appointment_date: apt.appointment_date,
         status: apt.status || 'scheduled',
         created_at: apt.created_at,
-        doctor_name: '', // Optional: you can fetch doctor name if needed
+        doctor_name: doctorData?.name || 'Doctor',
+        specialization: doctorData?.specialization || 'General Medicine'
       }));
 
       setAppointments(appointmentsWithPatients);
 
     } catch (error) {
       console.error('Error fetching appointments:', error);
+      toast({ title: 'Error', description: 'Failed to fetch appointments', variant: 'destructive' });
       setAppointments([]);
     } finally {
       setLoading(false);
@@ -145,7 +162,7 @@ const DoctorAppointments = () => {
                     <div>
                       <CardTitle className="flex items-center gap-2"><User className="size-5 text-blue-600" />{a.patient_name}</CardTitle>
                       <CardDescription className="mt-1">
-                        Username: {a.username}<span className="block">Doctor: {a.doctor_name || 'Doctor'}</span>
+                        Username: {a.username}<span className="block">Doctor: {a.doctor_name} ({a.specialization})</span>
                       </CardDescription>
                     </div>
                     <Badge className={getStatusColor(a.status)}>{a.status.charAt(0).toUpperCase() + a.status.slice(1)}</Badge>
@@ -164,9 +181,21 @@ const DoctorAppointments = () => {
                   </div>
 
                   <div className="flex gap-2 mt-4">
-                    {a.status === 'scheduled' && <Button size="sm" onClick={() => updateAppointmentStatus(a.id, 'confirmed')} className="bg-green-600 hover:bg-green-700"><CheckCircle className="size-4 mr-2" />Confirm</Button>}
-                    {(a.status === 'scheduled' || a.status === 'confirmed') && <Button size="sm" variant="outline" onClick={() => updateAppointmentStatus(a.id, 'completed')} className="border-blue-200 hover:bg-blue-50">Mark Complete</Button>}
-                    {a.status !== 'cancelled' && a.status !== 'completed' && <Button size="sm" variant="destructive" onClick={() => updateAppointmentStatus(a.id, 'cancelled')}><XCircle className="size-4 mr-2" />Cancel</Button>}
+                    {a.status === 'scheduled' && (
+                      <Button size="sm" onClick={() => updateAppointmentStatus(a.id, 'confirmed')} className="bg-green-600 hover:bg-green-700">
+                        <CheckCircle className="size-4 mr-2" />Confirm
+                      </Button>
+                    )}
+                    {(a.status === 'scheduled' || a.status === 'confirmed') && (
+                      <Button size="sm" variant="outline" onClick={() => updateAppointmentStatus(a.id, 'completed')} className="border-blue-200 hover:bg-blue-50">
+                        Mark Complete
+                      </Button>
+                    )}
+                    {a.status !== 'cancelled' && a.status !== 'completed' && (
+                      <Button size="sm" variant="destructive" onClick={() => updateAppointmentStatus(a.id, 'cancelled')}>
+                        <XCircle className="size-4 mr-2" />Cancel
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
