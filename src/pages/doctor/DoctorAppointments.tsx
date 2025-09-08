@@ -32,53 +32,70 @@ const DoctorAppointments = () => {
 
   const fetchAppointments = async () => {
     try {
-      const { data: appointmentsData, error: appointmentsError } = await supabase
+      // use let instead of const so we can reassign if fallback is needed
+      let appointmentsData;
+      let appointmentsError;
+
+      // ✅ Try to fetch with the correct relationship (patients instead of profiles)
+      const { data, error } = await supabase
         .from('appointments')
         .select(`
           *,
-          profiles!appointments_family_id_fkey(first_name, last_name)
+          patients!appointments_patient_id_fkey(first_name, last_name)
         `)
         .order('appointment_date', { ascending: true });
 
+      appointmentsData = data;
+      appointmentsError = error;
+
       if (appointmentsError) {
-        console.error('Error fetching appointments:', appointmentsError);
-        // Fallback to basic query without joins
+        console.error('Error fetching appointments (with join):', appointmentsError);
+
+        // fallback: fetch without join
         const { data: basicAppointments, error: basicError } = await supabase
           .from('appointments')
           .select('*')
           .order('appointment_date', { ascending: true });
-        
+
         if (basicError) throw basicError;
         appointmentsData = basicAppointments;
       }
-      
+
       if (appointmentsData && appointmentsData.length > 0) {
-        const appointmentsWithPatients = appointmentsData.map(apt => {
+        const appointmentsWithPatients = appointmentsData.map((apt: any) => {
           const notes = apt.notes || '';
-          const patientName = notes.includes('Patient: ') 
+
+          const patientName = apt.patients
+            ? `${apt.patients.first_name} ${apt.patients.last_name || ''}`.trim()
+            : notes.includes('Patient: ')
             ? notes.split('Patient: ')[1]?.split('\n')[0] || 'Unknown Patient'
-            : apt.profiles?.first_name ? `${apt.profiles.first_name} ${apt.profiles.last_name || ''}`.trim() : 'Unknown Patient';
+            : 'Unknown Patient';
+
           const username = notes.includes('Username: ')
             ? notes.split('Username: ')[1]?.split('\n')[0] || 'unknown'
             : 'unknown';
+
           const details = notes.includes('Details: ')
             ? notes.split('Details: ')[1]?.split('\n')[0] || 'No details provided'
             : notes;
-          const doctorName = notes.includes('Doctor: ') ? notes.split('Doctor: ')[1]?.split('\n')[0] : 'Healthcare Provider';
+
+          const doctorName = notes.includes('Doctor: ')
+            ? notes.split('Doctor: ')[1]?.split('\n')[0]
+            : 'Healthcare Provider';
 
           return {
             id: apt.id,
-            patient_id: apt.family_id,
+            patient_id: apt.patient_id ?? apt.family_id ?? 'unknown',
             patient_name: patientName,
             username: username,
             details: details,
             appointment_date: apt.appointment_date,
             status: apt.status || 'scheduled',
             created_at: apt.created_at,
-            doctor_name: doctorName
+            doctor_name: doctorName,
           };
         });
-        
+
         setAppointments(appointmentsWithPatients);
       } else {
         setAppointments([]);
@@ -100,11 +117,9 @@ const DoctorAppointments = () => {
 
       if (error) throw error;
 
-      setAppointments(prev => 
-        prev.map(apt => 
-          apt.id === appointmentId 
-            ? { ...apt, status: newStatus as any }
-            : apt
+      setAppointments(prev =>
+        prev.map(apt =>
+          apt.id === appointmentId ? { ...apt, status: newStatus as any } : apt
         )
       );
 
@@ -112,7 +127,6 @@ const DoctorAppointments = () => {
         title: 'Status Updated',
         description: `Appointment status changed to ${newStatus}`,
       });
-
     } catch (error) {
       console.error('Error updating appointment status:', error);
       toast({
@@ -145,7 +159,7 @@ const DoctorAppointments = () => {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -153,7 +167,7 @@ const DoctorAppointments = () => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -206,7 +220,7 @@ const DoctorAppointments = () => {
         </Card>
       ) : (
         <div className="space-y-4">
-          {appointments.map((appointment) => (
+          {appointments.map(appointment => (
             <motion.div
               key={appointment.id}
               initial={{ opacity: 0, x: -20 }}
@@ -249,7 +263,7 @@ const DoctorAppointments = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2 mt-4">
                     {appointment.status === 'scheduled' && (
                       <Button
@@ -261,7 +275,8 @@ const DoctorAppointments = () => {
                         Confirm
                       </Button>
                     )}
-                    {(appointment.status === 'scheduled' || appointment.status === 'confirmed') && (
+                    {(appointment.status === 'scheduled' ||
+                      appointment.status === 'confirmed') && (
                       <Button
                         size="sm"
                         variant="outline"
@@ -271,16 +286,19 @@ const DoctorAppointments = () => {
                         Mark Complete
                       </Button>
                     )}
-                    {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => updateAppointmentStatus(appointment.id, 'cancelled')}
-                      >
-                        <XCircle className="size-4 mr-2" />
-                        Cancel
-                      </Button>
-                    )}
+                    {appointment.status !== 'cancelled' &&
+                      appointment.status !== 'completed' && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() =>
+                            updateAppointmentStatus(appointment.id, 'cancelled')
+                          }
+                        >
+                          <XCircle className="size-4 mr-2" />
+                          Cancel
+                        </Button>
+                      )}
                   </div>
                 </CardContent>
               </Card>
