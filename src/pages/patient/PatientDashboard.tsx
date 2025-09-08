@@ -31,12 +31,13 @@ const PatientDashboard = () => {
   const fetchPatientProgress = async () => {
     if (!user) return;
 
-    try {
-      const { data: patientData, error: patientError } = await supabase
-        .from('patients')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
+   try {
+  const { data: patientData, error: patientError } = await supabase
+    .from("patients")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle(); // ✅ will return null instead of throwing error
+
 
       if (patientError || !patientData) {
         const sampleProgress: PatientProgress[] = [
