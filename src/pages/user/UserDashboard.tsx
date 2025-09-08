@@ -1,4 +1,4 @@
-import {motion} from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   CalendarCheck2,
   MessageSquare,
@@ -16,36 +16,26 @@ import {
   Activity,
   Calendar,
 } from "lucide-react";
-import {Link} from "react-router-dom";
-import {useRoleAuth} from "@/hooks/useRoleAuth";
-import {GlassmorphismCard} from "@/components/ui/glassmorphism-card";
-import {useState} from "react";
+import { Link } from "react-router-dom";
+import { useRoleAuth } from "@/hooks/useRoleAuth";
 
 const UserDashboard = () => {
-  const {user} = useRoleAuth();
-
-  // ✅ Fix: Initialize recentActivity to an empty array or sample data
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const { user } = useRoleAuth();
 
   const containerVariants = {
-    hidden: {opacity: 0},
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
+      transition: { staggerChildren: 0.1 },
     },
   };
 
   const itemVariants = {
-    hidden: {y: 20, opacity: 0},
+    hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-      },
+      transition: { type: "spring", stiffness: 100 },
     },
   };
 
@@ -63,22 +53,6 @@ const UserDashboard = () => {
         <p className="text-gray-600 mt-2">
           Manage your health and appointments
         </p>
-      </motion.div>
-
-      <motion.div variants={itemVariants}>
-        <GlassmorphismCard className="p-6 mb-8">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-100 rounded-full">
-              <User className="size-8 text-blue-600" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold">Health Summary</h2>
-              <p className="text-gray-600">
-                Your health profile and recent activity
-              </p>
-            </div>
-          </div>
-        </GlassmorphismCard>
       </motion.div>
 
       <motion.div
@@ -199,32 +173,13 @@ const UserDashboard = () => {
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            {recentActivity.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Activity className="size-12 mx-auto mb-4 opacity-50" />
-                <p>No recent activity</p>
-                <p className="text-sm mt-2">
-                  Your appointments and health updates will appear here
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {recentActivity.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg"
-                  >
-                    <Calendar className="size-5 text-blue-600" />
-                    <div>
-                      <p className="font-medium">{activity.title}</p>
-                      <p className="text-sm text-gray-600">
-                        {activity.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="text-center py-8 text-gray-500">
+              <Activity className="size-12 mx-auto mb-4 opacity-50" />
+              <p>No recent activity</p>
+              <p className="text-sm mt-2">
+                Your appointments and health updates will appear here
+              </p>
+            </div>
           </CardContent>
         </Card>
       </motion.div>

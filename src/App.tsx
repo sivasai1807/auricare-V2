@@ -18,16 +18,12 @@ import UserChatbot from "./pages/user/UserChatbot";
 
 // Patient pages
 import PatientDashboard from "./pages/patient/PatientDashboard";
-import PatientProgress from "./pages/patient/PatientProgress";
 import PatientAppointments from "./pages/patient/PatientAppointments";
 import PatientChatbot from "./pages/patient/PatientChatbot";
 
 // Doctor pages
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import DoctorAppointments from "./pages/doctor/DoctorAppointments";
-import DoctorPatients from "./pages/doctor/DoctorPatients";
-import DoctorSchedule from "./pages/doctor/DoctorSchedule";
-import DoctorLearning from "./pages/doctor/DoctorLearning";
 import DoctorChatbot from "./pages/doctor/DoctorChatbot";
 
 import NotFound from "./pages/NotFound";
@@ -78,7 +74,6 @@ function AppRoutes() {
           <>
             <Route path="/dashboard" element={<PatientDashboard />} />
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
-            <Route path="/patient/progress" element={<PatientProgress />} />
             <Route path="/patient/appointments" element={<PatientAppointments />} />
             <Route path="/patient/chatbot" element={<PatientChatbot />} />
           </>
@@ -90,9 +85,6 @@ function AppRoutes() {
             <Route path="/dashboard" element={<DoctorDashboard />} />
             <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
             <Route path="/doctor/appointments" element={<DoctorAppointments />} />
-            <Route path="/doctor/patients" element={<DoctorPatients />} />
-            <Route path="/doctor/schedule" element={<DoctorSchedule />} />
-            <Route path="/doctor/learning" element={<DoctorLearning />} />
             <Route path="/doctor/chatbot" element={<DoctorChatbot />} />
           </>
         )}
