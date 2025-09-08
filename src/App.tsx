@@ -7,6 +7,8 @@ import { HelmetProvider } from "react-helmet-async";
 import { RoleAuthProvider, useRoleAuth } from "@/hooks/useRoleAuth";
 import RoleBasedLayout from "./components/layout/RoleBasedLayout";
 import RoleBasedAuth from "./components/auth/RoleBasedAuth";
+
+// Common pages
 import Index from "./pages/Index";
 import About from "./pages/About";
 import News from "./pages/News";
@@ -15,18 +17,19 @@ import News from "./pages/News";
 import UserDashboard from "./pages/user/UserDashboard";
 import UserAppointments from "./pages/user/UserAppointments";
 import UserChatbot from "./pages/user/UserChatbot";
+import UserSchedule from "./pages/user/UserSchedule";
 
 // Patient pages
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import PatientAppointments from "./pages/patient/PatientAppointments";
 import PatientChatbot from "./pages/patient/PatientChatbot";
+import PatientProgress from "./pages/patient/PatientProgress"; // ✅ NEW
 
 // Doctor pages
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import DoctorAppointments from "./pages/doctor/DoctorAppointments";
 import DoctorChatbot from "./pages/doctor/DoctorChatbot";
 import DoctorLearningHub from "./pages/doctor/DoctorLearningHub";
-import UserSchedule from "./pages/user/UserSchedule";
 
 import NotFound from "./pages/NotFound";
 
@@ -41,8 +44,14 @@ function AppRoutes() {
         <div className="animate-pulse text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce"></div>
-            <div className="w-4 h-4 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-            <div className="w-4 h-4 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            <div
+              className="w-4 h-4 bg-purple-500 rounded-full animate-bounce"
+              style={{ animationDelay: "0.1s" }}
+            ></div>
+            <div
+              className="w-4 h-4 bg-green-500 rounded-full animate-bounce"
+              style={{ animationDelay: "0.2s" }}
+            ></div>
           </div>
           <p className="mt-2">Loading your dashboard...</p>
         </div>
@@ -80,6 +89,7 @@ function AppRoutes() {
             <Route path="/patient/appointments" element={<PatientAppointments />} />
             <Route path="/patient/chatbot" element={<PatientChatbot />} />
             <Route path="/patient/schedule" element={<UserSchedule />} />
+            <Route path="/patient/progress" element={<PatientProgress />} /> {/* ✅ NEW */}
           </>
         )}
 
