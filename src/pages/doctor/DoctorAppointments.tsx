@@ -35,27 +35,28 @@ const DoctorAppointments = () => {
     setLoading(true);
 
     try {
+      // Fetch appointments along with related patients
       const { data, error } = await supabase
         .from('appointments')
         .select(`
           *,
-          patients!appointments_patient_id_fkey(patient_name, username)
+          patients!appointments_patient_id_fkey(id, patient_name, username)
         `)
-        .eq('therapist_id', user.id)
+        .eq('therapist_id', user.id) // Only this doctor's appointments
         .order('appointment_date', { ascending: true });
 
       if (error) throw error;
 
       const appointmentsWithPatients = (data || []).map((apt: any) => ({
         id: apt.id,
-        patient_id: apt.patient_id ?? 'unknown',
-        patient_name: apt.patients?.patient_name || apt.notes?.match(/Patient: (.*)/)?.[1] || 'Unknown',
-        username: apt.patients?.username || apt.notes?.match(/Username: (.*)/)?.[1] || 'unknown',
-        details: apt.notes?.match(/Details: (.*)/)?.[1] || apt.notes || '',
+        patient_id: apt.patient_id,
+        patient_name: apt.patients?.patient_name || 'Unknown',
+        username: apt.patients?.username || 'unknown',
+        details: apt.notes || '',
         appointment_date: apt.appointment_date,
         status: apt.status || 'scheduled',
         created_at: apt.created_at,
-        doctor_name: apt.notes?.match(/Doctor: (.*)/)?.[1] || 'Doctor'
+        doctor_name: '', // Optional: you can fetch doctor name if needed
       }));
 
       setAppointments(appointmentsWithPatients);
@@ -101,7 +102,11 @@ const DoctorAppointments = () => {
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const formatTime = (d: string) => new Date(d).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-  if (loading) return <div className="flex items-center justify-center min-h-[400px]"><div className="animate-pulse text-gray-500">Loading appointments...</div></div>;
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="animate-pulse text-gray-500">Loading appointments...</div>
+    </div>
+  );
 
   const uniquePatients = new Set(appointments.map(a => a.patient_id));
 
@@ -139,7 +144,9 @@ const DoctorAppointments = () => {
                   <div className="flex justify-between items-start">
                     <div>
                       <CardTitle className="flex items-center gap-2"><User className="size-5 text-blue-600" />{a.patient_name}</CardTitle>
-                      <CardDescription className="mt-1">Username: {a.username}<span className="block">Doctor: {a.doctor_name}</span></CardDescription>
+                      <CardDescription className="mt-1">
+                        Username: {a.username}<span className="block">Doctor: {a.doctor_name || 'Doctor'}</span>
+                      </CardDescription>
                     </div>
                     <Badge className={getStatusColor(a.status)}>{a.status.charAt(0).toUpperCase() + a.status.slice(1)}</Badge>
                   </div>
