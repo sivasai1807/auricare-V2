@@ -91,18 +91,31 @@ const DoctorChatbot = () => {
       }));
 
       const response = await chatbotApi.doctorChat(input.trim(), chatHistory);
+      console.log("doctorChat response", response);
 
-      if (response.success) {
+      if (
+        response.success &&
+        response.response &&
+        response.response.trim().length > 0
+      ) {
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
           content: response.response,
           timestamp: new Date(),
         };
-
         setMessages((prev) => [...prev, assistantMessage]);
       } else {
-        throw new Error(response.error || "Failed to get response from AI");
+        const errorText = response.error || "Failed to get response from AI";
+        setError(errorText);
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content:
+            "I couldn't generate a response right now. Please try again in a moment.",
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
       }
     } catch (err) {
       console.error("Chat error:", err);

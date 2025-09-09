@@ -326,12 +326,32 @@ def setup_llm():
             print("❌ GROQ_API_KEY not found in environment")
             return None
             
-        base_llm = ChatGroq(
-            model="llama-3.1-70b-versatile", 
-            api_key=api_key,
-            temperature=0.1
-        )
-        
+        # Try env model first, then fallbacks known to be available
+        candidate_models = [
+            os.getenv("GROQ_MODEL"),
+            "llama-3.1-8b-instant",
+            "mixtral-8x7b-32768",
+            "gemma2-9b-it",
+        ]
+        candidate_models = [m for m in candidate_models if m]
+
+        base_llm = None
+        last_err = None
+        for m in candidate_models:
+            try:
+                base_llm = ChatGroq(model=m, api_key=api_key, temperature=0.1)
+                _ = base_llm.invoke("ping")
+                print(f"✅ Groq model ready: {m}")
+                break
+            except Exception as e:
+                last_err = e
+                print(f"⚠️  Groq model not available ({m}): {e}")
+                base_llm = None
+
+        if not base_llm:
+            print(f"❌ No Groq model available. Last error: {last_err}")
+            return None
+
         llm_with_tools = base_llm.bind_tools([patient_data_retrieval_tool, autism_knowledge_tool])
         print("✅ LLM initialized with tools")
         return llm_with_tools
@@ -506,16 +526,31 @@ Please provide helpful autism-related information.
 RESPONSE:"""
     
     try:
-        # Use base LLM for final response
+        # Use base LLM for final response with robust fallbacks
         from langchain_groq import ChatGroq
-        base_llm = ChatGroq(
-            model="llama-3.1-70b-versatile", 
-            api_key=os.getenv("GROQ_API_KEY"),
-            temperature=0.3  # Slightly higher for more natural conversation
-        )
-        response = base_llm.invoke(prompt)
-        return {"final_response": response.content}
-        
+        api_key = os.getenv("GROQ_API_KEY")
+        candidate_models = [
+            os.getenv("GROQ_MODEL"),
+            "llama-3.1-8b-instant",
+            "mixtral-8x7b-32768",
+            "gemma2-9b-it",
+        ]
+        candidate_models = [m for m in candidate_models if m]
+
+        last_err = None
+        for m in candidate_models:
+            try:
+                llm_try = ChatGroq(model=m, api_key=api_key, temperature=0.3)
+                response = llm_try.invoke(prompt)
+                print(f"✅ Using Groq model: {m}")
+                return {"final_response": response.content}
+            except Exception as e:
+                last_err = e
+                print(f"⚠️  Model failed ({m}): {e}")
+                continue
+
+        return {"final_response": f"❌ No available Groq model. {last_err}"}
+
     except Exception as e:
         return {"final_response": f"❌ Error generating response: {str(e)}"}
 
