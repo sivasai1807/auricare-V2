@@ -1,0 +1,1001 @@
+patient_id,patient_name,gender,patient_data,suggestion
+1,Quintus,Male,Difficulty with transitions or changes,Consistent reinforcement of routines
+2,Goldina,Female,Using someone's hand as an object,Exposure to structured play and social exchanges
+3,Kevina,Female,"Unusual fascination with numbers, patterns, dates",Chiropractic or art therapy as complementary approaches
+4,Eleonora,Genderfluid,Persistent preference for solitude,Mindfulness techniques
+5,Flo,Female,Difficulty in adjusting to social situations,Peer-mediated instruction
+6,Virgie,Male,Limited or absent eye contact,Parent education programs
+7,Shannah,Female,Limited or absent eye contact,Parent-mediated or parent-led intervention
+8,Robinet,Polygender,Difficulty with imaginative play,Peer-mediated instruction
+9,Germayne,Male,"Likes things a certain way (food, surroundings)",Visual schedules to support transitions
+10,Rudolph,Agender,Not imitating adult actions,Peer-mediated instruction
+11,Judith,Female,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Regular sleep routines
+12,Lesley,Non-binary,Difficulty adapting to expectations,Early speech and language therapy
+13,Carl,Male,Difficulty adapting to expectations,Peer-mediated instruction
+14,Brittne,Female,Irritability,Social skills training in group or individual settings
+15,Odelinda,Female,Difficulty initiating and sustaining conversation,Regular sleep routines
+16,Nikaniki,Female,Limited or absent eye contact,Special diets or nutritional intervention where appropriate
+17,Kele,Male,Not pretend playing,Medication for severe irritability (under clinical supervision)
+18,Bengt,Male,Strong aversion to crowds or busy places,Regular sleep routines
+19,Miller,Male,Apparent indifference to pain or temperature,Parent education programs
+20,Ulysses,Male,Difficulty with imaginative play,Exposure to structured play and social exchanges
+21,Pamela,Female,Self-injury behaviors,Early speech and language therapy
+22,Hyacinthie,Female,Self-isolation behaviors,Parent education programs
+23,Reube,Agender,Delayed language skills,Structured teaching using TEACCH techniques
+24,Erv,Male,Not imitating adult actions,Family counseling and support groups
+25,Alana,Female,Difficulty in reciprocal social interactions,Family counseling and support groups
+26,Olag,Male,Trouble transitioning between activities,Yoga and relaxation therapies
+27,Eugenius,Male,"Infrequent sharing of interest, emotions, enjoyment with others",Regular sleep routines
+28,Marieann,Female,Limited pretend play,Yoga and relaxation therapies
+29,Graig,Male,"Pronoun reversal (e.g., says 'you' for self)",Consistent reinforcement of routines
+30,Donny,Male,"Pronoun reversal (e.g., says 'you' for self)",Structured development routines
+31,Anita,Female,"Excelling in math, music, or art",Regular sleep routines
+32,Isabel,Non-binary,Often talks at length about a favorite subject,Structured development routines
+33,Guillema,Female,Loss of speech or skills previously developed,Sensory-friendly environments
+34,Rena,Female,Can be more or less sensitive than others to sensory input,Occupational therapy for sensory integration
+35,Romola,Genderfluid,Disturbed sleep cycles,Regular sleep routines
+36,Magdalen,Female,Resistance to change in routine,Regular monitoring for co-occurring conditions
+37,Lonnie,Female,Difficulty adapting to expectations,Consistent reinforcement of routines
+38,Yetta,Bigender,Avoids or stiffens when hugged,Exposure to structured play and social exchanges
+39,Liza,Female,"Likes things a certain way (food, surroundings)",Physical therapy for motor skills
+40,Joachim,Bigender,Displays repetitive questions,Use of AAC (Augmentative and Alternative Communication)
+41,Lauren,Male,Not imitating adult actions,Regular sleep routines
+42,Chariot,Male,Using someone's hand as an object,Consistent reinforcement of routines
+43,Seline,Female,"Unusual fascination with numbers, patterns, dates",Prevention: healthy prenatal care; environmental risk reduction
+44,Harper,Male,Repetitive use of objects,Prevention: healthy prenatal care; environmental risk reduction
+45,Aila,Bigender,"Likes things a certain way (food, surroundings)",Special diets or nutritional intervention where appropriate
+46,Babbie,Female,Irritability,Early speech and language therapy
+47,Roanne,Female,Resistance to change in routine,Medication for severe irritability (under clinical supervision)
+48,Ruthe,Female,Difficulty with imaginative play,Occupational therapy for sensory integration
+49,Alysia,Female,Difficulty with imaginative play,Music or animal therapy for well-being
+50,Nehemiah,Male,Rarely or not using gestures to communicate,Yoga and relaxation therapies
+51,Maisie,Female,Difficulty forming friendships,Visual schedules to support transitions
+52,Donalt,Male,"Hyperactive, impulsive, and/or inattentive behavior",Regular sleep routines
+53,Myrlene,Female,Extreme or unusual fears,Parent-mediated or parent-led intervention
+54,Germain,Male,Overly focused interests in moving objects,Occupational therapy for sensory integration
+55,Hodge,Male,"Displays good rote memory for facts, rhymes, jingles",Picture Exchange Communication System (PECS)
+56,Brunhilda,Female,Difficulty in adjusting to social situations,Use visual aids and clear physical boundaries
+57,Cherri,Female,Difficulty living independently,Special diets or nutritional intervention where appropriate
+58,Whitaker,Male,Using someone's hand as an object,Music or animal therapy for well-being
+59,Stillmann,Male,Delayed language skills,Peer-mediated instruction
+60,Osbourne,Male,Displays repetitive questions,Physical therapy for motor skills
+61,Stanislaw,Male,"Unusual reactions to lights, tastes, smells, colors",Sensory-friendly environments
+62,Winny,Male,Trouble understanding points of view,Mindfulness techniques
+63,Putnem,Male,Often talks at length about a favorite subject,Parent education programs
+64,Leicester,Male,Failure to respond to own name,Parent-mediated or parent-led intervention
+65,Wood,Male,Difficulty with imaginative play,Applied behavior analysis (ABA)
+66,Skipton,Male,Repetitive use of objects,Physical therapy for motor skills
+67,Auria,Female,"Likes things a certain way (food, surroundings)",Prevention: healthy prenatal care; environmental risk reduction
+68,Emmalynn,Female,Facial expressions or gestures not matching speech,Prevention: healthy prenatal care; environmental risk reduction
+69,Andreana,Female,Delayed cognitive or learning skills,Yoga and relaxation therapies
+70,Sela,Female,Often talks at length about a favorite subject,Applied behavior analysis (ABA)
+71,Raimondo,Male,"Displays unusual movements: spinning, hand flapping, rocking",Family counseling and support groups
+72,Camila,Female,Trouble understanding points of view,Applied behavior analysis (ABA)
+73,Don,Male,Resistance to change in routine,Sensory-friendly environments
+74,Crosby,Male,Extreme interest in details or facts,Peer-mediated instruction
+75,Zacharias,Male,Showing interest in objects over people,Prevention: healthy prenatal care; environmental risk reduction
+76,Lindy,Male,Extreme interest in details or facts,Structured development routines
+77,Gerald,Male,Unusual mannerisms,Structured development routines
+78,Jocko,Male,Persistent preference for solitude,Visual schedules to support transitions
+79,Bobbee,Female,Facial expressions or gestures not matching speech,Special diets or nutritional intervention where appropriate
+80,Payton,Male,Can be more or less sensitive than others to sensory input,Exposure to structured play and social exchanges
+81,Esra,Male,Can be more or less sensitive than others to sensory input,Early speech and language therapy
+82,Dill,Male,"Displays unusual movements: spinning, hand flapping, rocking",Medication for severe irritability (under clinical supervision)
+83,Aguistin,Male,"Displays unusual movements: spinning, hand flapping, rocking",Formation of predictable daily schedules
+84,Mitchell,Male,Enjoying rotating or spinning objects,Individualized educational programs
+85,Sayre,Male,Lack or loss of early acquired language,Occupational therapy for sensory integration
+86,Hugo,Male,Self-injury behaviors,Family counseling and support groups
+87,Adrien,Male,"Unusual tone of voice (flat, unemotional)",Use visual aids and clear physical boundaries
+88,Shaylyn,Female,Trouble understanding points of view,Regular sleep routines
+89,Norman,Male,"Interest in parts of objects like knobs, switches, wheels",Consistent reinforcement of routines
+90,Mordecai,Male,Difficulty with transitions or changes,Structured teaching using TEACCH techniques
+91,Shalne,Female,Difficulty forming friendships,Parent-mediated or parent-led intervention
+92,Amandi,Female,"Interest in parts of objects like knobs, switches, wheels",Structured development routines
+93,Geoff,Male,Not imitating adult actions,Peer-mediated instruction
+94,Dalston,Male,Difficulty initiating and sustaining conversation,Sensory-friendly environments
+95,Vivianna,Female,"Unusual reactions to lights, tastes, smells, colors",Frequent positive reinforcement
+96,Beauregard,Male,Self-injury behaviors,Use visual aids and clear physical boundaries
+97,Shari,Female,"Excelling in math, music, or art",Exposure to structured play and social exchanges
+98,Theodosia,Female,Irritability,Formation of predictable daily schedules
+99,Quintus,Male,Displays repetitive questions,Early speech and language therapy
+100,Melba,Female,Strong aversion to crowds or busy places,Physical therapy for motor skills
+101,Titus,Male,Apparent indifference to pain or temperature,Special diets or nutritional intervention where appropriate
+102,Nataniel,Male,Lining up objects,Exposure to structured play and social exchanges
+103,Balduin,Male,Reverse pronouns,Structured teaching using TEACCH techniques
+104,Charlton,Male,Resistance to change in routine,Yoga and relaxation therapies
+105,Pearle,Polygender,Playing with toys in unusual ways,Formation of predictable daily schedules
+106,Eddie,Male,Rarely or not using gestures to communicate,Sensory-friendly environments
+107,Dorrie,Agender,Self-injury behaviors,Applied behavior analysis (ABA)
+108,Nellie,Female,"Likes things a certain way (food, surroundings)",Applied behavior analysis (ABA)
+109,Wash,Male,Delayed cognitive or learning skills,Parent education programs
+110,Aldous,Male,Difficulty with imaginative play,Exposure to structured play and social exchanges
+111,Cathi,Female,"Hyperactive, impulsive, and/or inattentive behavior",Special diets or nutritional intervention where appropriate
+112,Dorey,Female,Displays repetitive questions,Mindfulness techniques
+113,Rose,Female,Trouble understanding points of view,Structured development routines
+114,Amelita,Female,Repeated words or phrases,Visual schedules to support transitions
+115,Leola,Female,Showing interest in objects over people,Individualized educational programs
+116,Roseann,Female,Enjoying rotating or spinning objects,Yoga and relaxation therapies
+117,Kali,Female,Limited or absent eye contact,Applied behavior analysis (ABA)
+118,Robinet,Female,"Hyperactive, impulsive, and/or inattentive behavior",Medication for severe irritability (under clinical supervision)
+119,Douglas,Male,Not pretend playing,Special diets or nutritional intervention where appropriate
+120,Carlo,Male,"Pronoun reversal (e.g., says 'you' for self)",Use of AAC (Augmentative and Alternative Communication)
+121,Carina,Female,Not imitating adult actions,Exposure to structured play and social exchanges
+122,Welsh,Male,Facial expressions or gestures not matching speech,Consistent reinforcement of routines
+123,Isobel,Female,Self-injury behaviors,Sensory-friendly environments
+124,Bernard,Male,Not imitating adult actions,Medication for severe irritability (under clinical supervision)
+125,Terrell,Male,Difficulty learning daily life skills,Formation of predictable daily schedules
+126,Lamond,Male,"Interest in unusual body movements: finger flicking, arm flapping",Music or animal therapy for well-being
+127,Raymond,Male,Lining up objects,Exposure to structured play and social exchanges
+128,Pryce,Male,"Sensory seeking through lights, textures, sounds",Exposure to structured play and social exchanges
+129,Mamie,Female,Not responding to social cues,Regular sleep routines
+130,Josey,Female,"Interest in unusual body movements: finger flicking, arm flapping",Use of AAC (Augmentative and Alternative Communication)
+131,Kaylee,Female,Unusual mannerisms,Music or animal therapy for well-being
+132,Randall,Male,Using someone's hand as an object,Frequent positive reinforcement
+133,Hilliard,Male,Apparent indifference to pain or temperature,Regular sleep routines
+134,Editha,Female,Poor awareness of danger,Parent-mediated or parent-led intervention
+135,Calypso,Female,"Pronoun reversal (e.g., says 'you' for self)",Social skills training in group or individual settings
+136,Zechariah,Male,Intense reactions to minor changes,Physical therapy for motor skills
+137,Iseabal,Female,"Displays good rote memory for facts, rhymes, jingles",Visual schedules to support transitions
+138,Netti,Female,Difficulty understanding what others are thinking or feeling,Use visual aids and clear physical boundaries
+139,Arlee,Female,Self-injury behaviors,Formation of predictable daily schedules
+140,Vyky,Female,Difficulty initiating and sustaining conversation,Exposure to structured play and social exchanges
+141,Myrtie,Female,Strong visual and auditory learning skills,Use of AAC (Augmentative and Alternative Communication)
+142,Coop,Male,"Unusual tone of voice (flat, unemotional)",Use visual aids and clear physical boundaries
+143,Antonietta,Female,Difficulty with imaginative play,Early speech and language therapy
+144,Abdul,Male,Self-isolation behaviors,Chiropractic or art therapy as complementary approaches
+145,Laurena,Female,Extreme interest in details or facts,Special diets or nutritional intervention where appropriate
+146,Gloria,Female,"Hyperactive, impulsive, and/or inattentive behavior",Peer-mediated instruction
+147,Alexandre,Male,"Excelling in math, music, or art",Structured teaching using TEACCH techniques
+148,Cristal,Female,Difficulty with imaginative play,Sensory-friendly environments
+149,Darnell,Male,Difficulty with transitions or changes,Applied behavior analysis (ABA)
+150,Elias,Male,Resistance to change in routine,Picture Exchange Communication System (PECS)
+151,Kiele,Female,Trouble transitioning between activities,Prevention: healthy prenatal care; environmental risk reduction
+152,Phylis,Female,Limited pretend play,Physical therapy for motor skills
+153,Kippar,Male,Irritability,Medication for severe irritability (under clinical supervision)
+154,Madelin,Female,Playing with toys in unusual ways,Formation of predictable daily schedules
+155,Wallis,Male,Using someone's hand as an object,Exposure to structured play and social exchanges
+156,Carleen,Bigender,"Excelling in math, music, or art",Early speech and language therapy
+157,Tess,Female,Delayed cognitive or learning skills,Structured development routines
+158,Selena,Female,Overly focused interests in moving objects,Sensory-friendly environments
+159,Kippy,Female,Delayed movement skills,Parent education programs
+160,Correna,Female,Delayed language skills,Regular monitoring for co-occurring conditions
+161,Galvan,Male,Displays distress for no apparent cause,Regular monitoring for co-occurring conditions
+162,Stanislaus,Male,Strong visual and auditory learning skills,Use of AAC (Augmentative and Alternative Communication)
+163,Moyra,Female,Using someone's hand as an object,Social skills training in group or individual settings
+164,Carroll,Male,Playing with toys in unusual ways,Chiropractic or art therapy as complementary approaches
+165,Andeee,Female,Repeated words or phrases,Occupational therapy for sensory integration
+166,Siegfried,Male,"Pronoun reversal (e.g., says 'you' for self)",Individualized educational programs
+167,Lynnelle,Female,Difficulty forming friendships,Special diets or nutritional intervention where appropriate
+168,Annadiane,Female,Difficulty with transitions or changes,Yoga and relaxation therapies
+169,Ag,Non-binary,"Hyperactive, impulsive, and/or inattentive behavior",Picture Exchange Communication System (PECS)
+170,Maxie,Male,Limited or absent eye contact,Regular sleep routines
+171,Julissa,Female,Difficulty with imaginative play,Early speech and language therapy
+172,Max,Agender,Persistent preference for solitude,Applied behavior analysis (ABA)
+173,Cristy,Female,"Displays good rote memory for facts, rhymes, jingles",Peer-mediated instruction
+174,Caspar,Male,Difficulty in reciprocal social interactions,Individualized educational programs
+175,Calhoun,Male,"Displays unusual movements: spinning, hand flapping, rocking",Physical therapy for motor skills
+176,Ardene,Female,Lack or loss of early acquired language,Mindfulness techniques
+177,Brig,Male,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Consistent reinforcement of routines
+178,Tobi,Female,"Unusual sensory reactions (aversion to sounds, textures)",Parent education programs
+179,Woody,Male,Lining up objects,Mindfulness techniques
+180,Odilia,Female,"Unusual fascination with numbers, patterns, dates",Consistent reinforcement of routines
+181,Zollie,Male,Apparent indifference to pain or temperature,Family counseling and support groups
+182,Kelli,Female,Not responding to social cues,Peer-mediated instruction
+183,Bridie,Female,"Hyperactive, impulsive, and/or inattentive behavior",Parent-mediated or parent-led intervention
+184,Merola,Female,Appears unaware of others' distress,Frequent positive reinforcement
+185,Jamey,Male,"Displays good rote memory for facts, rhymes, jingles",Music or animal therapy for well-being
+186,Finley,Male,"Excelling in math, music, or art",Structured development routines
+187,Aline,Female,Overly focused interests in moving objects,Structured teaching using TEACCH techniques
+188,Temple,Male,"Hyperactive, impulsive, and/or inattentive behavior",Visual schedules to support transitions
+189,Myrta,Female,Nonverbal communication only,Consistent reinforcement of routines
+190,Mair,Female,Disturbed sleep cycles,Special diets or nutritional intervention where appropriate
+191,Errick,Male,Unusual mannerisms,Parent-mediated or parent-led intervention
+192,Con,Male,Irritability,Mindfulness techniques
+193,Cicely,Female,"Unusual sensory reactions (aversion to sounds, textures)",Prevention: healthy prenatal care; environmental risk reduction
+194,Selig,Male,Not responding to social cues,Exposure to structured play and social exchanges
+195,Ezekiel,Male,"Displays good rote memory for facts, rhymes, jingles",Sensory-friendly environments
+196,Brandyn,Male,"Unusual sensory reactions (aversion to sounds, textures)",Regular sleep routines
+197,Stoddard,Agender,Disturbed sleep cycles,Chiropractic or art therapy as complementary approaches
+198,Chrotoem,Male,Appears unaware of others' distress,Mindfulness techniques
+199,Carolynn,Agender,Trouble understanding points of view,Special diets or nutritional intervention where appropriate
+200,Burton,Male,Difficulty adapting to expectations,Regular monitoring for co-occurring conditions
+201,Martita,Female,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Peer-mediated instruction
+202,Gilly,Female,Failure to respond to own name,Exposure to structured play and social exchanges
+203,Earlie,Genderfluid,Extreme interest in details or facts,Yoga and relaxation therapies
+204,Deeyn,Female,Not imitating adult actions,Sensory-friendly environments
+205,Linea,Female,"Displays unusual movements: spinning, hand flapping, rocking",Social skills training in group or individual settings
+206,Isaak,Genderqueer,Displays repetitive questions,Applied behavior analysis (ABA)
+207,Albrecht,Genderfluid,Repeated words or phrases,Music or animal therapy for well-being
+208,Maxim,Male,"Unusual tone of voice (flat, unemotional)",Use visual aids and clear physical boundaries
+209,Aprilette,Female,Difficulty with transitions or changes,Frequent positive reinforcement
+210,Sylvester,Male,Difficulty understanding what others are thinking or feeling,Parent-mediated or parent-led intervention
+211,Melesa,Female,Avoids or stiffens when hugged,Picture Exchange Communication System (PECS)
+212,Reese,Male,Disturbed sleep cycles,Parent-mediated or parent-led intervention
+213,Danit,Female,Limited or absent eye contact,Exposure to structured play and social exchanges
+214,Blaine,Male,Difficulty in reciprocal social interactions,Music or animal therapy for well-being
+215,Finley,Male,Reverse pronouns,Picture Exchange Communication System (PECS)
+216,Kendre,Female,Strong aversion to crowds or busy places,Yoga and relaxation therapies
+217,Candide,Female,Playing with toys in unusual ways,Applied behavior analysis (ABA)
+218,Deanna,Female,Difficulty initiating and sustaining conversation,Frequent positive reinforcement
+219,Liliane,Female,Difficulty adapting to expectations,Use of AAC (Augmentative and Alternative Communication)
+220,Etienne,Male,Can be more or less sensitive than others to sensory input,Social skills training in group or individual settings
+221,Lacie,Female,Self-isolation behaviors,Family counseling and support groups
+222,Jabez,Male,"Infrequent sharing of interest, emotions, enjoyment with others",Structured development routines
+223,Robb,Male,Self-isolation behaviors,Parent education programs
+224,Cornie,Male,Not imitating adult actions,Picture Exchange Communication System (PECS)
+225,Wernher,Bigender,Often talks at length about a favorite subject,Physical therapy for motor skills
+226,Gasparo,Male,Playing with toys in unusual ways,Picture Exchange Communication System (PECS)
+227,Ced,Male,Failure to respond to own name,Formation of predictable daily schedules
+228,Julita,Female,Facial expressions or gestures not matching speech,Peer-mediated instruction
+229,Torey,Male,Facial expressions or gestures not matching speech,Regular monitoring for co-occurring conditions
+230,Jamison,Male,Not responding to social cues,Regular sleep routines
+231,Germana,Female,"Sensory seeking through lights, textures, sounds",Parent education programs
+232,Etheline,Female,Lack or loss of early acquired language,Special diets or nutritional intervention where appropriate
+233,Gena,Non-binary,Can be more or less sensitive than others to sensory input,Structured teaching using TEACCH techniques
+234,Iosep,Genderfluid,Nonverbal communication only,Regular sleep routines
+235,Cecile,Female,Strong visual and auditory learning skills,Special diets or nutritional intervention where appropriate
+236,Benny,Male,Difficulty in reciprocal social interactions,Regular sleep routines
+237,Bethany,Female,"Excelling in math, music, or art",Mindfulness techniques
+238,Fonsie,Male,"Pronoun reversal (e.g., says 'you' for self)",Picture Exchange Communication System (PECS)
+239,Borg,Male,Facial expressions or gestures not matching speech,Family counseling and support groups
+240,Nickola,Male,"Displays good rote memory for facts, rhymes, jingles",Parent-mediated or parent-led intervention
+241,Engelbert,Male,Delayed movement skills,Family counseling and support groups
+242,Malcolm,Male,Difficulty living independently,Visual schedules to support transitions
+243,Giustina,Non-binary,Not taking turns in games or activities,Regular sleep routines
+244,Tore,Male,"Displays good rote memory for facts, rhymes, jingles",Regular sleep routines
+245,Dag,Male,Often talks at length about a favorite subject,Prevention: healthy prenatal care; environmental risk reduction
+246,Eula,Genderfluid,Often talks at length about a favorite subject,Structured teaching using TEACCH techniques
+247,Pip,Male,Strong visual and auditory learning skills,Social skills training in group or individual settings
+248,Bradney,Male,Delayed cognitive or learning skills,Visual schedules to support transitions
+249,Weidar,Male,Reverse pronouns,Mindfulness techniques
+250,Burch,Male,Often talks at length about a favorite subject,Structured teaching using TEACCH techniques
+251,Sheila,Female,"Unusual reactions to lights, tastes, smells, colors",Frequent positive reinforcement
+252,Blinni,Female,Displays repetitive questions,Frequent positive reinforcement
+253,Ambrose,Male,Can be more or less sensitive than others to sensory input,Music or animal therapy for well-being
+254,Carmen,Female,Difficulty initiating and sustaining conversation,Exposure to structured play and social exchanges
+255,Nickey,Male,Overly focused interests in moving objects,Applied behavior analysis (ABA)
+256,Klemens,Non-binary,Often talks at length about a favorite subject,Formation of predictable daily schedules
+257,Kissee,Female,Difficulty in reciprocal social interactions,Chiropractic or art therapy as complementary approaches
+258,Nonnah,Female,Using someone's hand as an object,Structured teaching using TEACCH techniques
+259,Darlene,Female,Intense reactions to minor changes,Chiropractic or art therapy as complementary approaches
+260,Jade,Female,"Unusual sensory reactions (aversion to sounds, textures)",Medication for severe irritability (under clinical supervision)
+261,Lauren,Female,Strong visual and auditory learning skills,Yoga and relaxation therapies
+262,Bettye,Agender,Self-isolation behaviors,Consistent reinforcement of routines
+263,Susie,Female,"Pronoun reversal (e.g., says 'you' for self)",Mindfulness techniques
+264,Alverta,Female,"Displays good rote memory for facts, rhymes, jingles",Applied behavior analysis (ABA)
+265,Rica,Female,Not taking turns in games or activities,Structured teaching using TEACCH techniques
+266,Gabriella,Female,Showing interest in objects over people,Consistent reinforcement of routines
+267,Durand,Male,Disturbed sleep cycles,Family counseling and support groups
+268,Jefferey,Male,Overly focused interests in moving objects,Physical therapy for motor skills
+269,Cherye,Female,Irritability,Mindfulness techniques
+270,Deonne,Female,Resistance to change in routine,Parent-mediated or parent-led intervention
+271,Oralla,Female,Intense reactions to minor changes,Music or animal therapy for well-being
+272,Christy,Female,Rarely or not using gestures to communicate,Applied behavior analysis (ABA)
+273,Vladimir,Male,Extreme interest in details or facts,Special diets or nutritional intervention where appropriate
+274,Temple,Male,Persistent preference for solitude,Medication for severe irritability (under clinical supervision)
+275,Brandon,Male,Playing with toys in unusual ways,Occupational therapy for sensory integration
+276,Ardelia,Female,Apparent indifference to pain or temperature,Applied behavior analysis (ABA)
+277,Harli,Female,Not pretend playing,Medication for severe irritability (under clinical supervision)
+278,Deloria,Female,Not pretend playing,Sensory-friendly environments
+279,Juan,Male,Difficulty initiating and sustaining conversation,Special diets or nutritional intervention where appropriate
+280,Lilia,Female,"Excelling in math, music, or art",Use visual aids and clear physical boundaries
+281,Drugi,Male,"Interest in unusual body movements: finger flicking, arm flapping",Chiropractic or art therapy as complementary approaches
+282,Yetty,Female,Disturbed sleep cycles,Visual schedules to support transitions
+283,Coleen,Female,Not responding to social cues,Prevention: healthy prenatal care; environmental risk reduction
+284,Oliver,Male,"Pronoun reversal (e.g., says 'you' for self)",Prevention: healthy prenatal care; environmental risk reduction
+285,Darelle,Female,Repeated words or phrases,Prevention: healthy prenatal care; environmental risk reduction
+286,Meridith,Female,Difficulty in reciprocal social interactions,Applied behavior analysis (ABA)
+287,Mireille,Female,Displays repetitive questions,Parent-mediated or parent-led intervention
+288,Kikelia,Female,Intense reactions to minor changes,Visual schedules to support transitions
+289,Angelita,Female,Not imitating adult actions,Chiropractic or art therapy as complementary approaches
+290,Staffard,Male,Facial expressions or gestures not matching speech,Frequent positive reinforcement
+291,Zachary,Non-binary,"Restricted interests, intense focus on hobby or topic",Special diets or nutritional intervention where appropriate
+292,Tymothy,Male,"Excelling in math, music, or art",Visual schedules to support transitions
+293,Reidar,Male,Displays repetitive questions,Regular sleep routines
+294,Lenci,Male,Enjoying rotating or spinning objects,Medication for severe irritability (under clinical supervision)
+295,Philis,Female,Difficulty adapting to expectations,Parent-mediated or parent-led intervention
+296,Antin,Male,Lining up objects,Sensory-friendly environments
+297,Reinald,Male,"Displays good rote memory for facts, rhymes, jingles",Peer-mediated instruction
+298,Royall,Male,Disturbed sleep cycles,Frequent positive reinforcement
+299,Jacquetta,Female,"Hyperactive, impulsive, and/or inattentive behavior",Special diets or nutritional intervention where appropriate
+300,Dilly,Male,Not taking turns in games or activities,Visual schedules to support transitions
+301,Garrek,Male,Difficulty initiating and sustaining conversation,Individualized educational programs
+302,Glenden,Male,Resistance to change in routine,Parent-mediated or parent-led intervention
+303,Ives,Male,Difficulty forming friendships,Picture Exchange Communication System (PECS)
+304,Jo,Male,Loss of speech or skills previously developed,Family counseling and support groups
+305,Kelwin,Male,"Interest in parts of objects like knobs, switches, wheels",Frequent positive reinforcement
+306,Maurice,Male,"Restricted interests, intense focus on hobby or topic",Occupational therapy for sensory integration
+307,Dorita,Female,"Likes things a certain way (food, surroundings)",Prevention: healthy prenatal care; environmental risk reduction
+308,Frannie,Female,Difficulty forming friendships,Applied behavior analysis (ABA)
+309,Aleen,Female,Difficulty learning daily life skills,Social skills training in group or individual settings
+310,Yankee,Male,"Pronoun reversal (e.g., says 'you' for self)",Social skills training in group or individual settings
+311,Amble,Male,Failure to respond to own name,Use visual aids and clear physical boundaries
+312,Orville,Male,"Interest in parts of objects like knobs, switches, wheels",Family counseling and support groups
+313,Nancie,Female,Overly focused interests in moving objects,Parent education programs
+314,Sheryl,Female,Difficulty understanding what others are thinking or feeling,Parent-mediated or parent-led intervention
+315,Manda,Genderfluid,Difficulty forming friendships,Visual schedules to support transitions
+316,Roselia,Female,Self-isolation behaviors,Frequent positive reinforcement
+317,Ryun,Male,"Excelling in math, music, or art",Chiropractic or art therapy as complementary approaches
+318,Jerrold,Male,Intense reactions to minor changes,Occupational therapy for sensory integration
+319,Ferd,Male,Difficulty living independently,Picture Exchange Communication System (PECS)
+320,Lavena,Female,Difficulty forming friendships,Picture Exchange Communication System (PECS)
+321,Bibbie,Female,"Displays unusual movements: spinning, hand flapping, rocking",Use of AAC (Augmentative and Alternative Communication)
+322,Harriette,Genderfluid,Not imitating adult actions,Physical therapy for motor skills
+323,Janka,Female,Lack or loss of early acquired language,Chiropractic or art therapy as complementary approaches
+324,Vevay,Female,Difficulty adapting to expectations,Consistent reinforcement of routines
+325,Jordan,Female,Extreme or unusual fears,Family counseling and support groups
+326,Nevile,Male,Irritability,Peer-mediated instruction
+327,Sigfried,Male,Nonverbal communication only,Mindfulness techniques
+328,Janek,Male,Displays distress for no apparent cause,Chiropractic or art therapy as complementary approaches
+329,Essy,Female,Trouble understanding points of view,Frequent positive reinforcement
+330,Cyrille,Male,Showing interest in objects over people,Use of AAC (Augmentative and Alternative Communication)
+331,Merv,Male,Showing interest in objects over people,Music or animal therapy for well-being
+332,Rufus,Male,Persistent preference for solitude,Visual schedules to support transitions
+333,Issy,Female,Often talks at length about a favorite subject,Frequent positive reinforcement
+334,Dugald,Male,Failure to respond to own name,Early speech and language therapy
+335,Sibel,Female,Unusual mannerisms,Early speech and language therapy
+336,Omar,Male,Difficulty living independently,Mindfulness techniques
+337,Cleopatra,Female,Self-isolation behaviors,Frequent positive reinforcement
+338,Ralf,Male,"Unusual reactions to lights, tastes, smells, colors",Structured development routines
+339,Morris,Male,Overly focused interests in moving objects,Chiropractic or art therapy as complementary approaches
+340,Brit,Male,Delayed language skills,Family counseling and support groups
+341,Constantine,Agender,Extreme or unusual fears,Medication for severe irritability (under clinical supervision)
+342,Berkie,Male,Limited or absent eye contact,Physical therapy for motor skills
+343,Frederica,Female,"Displays good rote memory for facts, rhymes, jingles",Special diets or nutritional intervention where appropriate
+344,Carrol,Male,"Infrequent sharing of interest, emotions, enjoyment with others",Music or animal therapy for well-being
+345,Siward,Male,Can be more or less sensitive than others to sensory input,Chiropractic or art therapy as complementary approaches
+346,Ruthie,Female,Not responding to social cues,Structured teaching using TEACCH techniques
+347,Ludovico,Male,Not responding to social cues,Exposure to structured play and social exchanges
+348,Augustin,Male,Loss of speech or skills previously developed,Yoga and relaxation therapies
+349,Janka,Female,"Hyperactive, impulsive, and/or inattentive behavior",Chiropractic or art therapy as complementary approaches
+350,Berenice,Female,Difficulty initiating and sustaining conversation,Parent education programs
+351,Deane,Female,"Likes things a certain way (food, surroundings)",Use visual aids and clear physical boundaries
+352,Sophia,Female,Self-isolation behaviors,Visual schedules to support transitions
+353,Wilden,Male,Lining up objects,Use of AAC (Augmentative and Alternative Communication)
+354,Hyacintha,Female,"Sensory seeking through lights, textures, sounds",Social skills training in group or individual settings
+355,Neil,Male,Difficulty initiating and sustaining conversation,Visual schedules to support transitions
+356,Minna,Female,Difficulty in adjusting to social situations,Use visual aids and clear physical boundaries
+357,Brant,Male,Enjoying rotating or spinning objects,Music or animal therapy for well-being
+358,Linnie,Female,Apparent indifference to pain or temperature,Consistent reinforcement of routines
+359,Marja,Female,Persistent preference for solitude,Consistent reinforcement of routines
+360,Kelcy,Female,"Infrequent sharing of interest, emotions, enjoyment with others",Formation of predictable daily schedules
+361,Reina,Female,Unusual mannerisms,Regular sleep routines
+362,Bordie,Male,Appears unaware of others' distress,Picture Exchange Communication System (PECS)
+363,Major,Male,"Unusual tone of voice (flat, unemotional)",Chiropractic or art therapy as complementary approaches
+364,Kerstin,Female,"Restricted interests, intense focus on hobby or topic",Peer-mediated instruction
+365,Ivie,Female,Poor awareness of danger,Medication for severe irritability (under clinical supervision)
+366,Winny,Male,Loss of speech or skills previously developed,Exposure to structured play and social exchanges
+367,Rand,Male,Intense reactions to minor changes,Exposure to structured play and social exchanges
+368,Bethany,Female,Intense reactions to minor changes,Regular monitoring for co-occurring conditions
+369,Vladimir,Male,"Pronoun reversal (e.g., says 'you' for self)",Prevention: healthy prenatal care; environmental risk reduction
+370,Cristabel,Female,Self-isolation behaviors,Individualized educational programs
+371,Jacqui,Female,Lining up objects,Chiropractic or art therapy as complementary approaches
+372,Hendrik,Genderfluid,Difficulty living independently,Use visual aids and clear physical boundaries
+373,Whitney,Male,Apparent indifference to pain or temperature,Sensory-friendly environments
+374,Berte,Non-binary,"Likes things a certain way (food, surroundings)",Chiropractic or art therapy as complementary approaches
+375,Juana,Female,Difficulty living independently,Exposure to structured play and social exchanges
+376,Vincenz,Male,Resistance to change in routine,Parent-mediated or parent-led intervention
+377,Selestina,Female,Limited pretend play,Yoga and relaxation therapies
+378,Torre,Male,Not imitating adult actions,Regular monitoring for co-occurring conditions
+379,Roselin,Female,"Unusual fascination with numbers, patterns, dates",Structured teaching using TEACCH techniques
+380,Brig,Male,Lining up objects,Early speech and language therapy
+381,Hayward,Male,Difficulty in reciprocal social interactions,Applied behavior analysis (ABA)
+382,Esme,Male,"Hyperactive, impulsive, and/or inattentive behavior",Prevention: healthy prenatal care; environmental risk reduction
+383,Ingar,Male,Difficulty in reciprocal social interactions,Visual schedules to support transitions
+384,Min,Female,Difficulty understanding what others are thinking or feeling,Parent-mediated or parent-led intervention
+385,Ameline,Female,Not imitating adult actions,Occupational therapy for sensory integration
+386,Renado,Male,Difficulty in reciprocal social interactions,Parent education programs
+387,Vonni,Female,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Structured development routines
+388,Rodger,Male,Extreme or unusual fears,Picture Exchange Communication System (PECS)
+389,Ainsley,Female,Difficulty with imaginative play,Use visual aids and clear physical boundaries
+390,Hilary,Genderqueer,Appears unaware of others' distress,Social skills training in group or individual settings
+391,Dylan,Bigender,"Infrequent sharing of interest, emotions, enjoyment with others",Use of AAC (Augmentative and Alternative Communication)
+392,Fannie,Female,"Unusual tone of voice (flat, unemotional)",Mindfulness techniques
+393,Lonny,Male,Poor awareness of danger,Yoga and relaxation therapies
+394,Anselm,Male,Delayed language skills,Mindfulness techniques
+395,Meridel,Female,"Unusual tone of voice (flat, unemotional)",Special diets or nutritional intervention where appropriate
+396,Chloris,Female,Persistent preference for solitude,Formation of predictable daily schedules
+397,Reinald,Male,Playing with toys in unusual ways,Early speech and language therapy
+398,Shelly,Female,Enjoying rotating or spinning objects,Frequent positive reinforcement
+399,Cecil,Female,Delayed cognitive or learning skills,Peer-mediated instruction
+400,Iris,Female,"Interest in unusual body movements: finger flicking, arm flapping",Social skills training in group or individual settings
+401,Ahmad,Male,Extreme or unusual fears,Peer-mediated instruction
+402,Maxy,Female,Poor awareness of danger,Music or animal therapy for well-being
+403,Winona,Female,Delayed language skills,Consistent reinforcement of routines
+404,Bartram,Male,"Interest in unusual body movements: finger flicking, arm flapping",Use visual aids and clear physical boundaries
+405,Heath,Male,Reverse pronouns,Exposure to structured play and social exchanges
+406,Vince,Male,"Pronoun reversal (e.g., says 'you' for self)",Visual schedules to support transitions
+407,Lucio,Male,"Unusual fascination with numbers, patterns, dates",Early speech and language therapy
+408,Aggi,Female,"Unusual fascination with numbers, patterns, dates",Music or animal therapy for well-being
+409,Agneta,Female,Difficulty in reciprocal social interactions,Parent-mediated or parent-led intervention
+410,Westley,Male,Playing with toys in unusual ways,Visual schedules to support transitions
+411,Darby,Male,Self-isolation behaviors,Social skills training in group or individual settings
+412,Angel,Male,Delayed cognitive or learning skills,Family counseling and support groups
+413,Tobi,Female,Unusual mannerisms,Mindfulness techniques
+414,Isis,Female,Showing interest in objects over people,Medication for severe irritability (under clinical supervision)
+415,Lynett,Bigender,Overly focused interests in moving objects,Individualized educational programs
+416,Artus,Male,Extreme or unusual fears,Peer-mediated instruction
+417,Alexandros,Male,Using someone's hand as an object,Music or animal therapy for well-being
+418,Ella,Non-binary,"Interest in parts of objects like knobs, switches, wheels",Formation of predictable daily schedules
+419,Cathyleen,Female,Difficulty with imaginative play,Medication for severe irritability (under clinical supervision)
+420,Yehudit,Male,Not pretend playing,Music or animal therapy for well-being
+421,Elysia,Female,Overly focused interests in moving objects,Occupational therapy for sensory integration
+422,Ebenezer,Male,"Displays good rote memory for facts, rhymes, jingles",Frequent positive reinforcement
+423,Cathee,Female,Using someone's hand as an object,Early speech and language therapy
+424,Tatiana,Female,Delayed cognitive or learning skills,Structured development routines
+425,Jerry,Male,"Unusual reactions to lights, tastes, smells, colors",Structured development routines
+426,Dorella,Female,Unusual mannerisms,Individualized educational programs
+427,Kerry,Male,Delayed movement skills,Parent education programs
+428,Gabie,Genderfluid,Not responding to social cues,Exposure to structured play and social exchanges
+429,Guy,Male,Resistance to change in routine,Regular sleep routines
+430,Norean,Female,Trouble transitioning between activities,Individualized educational programs
+431,Slade,Male,Enjoying rotating or spinning objects,Sensory-friendly environments
+432,Lise,Agender,Disturbed sleep cycles,Early speech and language therapy
+433,Egor,Male,Difficulty with imaginative play,Special diets or nutritional intervention where appropriate
+434,Lazaro,Male,"Restricted interests, intense focus on hobby or topic",Structured teaching using TEACCH techniques
+435,Dal,Male,"Likes things a certain way (food, surroundings)",Parent-mediated or parent-led intervention
+436,Norbie,Male,Difficulty forming friendships,Regular sleep routines
+437,Rudyard,Male,Difficulty in reciprocal social interactions,Peer-mediated instruction
+438,Aylmar,Male,"Unusual tone of voice (flat, unemotional)",Exposure to structured play and social exchanges
+439,Gal,Male,Irritability,Exposure to structured play and social exchanges
+440,Rosalie,Female,Difficulty in adjusting to social situations,Structured teaching using TEACCH techniques
+441,Angelica,Female,Playing with toys in unusual ways,Structured development routines
+442,Esdras,Male,Difficulty learning daily life skills,Sensory-friendly environments
+443,Perceval,Polygender,Trouble understanding points of view,Prevention: healthy prenatal care; environmental risk reduction
+444,Ofella,Female,Loss of speech or skills previously developed,Parent education programs
+445,Cleve,Male,Not taking turns in games or activities,Early speech and language therapy
+446,Alexis,Female,Difficulty in adjusting to social situations,Consistent reinforcement of routines
+447,Ardeen,Female,Disturbed sleep cycles,Picture Exchange Communication System (PECS)
+448,Reginald,Male,Difficulty forming friendships,Special diets or nutritional intervention where appropriate
+449,Lamont,Male,Apparent indifference to pain or temperature,Applied behavior analysis (ABA)
+450,Verla,Female,"Hyperactive, impulsive, and/or inattentive behavior",Medication for severe irritability (under clinical supervision)
+451,Brodie,Male,"Pronoun reversal (e.g., says 'you' for self)",Parent education programs
+452,Lorelle,Female,Difficulty understanding what others are thinking or feeling,Formation of predictable daily schedules
+453,Gypsy,Female,Displays repetitive questions,Applied behavior analysis (ABA)
+454,Reece,Male,"Excelling in math, music, or art",Individualized educational programs
+455,Ruby,Female,Lining up objects,Exposure to structured play and social exchanges
+456,Tim,Female,"Unusual tone of voice (flat, unemotional)",Mindfulness techniques
+457,Danice,Bigender,Limited pretend play,Medication for severe irritability (under clinical supervision)
+458,Jonathan,Male,Difficulty with transitions or changes,Chiropractic or art therapy as complementary approaches
+459,Mireille,Female,Enjoying rotating or spinning objects,Frequent positive reinforcement
+460,Tomlin,Male,Not responding to social cues,Individualized educational programs
+461,Daven,Male,Displays distress for no apparent cause,Exposure to structured play and social exchanges
+462,Joni,Non-binary,"Displays good rote memory for facts, rhymes, jingles",Mindfulness techniques
+463,Marleah,Agender,"Pronoun reversal (e.g., says 'you' for self)",Parent-mediated or parent-led intervention
+464,Jermain,Male,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Use of AAC (Augmentative and Alternative Communication)
+465,Teirtza,Female,Not taking turns in games or activities,Visual schedules to support transitions
+466,Natividad,Female,Displays repetitive questions,Frequent positive reinforcement
+467,Zola,Female,Often talks at length about a favorite subject,Prevention: healthy prenatal care; environmental risk reduction
+468,Xenia,Female,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Prevention: healthy prenatal care; environmental risk reduction
+469,Merline,Female,Resistance to change in routine,Structured teaching using TEACCH techniques
+470,Sven,Male,Limited pretend play,Yoga and relaxation therapies
+471,Roxana,Female,Intense reactions to minor changes,Picture Exchange Communication System (PECS)
+472,Theodoric,Male,Facial expressions or gestures not matching speech,Regular sleep routines
+473,Ranee,Female,Playing with toys in unusual ways,Structured development routines
+474,Jorry,Female,"Hyperactive, impulsive, and/or inattentive behavior",Individualized educational programs
+475,Oralia,Female,Difficulty with imaginative play,Chiropractic or art therapy as complementary approaches
+476,Ernest,Male,Failure to respond to own name,Social skills training in group or individual settings
+477,Gypsy,Female,Difficulty forming friendships,Peer-mediated instruction
+478,Selia,Female,Failure to respond to own name,Use visual aids and clear physical boundaries
+479,Suzie,Female,Extreme or unusual fears,Medication for severe irritability (under clinical supervision)
+480,Almire,Female,"Unusual sensory reactions (aversion to sounds, textures)",Music or animal therapy for well-being
+481,Haroun,Male,Reverse pronouns,Visual schedules to support transitions
+482,Salomi,Female,Extreme or unusual fears,Chiropractic or art therapy as complementary approaches
+483,Milena,Female,Repeated words or phrases,Regular sleep routines
+484,Pearl,Genderqueer,Trouble understanding points of view,Social skills training in group or individual settings
+485,Boonie,Male,Facial expressions or gestures not matching speech,Visual schedules to support transitions
+486,Alys,Female,Difficulty with imaginative play,Sensory-friendly environments
+487,Thayne,Male,Often talks at length about a favorite subject,Early speech and language therapy
+488,Ekaterina,Female,Repeated words or phrases,Music or animal therapy for well-being
+489,Coletta,Female,Difficulty in reciprocal social interactions,Prevention: healthy prenatal care; environmental risk reduction
+490,Scott,Male,Extreme interest in details or facts,Yoga and relaxation therapies
+491,Jordan,Male,"Excelling in math, music, or art",Regular monitoring for co-occurring conditions
+492,Niki,Male,Strong aversion to crowds or busy places,Regular sleep routines
+493,Cami,Female,"Likes things a certain way (food, surroundings)",Exposure to structured play and social exchanges
+494,Osborn,Male,Displays distress for no apparent cause,Medication for severe irritability (under clinical supervision)
+495,Isidore,Male,Lining up objects,Regular sleep routines
+496,Richy,Male,Disturbed sleep cycles,Physical therapy for motor skills
+497,Mitchel,Male,Delayed language skills,Family counseling and support groups
+498,Marcie,Female,Difficulty with imaginative play,Structured development routines
+499,Nicolina,Female,Difficulty in reciprocal social interactions,Mindfulness techniques
+500,Sibbie,Female,Repetitive use of objects,Visual schedules to support transitions
+501,Dick,Male,Can be more or less sensitive than others to sensory input,Mindfulness techniques
+502,Archer,Male,Facial expressions or gestures not matching speech,Early speech and language therapy
+503,Brooke,Male,Reverse pronouns,Yoga and relaxation therapies
+504,Staford,Male,Using someone's hand as an object,Peer-mediated instruction
+505,Bridget,Female,Difficulty in adjusting to social situations,Regular sleep routines
+506,Benedicta,Female,Apparent indifference to pain or temperature,Occupational therapy for sensory integration
+507,Bobinette,Female,"Displays good rote memory for facts, rhymes, jingles",Consistent reinforcement of routines
+508,Maude,Female,"Sensory seeking through lights, textures, sounds",Structured teaching using TEACCH techniques
+509,Connor,Male,Extreme or unusual fears,Yoga and relaxation therapies
+510,Angel,Female,"Pronoun reversal (e.g., says 'you' for self)",Yoga and relaxation therapies
+511,Barnett,Male,Failure to respond to own name,Use visual aids and clear physical boundaries
+512,Marianna,Female,Persistent preference for solitude,Use visual aids and clear physical boundaries
+513,Porter,Male,Repeated words or phrases,Occupational therapy for sensory integration
+514,Bertrand,Genderfluid,Enjoying rotating or spinning objects,Family counseling and support groups
+515,Moises,Male,Strong aversion to crowds or busy places,Occupational therapy for sensory integration
+516,Neddy,Male,"Sensory seeking through lights, textures, sounds",Regular sleep routines
+517,Bartholomeo,Male,Trouble transitioning between activities,Applied behavior analysis (ABA)
+518,Stevy,Male,"Infrequent sharing of interest, emotions, enjoyment with others",Social skills training in group or individual settings
+519,Gonzalo,Male,Self-isolation behaviors,Regular monitoring for co-occurring conditions
+520,Ralph,Male,Unusual mannerisms,Regular monitoring for co-occurring conditions
+521,Lorna,Genderqueer,Difficulty understanding what others are thinking or feeling,Medication for severe irritability (under clinical supervision)
+522,Brody,Polygender,Delayed cognitive or learning skills,Structured development routines
+523,Mose,Male,Unusual mannerisms,Special diets or nutritional intervention where appropriate
+524,Leta,Female,Displays repetitive questions,Frequent positive reinforcement
+525,Forrest,Agender,Strong aversion to crowds or busy places,Medication for severe irritability (under clinical supervision)
+526,Thacher,Male,Unusual mannerisms,Structured development routines
+527,Felike,Genderqueer,Persistent preference for solitude,Exposure to structured play and social exchanges
+528,Valaree,Female,"Unusual reactions to lights, tastes, smells, colors",Use visual aids and clear physical boundaries
+529,De witt,Male,Disturbed sleep cycles,Use visual aids and clear physical boundaries
+530,Sayre,Female,Not pretend playing,Visual schedules to support transitions
+531,Ber,Male,Lack or loss of early acquired language,Consistent reinforcement of routines
+532,Tedie,Male,Self-isolation behaviors,Parent education programs
+533,Noe,Male,Nonverbal communication only,Yoga and relaxation therapies
+534,Miranda,Female,"Unusual sensory reactions (aversion to sounds, textures)",Special diets or nutritional intervention where appropriate
+535,Fredi,Female,Nonverbal communication only,Parent-mediated or parent-led intervention
+536,Mallissa,Female,Showing interest in objects over people,Occupational therapy for sensory integration
+537,Cleavland,Male,Repetitive use of objects,Parent education programs
+538,Emlyn,Male,"Displays good rote memory for facts, rhymes, jingles",Social skills training in group or individual settings
+539,Lockwood,Male,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Mindfulness techniques
+540,Doyle,Male,Loss of speech or skills previously developed,Parent-mediated or parent-led intervention
+541,Bliss,Female,Unusual mannerisms,Yoga and relaxation therapies
+542,Gwyneth,Female,Self-injury behaviors,Physical therapy for motor skills
+543,Fanya,Female,Difficulty living independently,Frequent positive reinforcement
+544,Dallas,Male,Displays repetitive questions,Frequent positive reinforcement
+545,Jone,Male,Loss of speech or skills previously developed,Parent-mediated or parent-led intervention
+546,Vernice,Female,Difficulty understanding what others are thinking or feeling,Visual schedules to support transitions
+547,Doretta,Bigender,Difficulty understanding what others are thinking or feeling,Structured teaching using TEACCH techniques
+548,Quincy,Male,Persistent preference for solitude,Chiropractic or art therapy as complementary approaches
+549,Arlan,Male,Difficulty in reciprocal social interactions,Peer-mediated instruction
+550,Hans,Male,"Sensory seeking through lights, textures, sounds",Chiropractic or art therapy as complementary approaches
+551,Alric,Male,Strong visual and auditory learning skills,Chiropractic or art therapy as complementary approaches
+552,Ingelbert,Male,Difficulty in reciprocal social interactions,Use of AAC (Augmentative and Alternative Communication)
+553,Averil,Male,Persistent preference for solitude,Consistent reinforcement of routines
+554,Devora,Female,Not responding to social cues,Consistent reinforcement of routines
+555,Kele,Male,Enjoying rotating or spinning objects,Applied behavior analysis (ABA)
+556,Randall,Male,Difficulty in adjusting to social situations,Mindfulness techniques
+557,Sherri,Female,Limited pretend play,Parent-mediated or parent-led intervention
+558,Marius,Male,Difficulty with transitions or changes,Structured teaching using TEACCH techniques
+559,Glynn,Male,Resistance to change in routine,Picture Exchange Communication System (PECS)
+560,Dee dee,Female,Lining up objects,Parent education programs
+561,Claudianus,Male,"Interest in unusual body movements: finger flicking, arm flapping",Regular monitoring for co-occurring conditions
+562,Norene,Female,"Displays unusual movements: spinning, hand flapping, rocking",Consistent reinforcement of routines
+563,Dallis,Male,Repeated words or phrases,Family counseling and support groups
+564,Bill,Female,"Unusual tone of voice (flat, unemotional)",Parent-mediated or parent-led intervention
+565,Briant,Male,Difficulty with transitions or changes,Consistent reinforcement of routines
+566,Shell,Male,"Sensory seeking through lights, textures, sounds",Frequent positive reinforcement
+567,Emily,Female,Difficulty understanding what others are thinking or feeling,Sensory-friendly environments
+568,Alida,Female,Repetitive use of objects,Use of AAC (Augmentative and Alternative Communication)
+569,Daron,Male,Intense reactions to minor changes,Consistent reinforcement of routines
+570,Linus,Male,"Infrequent sharing of interest, emotions, enjoyment with others",Medication for severe irritability (under clinical supervision)
+571,Chad,Female,"Interest in unusual body movements: finger flicking, arm flapping",Regular monitoring for co-occurring conditions
+572,Randene,Female,"Displays unusual movements: spinning, hand flapping, rocking",Use of AAC (Augmentative and Alternative Communication)
+573,Jilli,Female,Difficulty understanding what others are thinking or feeling,Physical therapy for motor skills
+574,Clementine,Female,Lining up objects,Special diets or nutritional intervention where appropriate
+575,Joe,Male,Difficulty with transitions or changes,Applied behavior analysis (ABA)
+576,Carlee,Female,Extreme interest in details or facts,Music or animal therapy for well-being
+577,Zitella,Female,"Hyperactive, impulsive, and/or inattentive behavior",Use of AAC (Augmentative and Alternative Communication)
+578,Tristan,Male,Rarely or not using gestures to communicate,Parent-mediated or parent-led intervention
+579,Clay,Male,Difficulty adapting to expectations,Parent-mediated or parent-led intervention
+580,Benjy,Male,Intense reactions to minor changes,Structured teaching using TEACCH techniques
+581,Estrella,Female,Rarely or not using gestures to communicate,Occupational therapy for sensory integration
+582,Esdras,Male,Intense reactions to minor changes,Consistent reinforcement of routines
+583,Joshuah,Male,"Likes things a certain way (food, surroundings)",Individualized educational programs
+584,Drucie,Female,"Restricted interests, intense focus on hobby or topic",Early speech and language therapy
+585,Marcelle,Female,Extreme interest in details or facts,Frequent positive reinforcement
+586,Raynard,Male,Repeated words or phrases,Chiropractic or art therapy as complementary approaches
+587,Sheena,Female,Repeated words or phrases,Early speech and language therapy
+588,Lorant,Male,Self-injury behaviors,Use visual aids and clear physical boundaries
+589,Clemente,Male,Reverse pronouns,Special diets or nutritional intervention where appropriate
+590,Giordano,Male,Resistance to change in routine,Medication for severe irritability (under clinical supervision)
+591,Randie,Male,Displays repetitive questions,Social skills training in group or individual settings
+592,Ber,Agender,"Unusual tone of voice (flat, unemotional)",Early speech and language therapy
+593,Samuele,Male,Difficulty understanding what others are thinking or feeling,Chiropractic or art therapy as complementary approaches
+594,Donny,Female,"Unusual fascination with numbers, patterns, dates",Chiropractic or art therapy as complementary approaches
+595,Alexio,Male,"Displays good rote memory for facts, rhymes, jingles",Regular sleep routines
+596,Lara,Female,Unusual mannerisms,Chiropractic or art therapy as complementary approaches
+597,Gerik,Male,Delayed cognitive or learning skills,Early speech and language therapy
+598,Skipper,Male,"Restricted interests, intense focus on hobby or topic",Frequent positive reinforcement
+599,Helene,Female,Difficulty initiating and sustaining conversation,Exposure to structured play and social exchanges
+600,Derron,Male,"Unusual sensory reactions (aversion to sounds, textures)",Special diets or nutritional intervention where appropriate
+601,Rubia,Polygender,"Hyperactive, impulsive, and/or inattentive behavior",Special diets or nutritional intervention where appropriate
+602,Ced,Male,"Infrequent sharing of interest, emotions, enjoyment with others",Applied behavior analysis (ABA)
+603,Adler,Polygender,Difficulty in reciprocal social interactions,Occupational therapy for sensory integration
+604,Koressa,Female,Playing with toys in unusual ways,Peer-mediated instruction
+605,Aleda,Female,Appears unaware of others' distress,Yoga and relaxation therapies
+606,Emera,Female,Not imitating adult actions,Music or animal therapy for well-being
+607,Nalani,Female,Trouble transitioning between activities,Exposure to structured play and social exchanges
+608,Fayth,Genderfluid,Difficulty forming friendships,Exposure to structured play and social exchanges
+609,Flem,Male,Not responding to social cues,Formation of predictable daily schedules
+610,Amalle,Female,Disturbed sleep cycles,Mindfulness techniques
+611,Glenine,Female,Difficulty in reciprocal social interactions,Special diets or nutritional intervention where appropriate
+612,Genny,Female,Irritability,Sensory-friendly environments
+613,Selby,Male,"Interest in parts of objects like knobs, switches, wheels",Individualized educational programs
+614,Jone,Bigender,Difficulty with transitions or changes,Parent-mediated or parent-led intervention
+615,Tobie,Male,Persistent preference for solitude,Regular monitoring for co-occurring conditions
+616,Agata,Female,Can be more or less sensitive than others to sensory input,Social skills training in group or individual settings
+617,Lanna,Female,Repeated words or phrases,Yoga and relaxation therapies
+618,Galven,Male,"Pronoun reversal (e.g., says 'you' for self)",Special diets or nutritional intervention where appropriate
+619,Toby,Female,Trouble understanding points of view,Parent-mediated or parent-led intervention
+620,Kennie,Male,"Hyperactive, impulsive, and/or inattentive behavior",Regular sleep routines
+621,Luca,Male,Trouble understanding points of view,Music or animal therapy for well-being
+622,Gerik,Male,"Likes things a certain way (food, surroundings)",Regular monitoring for co-occurring conditions
+623,Rowena,Female,"Interest in parts of objects like knobs, switches, wheels",Regular sleep routines
+624,Lesley,Female,Unusual mannerisms,Individualized educational programs
+625,Justus,Male,Intense reactions to minor changes,Consistent reinforcement of routines
+626,Cornela,Female,Can be more or less sensitive than others to sensory input,Exposure to structured play and social exchanges
+627,Gilligan,Female,Difficulty with imaginative play,Peer-mediated instruction
+628,Jessey,Male,"Excelling in math, music, or art",Early speech and language therapy
+629,Mil,Female,Poor awareness of danger,Structured development routines
+630,Trace,Male,Delayed language skills,Visual schedules to support transitions
+631,Sheeree,Female,"Interest in unusual body movements: finger flicking, arm flapping",Peer-mediated instruction
+632,Natalee,Female,Extreme interest in details or facts,Music or animal therapy for well-being
+633,Cathrine,Female,Strong aversion to crowds or busy places,Early speech and language therapy
+634,Devondra,Female,Difficulty learning daily life skills,Social skills training in group or individual settings
+635,Gilberta,Female,Overly focused interests in moving objects,Formation of predictable daily schedules
+636,Dominik,Male,"Interest in parts of objects like knobs, switches, wheels",Physical therapy for motor skills
+637,Dana,Female,Reverse pronouns,Picture Exchange Communication System (PECS)
+638,Murdock,Male,Trouble transitioning between activities,Medication for severe irritability (under clinical supervision)
+639,Aldis,Male,Loss of speech or skills previously developed,Consistent reinforcement of routines
+640,Bord,Male,Lack or loss of early acquired language,Exposure to structured play and social exchanges
+641,Morissa,Female,"Likes things a certain way (food, surroundings)",Structured development routines
+642,Niki,Female,Limited pretend play,Prevention: healthy prenatal care; environmental risk reduction
+643,Juli,Female,Extreme interest in details or facts,Exposure to structured play and social exchanges
+644,Cati,Female,Failure to respond to own name,Applied behavior analysis (ABA)
+645,Manuel,Male,"Unusual sensory reactions (aversion to sounds, textures)",Parent-mediated or parent-led intervention
+646,Juieta,Female,Trouble understanding points of view,Exposure to structured play and social exchanges
+647,Brandyn,Male,Often talks at length about a favorite subject,Regular monitoring for co-occurring conditions
+648,Aguistin,Male,Irritability,Structured development routines
+649,Tina,Female,Delayed cognitive or learning skills,Visual schedules to support transitions
+650,Abbe,Female,"Sensory seeking through lights, textures, sounds",Occupational therapy for sensory integration
+651,Maryann,Female,Irritability,Chiropractic or art therapy as complementary approaches
+652,Diahann,Female,Can be more or less sensitive than others to sensory input,Use visual aids and clear physical boundaries
+653,Rad,Male,Can be more or less sensitive than others to sensory input,Occupational therapy for sensory integration
+654,Selinda,Non-binary,Strong aversion to crowds or busy places,Frequent positive reinforcement
+655,Sergei,Male,Rarely or not using gestures to communicate,Use visual aids and clear physical boundaries
+656,Torrence,Male,"Likes things a certain way (food, surroundings)",Peer-mediated instruction
+657,Cosette,Female,Difficulty initiating and sustaining conversation,Music or animal therapy for well-being
+658,Michal,Male,"Displays good rote memory for facts, rhymes, jingles",Chiropractic or art therapy as complementary approaches
+659,Gustavo,Male,Often talks at length about a favorite subject,Picture Exchange Communication System (PECS)
+660,Korney,Female,Self-injury behaviors,Special diets or nutritional intervention where appropriate
+661,Annmarie,Female,Limited or absent eye contact,Peer-mediated instruction
+662,Tobiah,Male,Self-injury behaviors,Regular monitoring for co-occurring conditions
+663,Robenia,Female,Rarely or not using gestures to communicate,Regular monitoring for co-occurring conditions
+664,Raphael,Male,Delayed movement skills,Regular monitoring for co-occurring conditions
+665,Edgard,Male,Not responding to social cues,Frequent positive reinforcement
+666,Katherina,Non-binary,"Excelling in math, music, or art",Special diets or nutritional intervention where appropriate
+667,Moreen,Female,Difficulty adapting to expectations,Occupational therapy for sensory integration
+668,Parry,Male,Often talks at length about a favorite subject,Prevention: healthy prenatal care; environmental risk reduction
+669,Bryanty,Male,Unusual mannerisms,Special diets or nutritional intervention where appropriate
+670,Orran,Male,"Interest in unusual body movements: finger flicking, arm flapping",Consistent reinforcement of routines
+671,Blinnie,Female,Delayed language skills,Yoga and relaxation therapies
+672,Sheffy,Male,Difficulty learning daily life skills,Family counseling and support groups
+673,Riva,Female,Intense reactions to minor changes,Use of AAC (Augmentative and Alternative Communication)
+674,Ariel,Male,Avoids or stiffens when hugged,Use visual aids and clear physical boundaries
+675,Kelsey,Genderqueer,Resistance to change in routine,Mindfulness techniques
+676,Jamal,Male,Displays repetitive questions,Individualized educational programs
+677,Sebastian,Male,"Interest in parts of objects like knobs, switches, wheels",Social skills training in group or individual settings
+678,Marcellina,Female,Can be more or less sensitive than others to sensory input,Structured teaching using TEACCH techniques
+679,Dana,Female,Difficulty adapting to expectations,Special diets or nutritional intervention where appropriate
+680,Salli,Female,Delayed language skills,Occupational therapy for sensory integration
+681,Ferdinand,Male,"Unusual sensory reactions (aversion to sounds, textures)",Family counseling and support groups
+682,Garvin,Male,Nonverbal communication only,Special diets or nutritional intervention where appropriate
+683,Hadleigh,Male,Limited or absent eye contact,Occupational therapy for sensory integration
+684,Tom,Male,Limited pretend play,Formation of predictable daily schedules
+685,Ximenes,Male,Disturbed sleep cycles,Parent education programs
+686,Calv,Male,"Infrequent sharing of interest, emotions, enjoyment with others",Peer-mediated instruction
+687,Sumner,Polygender,Delayed movement skills,Use of AAC (Augmentative and Alternative Communication)
+688,Marna,Female,Playing with toys in unusual ways,Use visual aids and clear physical boundaries
+689,Alberta,Female,Not taking turns in games or activities,Early speech and language therapy
+690,Ly,Male,Difficulty in adjusting to social situations,Music or animal therapy for well-being
+691,Karalee,Genderqueer,Difficulty adapting to expectations,Structured development routines
+692,Deni,Female,"Excelling in math, music, or art",Parent education programs
+693,Andris,Male,Enjoying rotating or spinning objects,Prevention: healthy prenatal care; environmental risk reduction
+694,Raymond,Male,Strong visual and auditory learning skills,Mindfulness techniques
+695,Robinetta,Female,"Unusual fascination with numbers, patterns, dates",Music or animal therapy for well-being
+696,Jania,Bigender,Not responding to social cues,Parent-mediated or parent-led intervention
+697,Tuck,Polygender,Loss of speech or skills previously developed,Visual schedules to support transitions
+698,Christye,Female,"Likes things a certain way (food, surroundings)",Early speech and language therapy
+699,Jessie,Male,Extreme or unusual fears,Medication for severe irritability (under clinical supervision)
+700,Rad,Male,Failure to respond to own name,Consistent reinforcement of routines
+701,Anabel,Female,Apparent indifference to pain or temperature,Yoga and relaxation therapies
+702,Shirl,Female,Delayed cognitive or learning skills,Social skills training in group or individual settings
+703,Austine,Female,Facial expressions or gestures not matching speech,Physical therapy for motor skills
+704,Nye,Male,Failure to respond to own name,Applied behavior analysis (ABA)
+705,Rhianna,Female,"Unusual tone of voice (flat, unemotional)",Yoga and relaxation therapies
+706,Llewellyn,Male,Difficulty initiating and sustaining conversation,Physical therapy for motor skills
+707,Clemmy,Female,Nonverbal communication only,Picture Exchange Communication System (PECS)
+708,Jeanette,Genderqueer,Disturbed sleep cycles,Special diets or nutritional intervention where appropriate
+709,Dud,Polygender,Lining up objects,Prevention: healthy prenatal care; environmental risk reduction
+710,Laurianne,Genderqueer,"Unusual tone of voice (flat, unemotional)",Parent-mediated or parent-led intervention
+711,Toiboid,Male,"Displays unusual movements: spinning, hand flapping, rocking",Applied behavior analysis (ABA)
+712,Beret,Female,"Interest in unusual body movements: finger flicking, arm flapping",Exposure to structured play and social exchanges
+713,Gus,Female,Can be more or less sensitive than others to sensory input,Yoga and relaxation therapies
+714,Corrianne,Female,Limited or absent eye contact,Visual schedules to support transitions
+715,Netti,Female,Intense reactions to minor changes,Sensory-friendly environments
+716,Chickie,Male,Poor awareness of danger,Chiropractic or art therapy as complementary approaches
+717,Nerita,Female,Difficulty in reciprocal social interactions,Mindfulness techniques
+718,Russell,Male,Difficulty adapting to expectations,Use visual aids and clear physical boundaries
+719,Kacie,Non-binary,Not pretend playing,Use visual aids and clear physical boundaries
+720,Blair,Male,Lack or loss of early acquired language,Applied behavior analysis (ABA)
+721,Susannah,Female,"Restricted interests, intense focus on hobby or topic",Physical therapy for motor skills
+722,Chuck,Male,Facial expressions or gestures not matching speech,Family counseling and support groups
+723,Doralynn,Female,Extreme or unusual fears,Sensory-friendly environments
+724,Sile,Female,Limited or absent eye contact,Structured development routines
+725,Merill,Male,Self-injury behaviors,Physical therapy for motor skills
+726,Edie,Female,Difficulty in reciprocal social interactions,Individualized educational programs
+727,Isiahi,Male,Avoids or stiffens when hugged,Regular sleep routines
+728,Vitia,Female,Apparent indifference to pain or temperature,Early speech and language therapy
+729,Poul,Male,Poor awareness of danger,Yoga and relaxation therapies
+730,Carrol,Male,Can be more or less sensitive than others to sensory input,Family counseling and support groups
+731,Dukey,Male,Displays repetitive questions,Occupational therapy for sensory integration
+732,Frans,Male,Difficulty living independently,Social skills training in group or individual settings
+733,Candi,Female,Not pretend playing,Social skills training in group or individual settings
+734,Paloma,Bigender,Playing with toys in unusual ways,Consistent reinforcement of routines
+735,Hallsy,Male,Poor awareness of danger,Structured development routines
+736,Darsey,Female,Difficulty forming friendships,Individualized educational programs
+737,Chiarra,Female,Difficulty initiating and sustaining conversation,Sensory-friendly environments
+738,Horton,Male,Playing with toys in unusual ways,Regular monitoring for co-occurring conditions
+739,Dennis,Non-binary,"Infrequent sharing of interest, emotions, enjoyment with others",Structured development routines
+740,Dallon,Male,Disturbed sleep cycles,Sensory-friendly environments
+741,Josephina,Female,"Unusual fascination with numbers, patterns, dates",Exposure to structured play and social exchanges
+742,Lilah,Female,Appears unaware of others' distress,Family counseling and support groups
+743,Reid,Bigender,"Displays good rote memory for facts, rhymes, jingles",Picture Exchange Communication System (PECS)
+744,Rici,Female,Repetitive use of objects,Medication for severe irritability (under clinical supervision)
+745,Reginald,Male,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Applied behavior analysis (ABA)
+746,Guy,Male,Nonverbal communication only,Individualized educational programs
+747,Caroljean,Female,Limited pretend play,Frequent positive reinforcement
+748,Seward,Male,Unusual mannerisms,Structured teaching using TEACCH techniques
+749,Barthel,Male,Unusual mannerisms,Early speech and language therapy
+750,Andie,Male,"Unusual fascination with numbers, patterns, dates",Chiropractic or art therapy as complementary approaches
+751,Rosita,Female,Difficulty in adjusting to social situations,Family counseling and support groups
+752,Justus,Male,Not taking turns in games or activities,Regular sleep routines
+753,Jocelin,Female,Repeated words or phrases,Picture Exchange Communication System (PECS)
+754,Ernestus,Male,Using someone's hand as an object,Structured teaching using TEACCH techniques
+755,Hugues,Male,Strong visual and auditory learning skills,Physical therapy for motor skills
+756,Ana,Female,"Infrequent sharing of interest, emotions, enjoyment with others",Yoga and relaxation therapies
+757,Giovanni,Male,Difficulty forming friendships,Sensory-friendly environments
+758,Davon,Male,Delayed cognitive or learning skills,Family counseling and support groups
+759,Alic,Male,Using someone's hand as an object,Regular monitoring for co-occurring conditions
+760,Ralph,Male,Showing interest in objects over people,Individualized educational programs
+761,Selina,Female,Strong aversion to crowds or busy places,Consistent reinforcement of routines
+762,Gennifer,Female,Displays distress for no apparent cause,Use of AAC (Augmentative and Alternative Communication)
+763,Corine,Female,Extreme interest in details or facts,Use of AAC (Augmentative and Alternative Communication)
+764,Aurie,Female,Loss of speech or skills previously developed,Special diets or nutritional intervention where appropriate
+765,Bella,Female,Avoids or stiffens when hugged,Medication for severe irritability (under clinical supervision)
+766,Tabb,Male,Nonverbal communication only,Regular sleep routines
+767,Tate,Male,Difficulty in reciprocal social interactions,Consistent reinforcement of routines
+768,Liliane,Genderfluid,Not responding to social cues,Parent-mediated or parent-led intervention
+769,Brook,Female,Difficulty initiating and sustaining conversation,Music or animal therapy for well-being
+770,Stepha,Female,Repetitive use of objects,Picture Exchange Communication System (PECS)
+771,Talyah,Female,"Unusual fascination with numbers, patterns, dates",Prevention: healthy prenatal care; environmental risk reduction
+772,Koralle,Female,Enjoying rotating or spinning objects,Structured teaching using TEACCH techniques
+773,Abigael,Female,"Likes things a certain way (food, surroundings)",Picture Exchange Communication System (PECS)
+774,Donnie,Male,Repeated words or phrases,Regular monitoring for co-occurring conditions
+775,Karrie,Female,Displays distress for no apparent cause,Applied behavior analysis (ABA)
+776,Mendie,Polygender,Difficulty in reciprocal social interactions,Medication for severe irritability (under clinical supervision)
+777,Curt,Male,Not responding to social cues,Yoga and relaxation therapies
+778,Greta,Female,Avoids or stiffens when hugged,Early speech and language therapy
+779,Vin,Female,Displays repetitive questions,Peer-mediated instruction
+780,Sukey,Female,"Restricted interests, intense focus on hobby or topic",Peer-mediated instruction
+781,Roddie,Male,Enjoying rotating or spinning objects,Early speech and language therapy
+782,Nealy,Male,Difficulty learning daily life skills,Social skills training in group or individual settings
+783,Dodie,Female,"Displays unusual movements: spinning, hand flapping, rocking",Chiropractic or art therapy as complementary approaches
+784,Hunfredo,Male,Difficulty with imaginative play,Chiropractic or art therapy as complementary approaches
+785,Ransell,Male,Poor awareness of danger,Structured teaching using TEACCH techniques
+786,Beverie,Female,Reverse pronouns,Special diets or nutritional intervention where appropriate
+787,Eward,Male,Using someone's hand as an object,Structured development routines
+788,Salvador,Male,Displays repetitive questions,Regular sleep routines
+789,Cleon,Male,"Sensory seeking through lights, textures, sounds",Social skills training in group or individual settings
+790,Vale,Male,"Pronoun reversal (e.g., says 'you' for self)",Peer-mediated instruction
+791,Lisle,Male,Intense reactions to minor changes,Physical therapy for motor skills
+792,Dulci,Female,Rarely or not using gestures to communicate,Parent-mediated or parent-led intervention
+793,Kimberli,Female,Difficulty learning daily life skills,Formation of predictable daily schedules
+794,Gill,Male,"Pronoun reversal (e.g., says 'you' for self)",Social skills training in group or individual settings
+795,Alyce,Female,Repetitive use of objects,Picture Exchange Communication System (PECS)
+796,Philly,Non-binary,Extreme or unusual fears,Social skills training in group or individual settings
+797,Noam,Male,Displays repetitive questions,Formation of predictable daily schedules
+798,Albert,Male,Facial expressions or gestures not matching speech,Family counseling and support groups
+799,Bevan,Male,Intense reactions to minor changes,Exposure to structured play and social exchanges
+800,Herman,Male,Enjoying rotating or spinning objects,Visual schedules to support transitions
+801,Redford,Male,Delayed movement skills,Picture Exchange Communication System (PECS)
+802,Lucas,Male,Showing interest in objects over people,Picture Exchange Communication System (PECS)
+803,Bud,Male,Repeated words or phrases,Yoga and relaxation therapies
+804,Kliment,Male,"Displays unusual movements: spinning, hand flapping, rocking",Parent-mediated or parent-led intervention
+805,Euphemia,Female,Using someone's hand as an object,Medication for severe irritability (under clinical supervision)
+806,Lewie,Male,Not imitating adult actions,Formation of predictable daily schedules
+807,Daria,Female,"Displays unusual movements: spinning, hand flapping, rocking",Music or animal therapy for well-being
+808,Barron,Male,"Likes things a certain way (food, surroundings)",Family counseling and support groups
+809,Eada,Female,Intense reactions to minor changes,Social skills training in group or individual settings
+810,Jewell,Female,Disturbed sleep cycles,Special diets or nutritional intervention where appropriate
+811,Billie,Male,Extreme interest in details or facts,Social skills training in group or individual settings
+812,Bran,Male,Lack or loss of early acquired language,Structured teaching using TEACCH techniques
+813,Seline,Female,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Social skills training in group or individual settings
+814,Derek,Male,"Restricted interests, intense focus on hobby or topic",Sensory-friendly environments
+815,Kitty,Female,Difficulty forming friendships,Structured development routines
+816,Paul,Male,Limited pretend play,Prevention: healthy prenatal care; environmental risk reduction
+817,Amii,Non-binary,Difficulty forming friendships,Structured development routines
+818,Blanche,Female,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Use visual aids and clear physical boundaries
+819,Deerdre,Female,"Likes things a certain way (food, surroundings)",Consistent reinforcement of routines
+820,Ronica,Female,Delayed cognitive or learning skills,Regular sleep routines
+821,Ignacio,Male,Strong visual and auditory learning skills,Chiropractic or art therapy as complementary approaches
+822,Cleve,Male,Repetitive use of objects,Use of AAC (Augmentative and Alternative Communication)
+823,Cross,Male,"Interest in unusual body movements: finger flicking, arm flapping",Prevention: healthy prenatal care; environmental risk reduction
+824,Pepito,Genderqueer,Irritability,Early speech and language therapy
+825,Claudia,Female,Overly focused interests in moving objects,Parent education programs
+826,Alix,Female,Strong visual and auditory learning skills,Chiropractic or art therapy as complementary approaches
+827,Bendick,Male,"Displays good rote memory for facts, rhymes, jingles",Occupational therapy for sensory integration
+828,Delphinia,Female,Delayed cognitive or learning skills,Formation of predictable daily schedules
+829,Donny,Female,"Displays unusual movements: spinning, hand flapping, rocking",Regular monitoring for co-occurring conditions
+830,Kali,Female,Difficulty initiating and sustaining conversation,Regular monitoring for co-occurring conditions
+831,Karie,Female,Limited or absent eye contact,Chiropractic or art therapy as complementary approaches
+832,Dahlia,Female,Difficulty with transitions or changes,Yoga and relaxation therapies
+833,Letta,Female,Overly focused interests in moving objects,Parent education programs
+834,Lorette,Polygender,Lining up objects,Parent education programs
+835,Godfry,Male,Irritability,Prevention: healthy prenatal care; environmental risk reduction
+836,Kassie,Female,"Excelling in math, music, or art",Prevention: healthy prenatal care; environmental risk reduction
+837,Catha,Female,Limited or absent eye contact,Picture Exchange Communication System (PECS)
+838,Egbert,Male,Extreme or unusual fears,Exposure to structured play and social exchanges
+839,Karalee,Female,Can be more or less sensitive than others to sensory input,Use visual aids and clear physical boundaries
+840,Tobe,Female,Delayed language skills,Individualized educational programs
+841,Kaleb,Male,Displays repetitive questions,Prevention: healthy prenatal care; environmental risk reduction
+842,Alanson,Male,"Likes things a certain way (food, surroundings)",Early speech and language therapy
+843,Andres,Male,Difficulty understanding what others are thinking or feeling,Sensory-friendly environments
+844,Nelie,Female,Difficulty initiating and sustaining conversation,Exposure to structured play and social exchanges
+845,Emmie,Female,Unusual mannerisms,Structured development routines
+846,Seward,Male,Repeated words or phrases,Social skills training in group or individual settings
+847,Row,Female,Difficulty understanding what others are thinking or feeling,Picture Exchange Communication System (PECS)
+848,Kincaid,Male,Self-isolation behaviors,Family counseling and support groups
+849,Hattie,Female,Displays distress for no apparent cause,Physical therapy for motor skills
+850,Ashley,Male,Difficulty understanding what others are thinking or feeling,Mindfulness techniques
+851,Germayne,Male,"Displays good rote memory for facts, rhymes, jingles",Structured development routines
+852,Avrit,Female,Difficulty in adjusting to social situations,Regular monitoring for co-occurring conditions
+853,Ashien,Female,Difficulty with imaginative play,Formation of predictable daily schedules
+854,Kinnie,Male,Can be more or less sensitive than others to sensory input,Yoga and relaxation therapies
+855,Shell,Female,Lack or loss of early acquired language,Mindfulness techniques
+856,Fletcher,Male,Disturbed sleep cycles,Regular monitoring for co-occurring conditions
+857,Elnora,Female,Not imitating adult actions,Structured teaching using TEACCH techniques
+858,Dagmar,Female,Can be more or less sensitive than others to sensory input,Structured development routines
+859,Vladamir,Male,Difficulty with imaginative play,Consistent reinforcement of routines
+860,Adolph,Male,Rarely or not using gestures to communicate,Use of AAC (Augmentative and Alternative Communication)
+861,Cory,Male,Not pretend playing,Peer-mediated instruction
+862,Bendix,Male,Difficulty forming friendships,Applied behavior analysis (ABA)
+863,Arlen,Polygender,Showing interest in objects over people,Special diets or nutritional intervention where appropriate
+864,Al,Male,Not imitating adult actions,Applied behavior analysis (ABA)
+865,Dar,Genderqueer,Trouble transitioning between activities,Prevention: healthy prenatal care; environmental risk reduction
+866,Alicia,Female,Extreme interest in details or facts,Exposure to structured play and social exchanges
+867,Dene,Male,"Displays unusual movements: spinning, hand flapping, rocking",Use visual aids and clear physical boundaries
+868,Elmer,Male,"Interest in unusual body movements: finger flicking, arm flapping",Regular sleep routines
+869,Bertine,Agender,Strong visual and auditory learning skills,Frequent positive reinforcement
+870,Lyman,Agender,"Unusual fascination with numbers, patterns, dates",Regular sleep routines
+871,Juanita,Female,"Interest in parts of objects like knobs, switches, wheels",Peer-mediated instruction
+872,Lori,Bigender,"Infrequent sharing of interest, emotions, enjoyment with others",Occupational therapy for sensory integration
+873,Siobhan,Female,"Hyperactive, impulsive, and/or inattentive behavior",Mindfulness techniques
+874,Crissie,Female,Persistent preference for solitude,Peer-mediated instruction
+875,Joli,Female,Limited or absent eye contact,Regular sleep routines
+876,Anthony,Male,Irritability,Exposure to structured play and social exchanges
+877,Julianne,Female,Delayed cognitive or learning skills,Individualized educational programs
+878,Obed,Male,"Excelling in math, music, or art",Regular monitoring for co-occurring conditions
+879,Mandie,Female,Difficulty with imaginative play,Medication for severe irritability (under clinical supervision)
+880,Boot,Male,Appears unaware of others' distress,Physical therapy for motor skills
+881,Brock,Male,Enjoying rotating or spinning objects,Applied behavior analysis (ABA)
+882,Geoffrey,Male,Displays repetitive questions,Sensory-friendly environments
+883,Madelon,Female,Self-injury behaviors,Music or animal therapy for well-being
+884,Saxon,Male,Trouble transitioning between activities,Parent education programs
+885,Delainey,Male,Self-injury behaviors,Use of AAC (Augmentative and Alternative Communication)
+886,Neale,Polygender,"Pronoun reversal (e.g., says 'you' for self)",Medication for severe irritability (under clinical supervision)
+887,Abdul,Male,Nonverbal communication only,Parent education programs
+888,Sisile,Female,Trouble transitioning between activities,Early speech and language therapy
+889,Chester,Genderfluid,Self-isolation behaviors,Sensory-friendly environments
+890,Jarred,Male,Poor awareness of danger,Special diets or nutritional intervention where appropriate
+891,Tanhya,Female,Strong aversion to crowds or busy places,Chiropractic or art therapy as complementary approaches
+892,Deni,Female,Persistent preference for solitude,Structured development routines
+893,Colline,Female,Trouble transitioning between activities,Medication for severe irritability (under clinical supervision)
+894,Stella,Female,"Unusual fascination with numbers, patterns, dates",Parent education programs
+895,Araldo,Male,"Unusual reactions to lights, tastes, smells, colors",Chiropractic or art therapy as complementary approaches
+896,Donnamarie,Female,Difficulty with imaginative play,Sensory-friendly environments
+897,Upton,Male,Difficulty living independently,Exposure to structured play and social exchanges
+898,Gregor,Male,"Unusual reactions to lights, tastes, smells, colors",Visual schedules to support transitions
+899,Sisely,Female,Disturbed sleep cycles,Medication for severe irritability (under clinical supervision)
+900,Kennie,Bigender,"Interest in parts of objects like knobs, switches, wheels",Frequent positive reinforcement
+901,Rey,Female,Self-isolation behaviors,Peer-mediated instruction
+902,Jorge,Male,"Likes things a certain way (food, surroundings)",Regular monitoring for co-occurring conditions
+903,Putnem,Male,Extreme interest in details or facts,Mindfulness techniques
+904,Averyl,Female,"Unusual fascination with numbers, patterns, dates",Regular monitoring for co-occurring conditions
+905,Angelo,Male,Repeated words or phrases,Parent-mediated or parent-led intervention
+906,Hendrick,Male,Limited pretend play,Occupational therapy for sensory integration
+907,Ian,Male,Poor awareness of danger,Medication for severe irritability (under clinical supervision)
+908,Mariquilla,Female,"Sensory seeking through lights, textures, sounds",Prevention: healthy prenatal care; environmental risk reduction
+909,Cyndi,Female,"Hyperactive, impulsive, and/or inattentive behavior",Structured teaching using TEACCH techniques
+910,Tadio,Male,Can be more or less sensitive than others to sensory input,Early speech and language therapy
+911,Rasla,Genderfluid,Limited pretend play,Physical therapy for motor skills
+912,Birgitta,Female,Not taking turns in games or activities,Physical therapy for motor skills
+913,Catherine,Female,"Displays unusual movements: spinning, hand flapping, rocking",Structured development routines
+914,Bern,Male,Intense reactions to minor changes,Physical therapy for motor skills
+915,Web,Male,Persistent preference for solitude,Occupational therapy for sensory integration
+916,Daveen,Female,Irritability,Chiropractic or art therapy as complementary approaches
+917,Dev,Male,"Unusual tone of voice (flat, unemotional)",Picture Exchange Communication System (PECS)
+918,Sully,Male,Displays repetitive questions,Music or animal therapy for well-being
+919,Kristen,Female,Poor awareness of danger,Music or animal therapy for well-being
+920,Tabbitha,Female,Unusual mannerisms,Applied behavior analysis (ABA)
+921,Eolanda,Bigender,Difficulty forming friendships,Music or animal therapy for well-being
+922,Yorgo,Male,Playing with toys in unusual ways,Formation of predictable daily schedules
+923,Domenic,Genderqueer,Not taking turns in games or activities,Regular sleep routines
+924,Eada,Female,Extreme or unusual fears,Special diets or nutritional intervention where appropriate
+925,Leola,Female,Limited or absent eye contact,Regular monitoring for co-occurring conditions
+926,Farly,Male,Difficulty with imaginative play,Peer-mediated instruction
+927,Kassia,Female,Overly focused interests in moving objects,Special diets or nutritional intervention where appropriate
+928,Eran,Female,Self-injury behaviors,Mindfulness techniques
+929,Bibbye,Female,Enjoying rotating or spinning objects,Prevention: healthy prenatal care; environmental risk reduction
+930,Rich,Male,"Excelling in math, music, or art",Early speech and language therapy
+931,Zachery,Non-binary,Difficulty learning daily life skills,Sensory-friendly environments
+932,Liane,Female,Irritability,Chiropractic or art therapy as complementary approaches
+933,Kerk,Male,Difficulty understanding what others are thinking or feeling,Structured teaching using TEACCH techniques
+934,Jodie,Male,Rarely or not using gestures to communicate,Structured development routines
+935,Marlowe,Male,Persistent preference for solitude,Structured development routines
+936,Farah,Female,Repetitive use of objects,Structured teaching using TEACCH techniques
+937,Alexio,Male,"Interest in unusual body movements: finger flicking, arm flapping",Social skills training in group or individual settings
+938,Zachary,Male,Facial expressions or gestures not matching speech,Yoga and relaxation therapies
+939,Stacy,Female,Trouble transitioning between activities,Structured teaching using TEACCH techniques
+940,Damita,Female,"Unusual reactions to lights, tastes, smells, colors",Regular sleep routines
+941,Elden,Polygender,Extreme interest in details or facts,Applied behavior analysis (ABA)
+942,Kristoffer,Male,Not responding to social cues,Applied behavior analysis (ABA)
+943,Tom,Agender,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Visual schedules to support transitions
+944,Wally,Female,Using someone's hand as an object,Peer-mediated instruction
+945,Caprice,Female,"Restricted interests, intense focus on hobby or topic",Early speech and language therapy
+946,Lenette,Female,Difficulty understanding what others are thinking or feeling,Regular monitoring for co-occurring conditions
+947,Ram,Male,Displays distress for no apparent cause,Frequent positive reinforcement
+948,Farrand,Female,Limited or absent eye contact,Family counseling and support groups
+949,Glynnis,Female,"Unusual sensory reactions (aversion to sounds, textures)",Regular sleep routines
+950,Augusto,Male,Displays repetitive questions,Use visual aids and clear physical boundaries
+951,Lucky,Female,Difficulty in adjusting to social situations,Social skills training in group or individual settings
+952,Jacquenette,Female,Facial expressions or gestures not matching speech,Formation of predictable daily schedules
+953,Denny,Male,Overly focused interests in moving objects,Applied behavior analysis (ABA)
+954,Zeke,Male,Overly focused interests in moving objects,Applied behavior analysis (ABA)
+955,Dudley,Male,"Pronoun reversal (e.g., says 'you' for self)",Peer-mediated instruction
+956,Bordy,Male,Extreme interest in details or facts,Prevention: healthy prenatal care; environmental risk reduction
+957,Berke,Male,Persistent preference for solitude,Early speech and language therapy
+958,Alleyn,Male,Difficulty in adjusting to social situations,Parent-mediated or parent-led intervention
+959,Vania,Female,Poor awareness of danger,Consistent reinforcement of routines
+960,Ancell,Male,"Unusual sensory reactions (aversion to sounds, textures)",Use visual aids and clear physical boundaries
+961,Audrye,Female,Not taking turns in games or activities,Chiropractic or art therapy as complementary approaches
+962,Alejandra,Female,Difficulty adapting to expectations,Parent education programs
+963,Selestina,Female,"Excelling in math, music, or art",Exposure to structured play and social exchanges
+964,Benedick,Male,Facial expressions or gestures not matching speech,Peer-mediated instruction
+965,Cull,Male,"Hyperactive, impulsive, and/or inattentive behavior",Consistent reinforcement of routines
+966,Burk,Male,Self-injury behaviors,Sensory-friendly environments
+967,Darbee,Male,Displays repetitive questions,Regular sleep routines
+968,Ermin,Male,"Displays unusual movements: spinning, hand flapping, rocking",Use of AAC (Augmentative and Alternative Communication)
+969,Kippie,Genderqueer,Not pretend playing,Picture Exchange Communication System (PECS)
+970,Debora,Bigender,Reverse pronouns,Use of AAC (Augmentative and Alternative Communication)
+971,Carley,Female,"Unusual reactions to lights, tastes, smells, colors",Structured teaching using TEACCH techniques
+972,Atalanta,Female,Difficulty learning daily life skills,Yoga and relaxation therapies
+973,Floyd,Male,Delayed cognitive or learning skills,Structured development routines
+974,Amelia,Female,Not imitating adult actions,Special diets or nutritional intervention where appropriate
+975,Phaidra,Female,Not taking turns in games or activities,Special diets or nutritional intervention where appropriate
+976,Austin,Male,"Displays unusual movements: spinning, hand flapping, rocking",Occupational therapy for sensory integration
+977,Trixie,Female,Reverse pronouns,Use visual aids and clear physical boundaries
+978,Carmine,Female,Difficulty forming friendships,Parent education programs
+979,Tildi,Female,Failure to respond to own name,Visual schedules to support transitions
+980,Eziechiele,Male,"Unusual fascination with numbers, patterns, dates",Use of AAC (Augmentative and Alternative Communication)
+981,Bethina,Female,Not pretend playing,Prevention: healthy prenatal care; environmental risk reduction
+982,Margie,Female,Loss of speech or skills previously developed,Structured development routines
+983,Shawn,Female,Facial expressions or gestures not matching speech,Sensory-friendly environments
+984,Vinnie,Male,Lack or loss of early acquired language,Early speech and language therapy
+985,Judith,Female,Difficulty in adjusting to social situations,Regular sleep routines
+986,Raffarty,Male,Apparent indifference to pain or temperature,Parent education programs
+987,Halsey,Male,"Unusual sensory reactions (aversion to sounds, textures)",Yoga and relaxation therapies
+988,Gabbie,Female,Repeated words or phrases,Music or animal therapy for well-being
+989,Nomi,Female,Apparent indifference to pain or temperature,Yoga and relaxation therapies
+990,Rubi,Female,"Displays good rote memory for facts, rhymes, jingles",Early speech and language therapy
+991,Juditha,Female,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Frequent positive reinforcement
+992,Padraic,Male,"Unusual fascination with numbers, patterns, dates",Parent-mediated or parent-led intervention
+993,Laura,Female,"Repetitive behaviors: rocking, hand flapping, finger flicking, head banging, repeating phrases or sounds (echolalia)",Consistent reinforcement of routines
+994,Haydon,Male,Not taking turns in games or activities,Visual schedules to support transitions
+995,Paulina,Female,Not taking turns in games or activities,Formation of predictable daily schedules
+996,Ailsun,Female,"Restricted interests, intense focus on hobby or topic",Exposure to structured play and social exchanges
+997,Hendrika,Female,"Pronoun reversal (e.g., says 'you' for self)",Special diets or nutritional intervention where appropriate
+998,Upton,Male,"Hyperactive, impulsive, and/or inattentive behavior",Visual schedules to support transitions
+999,Aileen,Female,Playing with toys in unusual ways,Early speech and language therapy
+1000,Gerome,Male,Intense reactions to minor changes,Structured development routines

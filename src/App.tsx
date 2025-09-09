@@ -1,10 +1,10 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
-import { RoleAuthProvider, useRoleAuth } from "@/hooks/useRoleAuth";
+import {Toaster} from "@/components/ui/toaster";
+import {Toaster as Sonner} from "@/components/ui/sonner";
+import {TooltipProvider} from "@/components/ui/tooltip";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {BrowserRouter, Routes, Route} from "react-router-dom";
+import {HelmetProvider} from "react-helmet-async";
+import {RoleAuthProvider, useRoleAuth} from "@/hooks/useRoleAuth";
 import RoleBasedLayout from "./components/layout/RoleBasedLayout";
 import RoleBasedAuth from "./components/auth/RoleBasedAuth";
 
@@ -30,13 +30,15 @@ import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import DoctorAppointments from "./pages/doctor/DoctorAppointments";
 import DoctorChatbot from "./pages/doctor/DoctorChatbot";
 import DoctorLearningHub from "./pages/doctor/DoctorLearningHub";
+import DoctorSchedule from "./pages/doctor/DoctorSchedule";
 
 import NotFound from "./pages/NotFound";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
 function AppRoutes() {
-  const { user, userRole, loading } = useRoleAuth();
+  const {user, userRole, loading} = useRoleAuth();
 
   if (loading) {
     return (
@@ -46,11 +48,11 @@ function AppRoutes() {
             <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce"></div>
             <div
               className="w-4 h-4 bg-purple-500 rounded-full animate-bounce"
-              style={{ animationDelay: "0.1s" }}
+              style={{animationDelay: "0.1s"}}
             ></div>
             <div
               className="w-4 h-4 bg-green-500 rounded-full animate-bounce"
-              style={{ animationDelay: "0.2s" }}
+              style={{animationDelay: "0.2s"}}
             ></div>
           </div>
           <p className="mt-2">Loading your dashboard...</p>
@@ -86,10 +88,17 @@ function AppRoutes() {
           <>
             <Route path="/dashboard" element={<PatientDashboard />} />
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
-            <Route path="/patient/appointments" element={<PatientAppointments />} />
+            <Route
+              path="/patient/appointments"
+              element={<PatientAppointments />}
+            />
             <Route path="/patient/chatbot" element={<PatientChatbot />} />
-            <Route path="/patient/schedule" element={<UserSchedule />} />
-            <Route path="/patient/progress" element={<PatientProgress />} /> {/* ✅ NEW */}
+            {/* Patients cannot manage schedules */}
+            <Route
+              path="/patient/progress"
+              element={<PatientProgress />}
+            />{" "}
+            {/* ✅ NEW */}
           </>
         )}
 
@@ -98,14 +107,19 @@ function AppRoutes() {
           <>
             <Route path="/dashboard" element={<DoctorDashboard />} />
             <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
-            <Route path="/doctor/appointments" element={<DoctorAppointments />} />
+            <Route
+              path="/doctor/appointments"
+              element={<DoctorAppointments />}
+            />
             <Route path="/doctor/chatbot" element={<DoctorChatbot />} />
             <Route path="/doctor/learning" element={<DoctorLearningHub />} />
+            <Route path="/doctor/schedule" element={<DoctorSchedule />} />
           </>
         )}
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      {/* Chatbot is embedded on dedicated AI Assistant pages only */}
     </RoleBasedLayout>
   );
 }
@@ -118,7 +132,9 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <AppRoutes />
+            <ErrorBoundary>
+              <AppRoutes />
+            </ErrorBoundary>
           </TooltipProvider>
         </RoleAuthProvider>
       </BrowserRouter>
