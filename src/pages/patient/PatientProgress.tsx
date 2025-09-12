@@ -1,14 +1,30 @@
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { TrendingUp, Activity, Heart, Calendar } from 'lucide-react';
+import {motion, type Variants} from "framer-motion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
+import {TrendingUp, Activity, Heart, Calendar} from "lucide-react";
 
-import { useState, useEffect } from 'react';
-import { useRoleAuth } from '@/hooks/useRoleAuth';
-import { supabase } from '@/integrations/supabase/client';
+import {useState, useEffect} from "react";
+import {useRoleAuth} from "@/hooks/useRoleAuth";
+import {supabase} from "@/integrations/supabase/client";
 
 const PatientProgress = () => {
-  const { user } = useRoleAuth();
+  const {user} = useRoleAuth();
   const [progressData, setProgressData] = useState<any[]>([]);
   const [healthMetrics, setHealthMetrics] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,26 +38,31 @@ const PatientProgress = () => {
 
     try {
       // Fetch patient progress
-      const { data: patient } = await supabase
-        .from('patients')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
+      const patientRes: any = await (supabase as any)
+        .from("patients")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      const patient = patientRes?.data as any;
 
       if (patient) {
-        const { data: progress, error: progressError } = await supabase
-          .from('patient_progress')
-          .select('*')
-          .eq('patient_id', patient.id)
-          .order('week_number', { ascending: true });
+        const progressRes: any = await (supabase as any)
+          .from("patient_progress")
+          .select("*")
+          .eq("patient_id", patient.id)
+          .order("week_number", {ascending: true});
+        const progress = progressRes?.data as any[] | null;
+        const progressError = progressRes?.error as any;
 
         if (progressError) throw progressError;
 
-        const { data: metrics, error: metricsError } = await supabase
-          .from('health_metrics')
-          .select('*')
-          .eq('patient_id', patient.id)
-          .order('recorded_date', { ascending: true });
+        const metricsRes: any = await (supabase as any)
+          .from("health_metrics")
+          .select("*")
+          .eq("patient_id", patient.id)
+          .order("recorded_date", {ascending: true});
+        const metrics = metricsRes?.data as any[] | null;
+        const metricsError = metricsRes?.error as any;
 
         if (metricsError) throw metricsError;
 
@@ -52,7 +73,7 @@ const PatientProgress = () => {
         setHealthMetrics(vitalSigns);
       }
     } catch (error) {
-      console.error('Error fetching progress data:', error);
+      console.error("Error fetching progress data:", error);
       setProgressData(weeklyData);
       setHealthMetrics(vitalSigns);
     } finally {
@@ -62,42 +83,58 @@ const PatientProgress = () => {
 
   // Mock data for charts
   const weeklyData = [
-    { week: 'Week 1', healthScore: 75, symptoms: 3 },
-    { week: 'Week 2', healthScore: 78, symptoms: 2 },
-    { week: 'Week 3', healthScore: 82, symptoms: 2 },
-    { week: 'Week 4', healthScore: 85, symptoms: 1 },
-    { week: 'Week 5', healthScore: 88, symptoms: 1 },
-    { week: 'Week 6', healthScore: 90, symptoms: 0 },
+    {week: "Week 1", healthScore: 75, symptoms: 3},
+    {week: "Week 2", healthScore: 78, symptoms: 2},
+    {week: "Week 3", healthScore: 82, symptoms: 2},
+    {week: "Week 4", healthScore: 85, symptoms: 1},
+    {week: "Week 5", healthScore: 88, symptoms: 1},
+    {week: "Week 6", healthScore: 90, symptoms: 0},
   ];
 
   const vitalSigns = [
-    { date: '2024-01-01', heartRate: 72, bloodPressure: 120 },
-    { date: '2024-01-08', heartRate: 75, bloodPressure: 118 },
-    { date: '2024-01-15', heartRate: 70, bloodPressure: 115 },
-    { date: '2024-01-22', heartRate: 68, bloodPressure: 112 },
-    { date: '2024-01-29', heartRate: 70, bloodPressure: 110 },
+    {date: "2024-01-01", heartRate: 72, bloodPressure: 120},
+    {date: "2024-01-08", heartRate: 75, bloodPressure: 118},
+    {date: "2024-01-15", heartRate: 70, bloodPressure: 115},
+    {date: "2024-01-22", heartRate: 68, bloodPressure: 112},
+    {date: "2024-01-29", heartRate: 70, bloodPressure: 110},
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
+  // Normalize data to match chart keys
+  const normalizedProgress = (
+    progressData && progressData.length > 0 ? progressData : weeklyData
+  ).map((d: any) => ({
+    week: d.week,
+    health_score: d.health_score ?? d.healthScore,
+    symptom_count: d.symptom_count ?? d.symptoms,
+  }));
+
+  const normalizedMetrics = (
+    healthMetrics && healthMetrics.length > 0 ? healthMetrics : vitalSigns
+  ).map((d: any) => ({
+    recorded_date: d.recorded_date ?? d.date,
+    value: d.value ?? d.heartRate,
+  }));
+
+  const containerVariants: Variants = {
+    hidden: {opacity: 0},
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+  const itemVariants: Variants = {
+    hidden: {y: 20, opacity: 0},
     visible: {
       y: 0,
       opacity: 1,
       transition: {
         type: "spring",
-        stiffness: 100
-      }
-    }
+        stiffness: 100,
+      },
+    },
   };
 
   return (
@@ -111,7 +148,9 @@ const PatientProgress = () => {
         <h1 className="text-3xl font-heading font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
           Progress Tracker
         </h1>
-        <p className="text-gray-600 mt-2">Monitor your health journey with detailed reports</p>
+        <p className="text-gray-600 mt-2">
+          Monitor your health journey with detailed reports
+        </p>
       </motion.div>
 
       <motion.div
@@ -178,22 +217,22 @@ const PatientProgress = () => {
           <CardContent>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={progressData.length > 0 ? progressData : weeklyData}>
+                <LineChart data={normalizedProgress}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="week" />
                   <YAxis />
                   <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="health_score" 
-                    stroke="#16a34a" 
+                  <Line
+                    type="monotone"
+                    dataKey="health_score"
+                    stroke="#16a34a"
                     strokeWidth={3}
                     name="Health Score"
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="symptom_count" 
-                    stroke="#dc2626" 
+                  <Line
+                    type="monotone"
+                    dataKey="symptom_count"
+                    stroke="#dc2626"
                     strokeWidth={3}
                     name="Symptom Count"
                   />
@@ -218,7 +257,7 @@ const PatientProgress = () => {
           <CardContent>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={healthMetrics.length > 0 ? healthMetrics : vitalSigns}>
+                <BarChart data={normalizedMetrics}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="recorded_date" />
                   <YAxis />
@@ -244,8 +283,12 @@ const PatientProgress = () => {
               <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-semibold text-green-800">Excellent Progress</h4>
-                    <p className="text-sm text-green-700">Health score improved significantly this week</p>
+                    <h4 className="font-semibold text-green-800">
+                      Excellent Progress
+                    </h4>
+                    <p className="text-sm text-green-700">
+                      Health score improved significantly this week
+                    </p>
                   </div>
                   <span className="text-xs text-green-600">2 days ago</span>
                 </div>
@@ -253,8 +296,12 @@ const PatientProgress = () => {
               <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-semibold text-blue-800">Medication Reminder</h4>
-                    <p className="text-sm text-blue-700">Continue current medication as prescribed</p>
+                    <h4 className="font-semibold text-blue-800">
+                      Medication Reminder
+                    </h4>
+                    <p className="text-sm text-blue-700">
+                      Continue current medication as prescribed
+                    </p>
                   </div>
                   <span className="text-xs text-blue-600">5 days ago</span>
                 </div>
@@ -262,8 +309,12 @@ const PatientProgress = () => {
               <div className="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-semibold text-yellow-800">Follow-up Scheduled</h4>
-                    <p className="text-sm text-yellow-700">Next appointment scheduled for next week</p>
+                    <h4 className="font-semibold text-yellow-800">
+                      Follow-up Scheduled
+                    </h4>
+                    <p className="text-sm text-yellow-700">
+                      Next appointment scheduled for next week
+                    </p>
                   </div>
                   <span className="text-xs text-yellow-600">1 week ago</span>
                 </div>
