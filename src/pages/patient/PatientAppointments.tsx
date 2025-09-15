@@ -50,6 +50,7 @@ const PatientAppointments = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "confirmed":
+      case "scheduled":
         return "bg-green-100 text-green-800";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
@@ -149,12 +150,17 @@ const PatientAppointments = () => {
                         {"Healthcare Appointment"}
                       </CardTitle>
                       <CardDescription className="mt-1">
-                        Status: {appointment.status}
+                        Status:{" "}
+                        {appointment.status === "confirmed"
+                          ? "scheduled"
+                          : appointment.status}
                       </CardDescription>
                     </div>
                     <Badge className={getStatusColor(appointment.status)}>
-                      {appointment.status.charAt(0).toUpperCase() +
-                        appointment.status.slice(1)}
+                      {appointment.status === "confirmed"
+                        ? "Scheduled"
+                        : appointment.status.charAt(0).toUpperCase() +
+                          appointment.status.slice(1)}
                     </Badge>
                   </div>
                 </CardHeader>

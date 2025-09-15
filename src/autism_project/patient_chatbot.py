@@ -70,14 +70,37 @@ class AutismAwarenessBot:
         if not self.autism_knowledge:
             return "I'm currently unable to access my knowledge base. Please try again later."
 
-        # Basic keyword matching
+        # Basic keyword matching with prioritization for symptom/early-sign queries
         query_terms = [t.strip().lower() for t in query.split() if len(t) > 3]
         sentences = [s.strip() for s in self.autism_knowledge.split(". ") if s.strip()]
+
+        # Remove boilerplate/disclaimer sentences and overly long lines
+        boilerplate_markers = [
+            "Autism Spectrum Disorder: A Comprehensive Knowledge Base",
+            "Important Disclaimer for Caregivers and Medical Practitioners",
+        ]
+        filtered_sentences: List[str] = []
+        for s in sentences:
+            if any(marker.lower() in s.lower() for marker in boilerplate_markers):
+                continue
+            if len(s) > 300:
+                continue
+            filtered_sentences.append(s)
+        sentences = filtered_sentences or sentences
+
+        # If the user asks about early signs or symptoms, prioritize such sentences
+        symptom_focus_terms = [
+            "early sign", "early signs", "signs of autism", "symptom", "symptoms",
+            "behaviour", "behavior", "developmental", "milestones", "screening"
+        ]
+        prioritize_symptoms = any(term in (query or "").lower() for term in symptom_focus_terms)
 
         scored: List[tuple[int, str]] = []
         for sent in sentences:
             lower = sent.lower()
             score = sum(1 for t in query_terms if t in lower)
+            if prioritize_symptoms and ("symptom" in lower or "sign" in lower):
+                score += 2  # boost relevant sentences
             if score:
                 scored.append((score, sent))
 
@@ -95,17 +118,49 @@ class AutismAwarenessBot:
         max_chars = 900
         if len(answer) > max_chars:
             answer = answer[:max_chars].rsplit(" ", 1)[0] + "…"
-        return (
-            f"Here is information from my autism knowledge base: {answer}\n\n"
-            "For personalized support, please consult autism specialists or local support organizations."
-        )
+        # Concise fallback without repeating boilerplate headers
+        cleaned = answer
+        long_header = "Autism Spectrum Disorder: A Comprehensive Knowledge Base"
+        if cleaned.startswith(long_header):
+            cleaned = cleaned[len(long_header):].lstrip(" :\n")
+        # Remove any lingering boilerplate markers
+        for marker in [long_header, "Important Disclaimer for Caregivers and Medical Practitioners"]:
+            cleaned = cleaned.replace(marker, "").strip()
+        return f"{cleaned}\n\nFor personalized support, please consult autism specialists or local support organizations."
+
+    def _answer_from_pdf_scored(self, query: str):
+        """Return (answer, score) where score is based on keyword hits; higher is better."""
+        if not self.autism_knowledge:
+            return None, 0
+        query_terms = [t.strip().lower() for t in query.split() if len(t) > 3]
+        sentences = [s.strip() for s in self.autism_knowledge.split(". ") if s.strip()]
+        scored: List[tuple[int, str]] = []
+        for sent in sentences:
+            lower = sent.lower()
+            score = sum(1 for t in query_terms if t in lower)
+            if score:
+                scored.append((score, sent))
+        if not scored:
+            return None, 0
+        scored.sort(key=lambda x: x[0], reverse=True)
+        top = [s for _, s in scored[:5]]
+        answer = " ".join(top)
+        # Trim
+        max_chars = 800
+        if len(answer) > max_chars:
+            answer = answer[:max_chars].rsplit(" ", 1)[0] + "…"
+        return answer, sum(score for score, _ in scored[:3])
 
     def system_prompt(self):
         prompt = (
-            f"You are {self.name}, a compassionate and knowledgeable assistant specializing in autism awareness and support.\n\n"
-            f"Instructions:\n"
-            f"- For the first message, say: \"Hello! Welcome to our autism awareness and support center. I'm here to provide information, resources, and support about autism spectrum disorders. How can I help you today?\"\n"
-            f"- PRIMARILY focus on topics related to:\n"
+            f"You are {self.name}, an Autism Advisor: warm, concise, and evidence-informed.\n"
+            f"Your goals: help users understand autism, provide practical strategies, and point to support resources.\n\n"
+            f"Style:\n"
+            f"- Friendly, encouraging, and easy to read.\n"
+            f"- Keep answers short and structured with bullets when helpful.\n"
+            f"- Avoid repeating long headers or disclaimers.\n"
+            f"- If the user greets you (hi/hello/hey), reply with a brief greeting and 3 suggested follow-ups.\n\n"
+            f"Scope (focus on):\n"
             f"  * Autism spectrum disorders (ASD)\n"
             f"  * Early signs and symptoms of autism\n"
             f"  * Autism diagnosis and assessment\n"
@@ -116,13 +171,9 @@ class AutismAwarenessBot:
             f"  * Educational strategies for autism\n"
             f"  * Daily living skills and independence\n"
             f"  * Sensory processing and autism\n"
-            f"- Use the autism knowledge from the PDF document as your primary source of information\n"
-            f"- Be empathetic, understanding, and non-judgmental in all responses\n"
-            f"- For current research, statistics, or recent developments in autism, mention you can look up the latest information\n"
-            f"- If asked about non-autism topics, gently redirect: \"While I focus on autism awareness and support, I'd be happy to help with any autism-related questions you might have.\"\n"
-            f"- Always provide supportive and encouraging responses\n"
-            f"- End autism-related advice with: \"For personalized support and resources, consider consulting with autism specialists or local support organizations.\"\n"
-            f"- Be respectful of neurodiversity and avoid language that suggests autism needs to be 'cured' or 'fixed'\n\n"
+            f"Use the autism PDF knowledge base below as primary context. If the PDF lacks details, you may reason concisely or say you can search for current info.\n"
+            f"End actionable answers with one short supportive nudge to seek local professional help when appropriate.\n"
+            f"Be respectful of neurodiversity and avoid language that suggests autism needs to be 'cured' or 'fixed'.\n\n"
             f"Autism Knowledge Base: {self.autism_knowledge}..."
         )
         return prompt
@@ -131,7 +182,35 @@ class AutismAwarenessBot:
         if history is None:
             history = []
 
-        # Build messages for LLM call
+        # Greeting / small-talk fast path
+        msg_lower = (message or "").strip().lower()
+        greetings = {"hi", "hello", "hey", "hai", "hola"}
+        if msg_lower in greetings or msg_lower.startswith("hi ") or msg_lower.startswith("hello "):
+            return (
+                "Hi! I’m your Autism Advisor. How can I help today?\n"
+                "- Early signs of autism\n- Evidence‑based therapies\n- Support at home and school"
+            )
+
+        # Identity/ability queries fast path
+        identity_phrases = [
+            "who are you", "what are you", "what is this", "what can you do",
+            "your name", "who r u"
+        ]
+        if any(phrase in msg_lower for phrase in identity_phrases):
+            return (
+                "I’m your Autism Advisor — a supportive assistant that explains autism clearly and suggests practical next steps. "
+                "Ask me about early signs, therapies, school support, or daily strategies."
+            )
+
+        # First try: PDF retrieval answer; if strong enough, use it directly
+        pdf_answer, pdf_score = self._answer_from_pdf_scored(message)
+        # Lower threshold so common questions like early signs/symptoms answer directly from PDF
+        if pdf_answer and pdf_score >= 2:
+            content = pdf_answer
+        else:
+            content = None
+
+        # Build messages for LLM call (only if PDF was weak)
         messages = [{"role": "system", "content": self.system_prompt()}]
         
         # Add previous conversation history
@@ -144,29 +223,16 @@ class AutismAwarenessBot:
         # Add current user message
         messages.append({"role": "user", "content": message})
 
-        content = None
-        # 1) Try Groq with a list of candidate models (handles deprecations automatically)
-        groq_model_candidates: List[str] = [
-            "llama-3.2-11b-text",           # recent llama 3.2 text model
-            "llama-3.1-8b-instant",         # smaller/faster
-            "llama-3.1-70b-versatile",      # larger instruct
-            "mixtral-8x7b-32768",           # Mixtral
-            "gemma2-9b-it",                 # Gemma instruct
-        ]
-
-        if groq_client:
-            for model_name in groq_model_candidates:
-                try:
-                    response = groq_client.chat.completions.create(
-                        model=model_name,
-                        messages=messages,
-                    )
-                    content = response.choices[0].message.content.strip()
-                    # Stop at first success
-                    break
-                except Exception as groq_err:
-                    print(f"Groq model failed ({model_name}):", groq_err)
-                    continue
+        # 1) Try Groq with the requested model only
+        if not content and groq_client:
+            try:
+                response = groq_client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=messages,
+                )
+                content = response.choices[0].message.content.strip()
+            except Exception as groq_err:
+                print("Groq model failed (llama-3.1-8b-instant):", groq_err)
 
         # 2) Fallback to Gemini if Groq unavailable or all candidates failed
         if not content:
@@ -206,7 +272,27 @@ class AutismAwarenessBot:
         if any(keyword in message.lower() for keyword in autism_current_keywords):
             search_result = serper_search(f"autism {message}")
             if search_result and "No relevant information found" not in search_result and "Search API" not in search_result:
-                content += f"\n\nHere's some current information I found about autism:\n{search_result}"
+                # Append concise current info once
+                content += f"\n\nCurrent info: {search_result}"
+
+        # Normalize: remove obvious duplicated boilerplate chunks
+        try:
+            content = content.strip()
+            # Collapse duplicate long titles if present
+            long_header = "Autism Spectrum Disorder: A Comprehensive Knowledge Base"
+            while content.count(long_header) > 1:
+                first = content.find(long_header)
+                second = content.find(long_header, first + 1)
+                content = content[:second] + content[second + len(long_header):]
+            # If the model echoed the long header at the beginning, drop it once
+            if content.startswith(long_header):
+                content = content[len(long_header):].lstrip(" :\n")
+            # Strip disclaimers/boilerplate anywhere
+            for marker in [long_header, "Important Disclaimer for Caregivers and Medical Practitioners"]:
+                content = content.replace(marker, "")
+            content = content.strip()
+        except Exception:
+            pass
 
         return content
 

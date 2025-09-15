@@ -1,0 +1,19 @@
+{
+  "brand": {
+    "user": "स्वास्थ्य",
+    "patient": "रोगी पोर्टल",
+    "doctor": "डॉक्टर पोर्टल"
+  },
+  "nav": {
+    "dashboard": "डैशबोर्ड",
+    "appointments": "अपॉइंटमेंट्स",
+    "chatbot": "चैटबॉट",
+    "schedule": "शेड्यूल",
+    "about": "हमारे बारे में",
+    "news": "समाचार",
+    "progress": "प्रगति",
+    "learning": "लर्निंग हब",
+    "aiAssistant": "एआई सहायक"
+  },
+  "auth": {"getStarted": "शुरू करें", "signOut": "साइन आउट"}
+}

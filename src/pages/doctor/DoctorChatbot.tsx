@@ -14,6 +14,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import {chatbotApi, ChatMessage} from "@/lib/chatbotApi";
+import {useTranslation} from "react-i18next";
 
 interface Message {
   id: string;
@@ -38,6 +39,7 @@ const DoctorChatbot = () => {
     "checking" | "connected" | "error"
   >("checking");
   const [error, setError] = useState<string | null>(null);
+  const {t} = useTranslation();
 
   const suggestions = [
     "Can I get patient with id 992?",
@@ -150,11 +152,9 @@ const DoctorChatbot = () => {
     >
       <div className="text-center">
         <h1 className="text-3xl font-heading font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          AI Medical Assistant
+          {t("nav.aiAssistant")}
         </h1>
-        <p className="text-gray-600 mt-2">
-          Advanced AI support for clinical decision making
-        </p>
+        <p className="text-gray-600 mt-2">{t("doctor.aiSubtitle")}</p>
 
         {/* API Status Indicator */}
         <div className="mt-4 flex justify-center">
@@ -227,7 +227,7 @@ const DoctorChatbot = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="size-5 text-purple-600" />
-            Medical AI Assistant
+            {t("nav.aiAssistant")}
           </CardTitle>
         </CardHeader>
         <CardContent>

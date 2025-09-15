@@ -1,0 +1,19 @@
+{
+  "brand": {
+    "user": "Gesundheit",
+    "patient": "Patientenportal",
+    "doctor": "Ärzteportal"
+  },
+  "nav": {
+    "dashboard": "Übersicht",
+    "appointments": "Termine",
+    "chatbot": "Chatbot",
+    "schedule": "Zeitplan",
+    "about": "Über uns",
+    "news": "Neuigkeiten",
+    "progress": "Fortschritt",
+    "learning": "Lernzentrum",
+    "aiAssistant": "KI-Assistent"
+  },
+  "auth": {"getStarted": "Loslegen", "signOut": "Abmelden"}
+}

@@ -1,15 +1,31 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Users, Calendar, TrendingUp, MessageSquare, Stethoscope, Clock, Activity } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useRoleAuth } from '@/hooks/useRoleAuth';
-import { supabase } from '@/integrations/supabase/client';
+import {useState, useEffect} from "react";
+import {motion} from "framer-motion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
+import {Badge} from "@/components/ui/badge";
+import {
+  Users,
+  Calendar,
+  TrendingUp,
+  MessageSquare,
+  Stethoscope,
+  Clock,
+  Activity,
+} from "lucide-react";
+import {Link} from "react-router-dom";
+import {useTranslation} from "react-i18next";
+import {useRoleAuth} from "@/hooks/useRoleAuth";
+import {supabase} from "@/integrations/supabase/client";
+import {getCurrentDoctor} from "@/lib/supabase/doctors";
 
 const DoctorDashboard = () => {
-  const { user } = useRoleAuth();
+  const {user} = useRoleAuth();
   const [appointmentCount, setAppointmentCount] = useState(0);
   const [patientCount, setPatientCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -20,45 +36,73 @@ const DoctorDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const { data: appointments } = await supabase
-        .from('appointments')
-        .select('*');
+      const doctor = await getCurrentDoctor();
+      if (!doctor) {
+        setAppointmentCount(0);
+        setPatientCount(0);
+        return;
+      }
 
-      const { data: patients } = await supabase
-        .from('patients')
-        .select('*');
+      // Start/end of today in local time => ISO for timestampz comparison
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      const end = new Date();
+      end.setHours(23, 59, 59, 999);
 
-      // Get learning videos count
-      const { data: videos } = await supabase
-        .from('learning_videos')
-        .select('*');
+      // Fetch only this doctor's appointments
+      const {data: apptsAll, error: apptsErr} = await supabase
+        .from("appointments")
+        .select("id, patient_id, therapist_id, appointment_date")
+        .eq("therapist_id", doctor.id);
+      if (apptsErr) throw apptsErr;
 
-      setAppointmentCount(appointments?.length || 0);
-      setPatientCount(patients?.length || 0);
+      // Today's appointments for this doctor
+      const {data: apptsToday, error: todayErr} = await supabase
+        .from("appointments")
+        .select("id")
+        .eq("therapist_id", doctor.id)
+        .gte("appointment_date", start.toISOString())
+        .lte("appointment_date", end.toISOString());
+      if (todayErr) throw todayErr;
+
+      // Count distinct patients the doctor has appointments with
+      const uniquePatients = new Set(
+        (apptsAll || []).map((a) => a.patient_id).filter(Boolean)
+      );
+
+      setAppointmentCount((apptsAll || []).length);
+      setPatientCount(uniquePatients.size);
+
+      // Update the card "Today's Schedule" number by state if needed later
+      // (kept static UI but can use apptsToday.length)
+      const todayCount = (apptsToday || []).length;
+      // Optional: could store in state if you want to render dynamically
+      (window as any).__doctor_today_appt_count = todayCount; // harmless no-op for now
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: {opacity: 0},
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+      transition: {staggerChildren: 0.1},
+    },
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: {y: 20, opacity: 0},
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100 }
-    }
+      transition: {type: "spring", stiffness: 100},
+    },
   };
 
+  const {t} = useTranslation();
   return (
     <motion.div
       variants={containerVariants}
@@ -68,9 +112,11 @@ const DoctorDashboard = () => {
     >
       <motion.div variants={itemVariants} className="text-center">
         <h1 className="text-4xl font-heading font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          Welcome, Dr. {user?.user_metadata?.name?.split(' ')[1] || 'Doctor'}!
+          {t("headings.doctorWelcome", {
+            name: user?.user_metadata?.name?.split(" ")[1] || "Doctor",
+          })}
         </h1>
-        <p className="text-gray-600 mt-2">Manage your patients and appointments</p>
+        <p className="text-gray-600 mt-2">{t("headings.doctorSubtitle")}</p>
       </motion.div>
 
       <motion.div
@@ -87,7 +133,7 @@ const DoctorDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-blue-600">
-                {loading ? '...' : patientCount}
+                {loading ? "..." : patientCount}
               </div>
               <p className="text-sm text-gray-600">Registered patients</p>
             </CardContent>
@@ -104,7 +150,7 @@ const DoctorDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-green-600">
-                {loading ? '...' : appointmentCount}
+                {loading ? "..." : appointmentCount}
               </div>
               <p className="text-sm text-gray-600">Total bookings</p>
             </CardContent>
@@ -180,7 +226,10 @@ const DoctorDashboard = () => {
             </CardHeader>
             <CardContent>
               <Link to="/doctor/chatbot">
-                <Button variant="outline" className="w-full border-indigo-200 hover:bg-indigo-50">
+                <Button
+                  variant="outline"
+                  className="w-full border-indigo-200 hover:bg-indigo-50"
+                >
                   Open Assistant
                 </Button>
               </Link>
@@ -200,14 +249,18 @@ const DoctorDashboard = () => {
                 <Calendar className="size-5 text-blue-600" />
                 <div>
                   <p className="font-medium">New appointment booked</p>
-                  <p className="text-sm text-gray-600">Patient scheduled for tomorrow at 2:00 PM</p>
+                  <p className="text-sm text-gray-600">
+                    Patient scheduled for tomorrow at 2:00 PM
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
                 <TrendingUp className="size-5 text-green-600" />
                 <div>
                   <p className="font-medium">Patient progress updated</p>
-                  <p className="text-sm text-gray-600">Health score improved for 3 patients this week</p>
+                  <p className="text-sm text-gray-600">
+                    Health score improved for 3 patients this week
+                  </p>
                 </div>
               </div>
             </div>

@@ -1,0 +1,15 @@
+{
+  "brand": {"user": "헬스케어", "patient": "환자 포털", "doctor": "의사 포털"},
+  "nav": {
+    "dashboard": "대시보드",
+    "appointments": "예약",
+    "chatbot": "챗봇",
+    "schedule": "일정",
+    "about": "소개",
+    "news": "뉴스",
+    "progress": "진행상황",
+    "learning": "학습 허브",
+    "aiAssistant": "AI 도우미"
+  },
+  "auth": {"getStarted": "시작하기", "signOut": "로그아웃"}
+}

@@ -1,0 +1,19 @@
+{
+  "brand": {
+    "user": "ヘルスケア",
+    "patient": "患者ポータル",
+    "doctor": "医師ポータル"
+  },
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "appointments": "予約",
+    "chatbot": "チャットボット",
+    "schedule": "スケジュール",
+    "about": "概要",
+    "news": "ニュース",
+    "progress": "進捗",
+    "learning": "ラーニングハブ",
+    "aiAssistant": "AIアシスタント"
+  },
+  "auth": {"getStarted": "はじめる", "signOut": "サインアウト"}
+}

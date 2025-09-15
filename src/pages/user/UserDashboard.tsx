@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import {motion} from "framer-motion";
 import {
   Card,
   CardContent,
@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import {Button} from "@/components/ui/button";
 import {
   CalendarCheck2,
   MessageSquare,
@@ -16,29 +16,31 @@ import {
   Activity,
   Calendar,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useRoleAuth } from "@/hooks/useRoleAuth";
+import {Link} from "react-router-dom";
+import {useTranslation} from "react-i18next";
+import {useRoleAuth} from "@/hooks/useRoleAuth";
 
 const UserDashboard = () => {
-  const { user } = useRoleAuth();
+  const {user} = useRoleAuth();
 
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: {opacity: 0},
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 },
+      transition: {staggerChildren: 0.1},
     },
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: {y: 20, opacity: 0},
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100 },
+      transition: {type: "spring", stiffness: 100},
     },
   };
 
+  const {t} = useTranslation();
   return (
     <motion.div
       variants={containerVariants}
@@ -48,11 +50,11 @@ const UserDashboard = () => {
     >
       <motion.div variants={itemVariants} className="text-center">
         <h1 className="text-4xl font-heading font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Welcome back, {user?.user_metadata?.first_name || "User"}!
+          {t("headings.userWelcome", {
+            name: user?.user_metadata?.first_name || "User",
+          })}
         </h1>
-        <p className="text-gray-600 mt-2">
-          Manage your health and appointments
-        </p>
+        <p className="text-gray-600 mt-2">{t("headings.userSubtitle")}</p>
       </motion.div>
 
       <motion.div
