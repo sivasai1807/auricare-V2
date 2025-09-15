@@ -1,0 +1,19 @@
+{
+  "brand": {
+    "user": "الرعاية الصحية",
+    "patient": "بوابة المريض",
+    "doctor": "بوابة الطبيب"
+  },
+  "nav": {
+    "dashboard": "اللوحة",
+    "appointments": "المواعيد",
+    "chatbot": "المساعد",
+    "schedule": "الجدول",
+    "about": "حول",
+    "news": "الأخبار",
+    "progress": "التقدم",
+    "learning": "مركز التعلم",
+    "aiAssistant": "مساعد الذكاء الاصطناعي"
+  },
+  "auth": {"getStarted": "ابدأ", "signOut": "تسجيل الخروج"}
+}

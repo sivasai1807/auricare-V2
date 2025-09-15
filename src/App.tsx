@@ -7,6 +7,7 @@ import {HelmetProvider} from "react-helmet-async";
 import {RoleAuthProvider, useRoleAuth} from "@/hooks/useRoleAuth";
 import RoleBasedLayout from "./components/layout/RoleBasedLayout";
 import RoleBasedAuth from "./components/auth/RoleBasedAuth";
+import "@/i18n";
 
 // Common pages
 import Index from "./pages/Index";

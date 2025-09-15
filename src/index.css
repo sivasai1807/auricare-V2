@@ -33,5 +33,76 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: inherit;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  a,
+  span,
+  div,
+  button,
+  input,
+  textarea,
+  select,
+  label,
+  small,
+  strong,
+  em,
+  ul,
+  ol,
+  li,
+  table,
+  th,
+  td,
+  blockquote {
+    font-family: inherit;
+  }
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace;
+  }
+}
+
+/* Multilingual font stacks controlled by html[data-font] set in i18n */
+@layer base {
+  :root {
+    --font-latin: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+      Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    --font-devanagari: "Noto Sans Devanagari", var(--font-latin);
+    --font-chinese: "Noto Sans SC", "Microsoft YaHei", var(--font-latin);
+    --font-japanese: "Noto Sans JP", "Hiragino Kaku Gothic Pro",
+      var(--font-latin);
+    --font-korean: "Noto Sans KR", "Malgun Gothic", var(--font-latin);
+    --font-arabic: "Noto Naskh Arabic", "Amiri", var(--font-latin);
+  }
+  html[data-font="latin"] {
+    font-family: var(--font-latin);
+  }
+  html[data-font="devanagari"] {
+    font-family: var(--font-devanagari);
+  }
+  html[data-font="chinese"] {
+    font-family: var(--font-chinese);
+  }
+  html[data-font="japanese"] {
+    font-family: var(--font-japanese);
+  }
+  html[data-font="korean"] {
+    font-family: var(--font-korean);
+  }
+  html[data-font="arabic"] {
+    font-family: var(--font-arabic);
+  }
+  .font-heading,
+  .font-sans {
+    font-family: inherit;
   }
 }

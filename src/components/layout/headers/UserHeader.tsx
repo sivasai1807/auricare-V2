@@ -1,30 +1,41 @@
-import { Link, NavLink } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Menu, User, LogOut, Heart } from "lucide-react";
-import { useState } from "react";
-import { useRoleAuth } from "@/hooks/useRoleAuth";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {Link, NavLink} from "react-router-dom";
+import {Button} from "@/components/ui/button";
+import {Menu, User, LogOut, Heart} from "lucide-react";
+import {useState} from "react";
+import {useRoleAuth} from "@/hooks/useRoleAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {useTranslation} from "react-i18next";
+import LanguageSelector from "@/components/ui/LanguageSelector";
 
 const navItems = [
-  { to: "/user/dashboard", label: "Dashboard" },
-  { to: "/user/appointments", label: "Appointments" },
-  { to: "/user/chatbot", label: "Chatbot" },
-  { to: "/user/schedule", label: "Schedule" },
-  { to: "/about", label: "About" },
-  { to: "/news", label: "News" },
+  {to: "/user/dashboard", key: "nav.dashboard"},
+  {to: "/user/appointments", key: "nav.appointments"},
+  {to: "/user/chatbot", key: "nav.chatbot"},
+  {to: "/user/schedule", key: "nav.schedule"},
+  {to: "/about", key: "nav.about"},
+  {to: "/news", key: "nav.news"},
 ];
 
 export default function UserHeader() {
   const [open, setOpen] = useState(false);
-  const { user, signOut } = useRoleAuth();
+  const {user, signOut} = useRoleAuth();
+  const {t} = useTranslation();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70 shadow-sm">
       <div className="container mx-auto h-16 flex items-center justify-between px-4">
-        <Link to="/user/dashboard" className="flex items-center gap-2 font-heading text-xl font-bold">
+        <Link
+          to="/user/dashboard"
+          className="flex items-center gap-2 font-heading text-xl font-bold"
+        >
           <Heart className="size-6 text-blue-600" />
           <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            HealthCare
+            {t("brand.user")}
           </span>
         </Link>
 
@@ -33,40 +44,58 @@ export default function UserHeader() {
             <NavLink
               key={item.to}
               to={item.to}
-              className={({ isActive }) =>
-                `transition-colors hover:text-blue-600 ${isActive ? 'text-blue-600 font-medium' : 'text-gray-600'}`
+              className={({isActive}) =>
+                `transition-colors hover:text-blue-600 ${
+                  isActive ? "text-blue-600 font-medium" : "text-gray-600"
+                }`
               }
             >
-              {item.label}
+              {t(item.key)}
             </NavLink>
           ))}
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
+          <LanguageSelector />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
                   <User className="size-4" />
                   {user.user_metadata?.first_name || user.email}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white/90 backdrop-blur">
+              <DropdownMenuContent
+                align="end"
+                className="bg-white/90 backdrop-blur"
+              >
                 <DropdownMenuItem asChild>
-                  <Link to="/user/dashboard">Dashboard</Link>
+                  <Link to="/user/dashboard">{t("nav.dashboard")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut}>
                   <LogOut className="size-4 mr-2" />
-                  Sign Out
+                  {t("auth.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link to="/auth"><Button variant="glow" size="sm">Get Started</Button></Link>
+            <Link to="/auth">
+              <Button variant="glow" size="sm">
+                {t("auth.getStarted")}
+              </Button>
+            </Link>
           )}
         </div>
 
-        <button className="md:hidden p-2" aria-label="Toggle menu" onClick={() => setOpen(!open)}>
+        <button
+          className="md:hidden p-2"
+          aria-label="Toggle menu"
+          onClick={() => setOpen(!open)}
+        >
           <Menu className="size-6" />
         </button>
       </div>
@@ -75,15 +104,24 @@ export default function UserHeader() {
         <div className="md:hidden border-t bg-white/90 backdrop-blur">
           <nav className="container py-3 grid grid-cols-2 gap-3 px-4">
             {navItems.map((item) => (
-              <NavLink key={item.to} to={item.to} className="text-sm text-gray-600 hover:text-blue-600" onClick={() => setOpen(false)}>
-                {item.label}
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className="text-sm text-gray-600 hover:text-blue-600"
+                onClick={() => setOpen(false)}
+              >
+                {t(item.key)}
               </NavLink>
             ))}
             <div className="col-span-2">
               {user ? (
-                <Button className="w-full" variant="ghost" onClick={signOut}>Sign Out</Button>
+                <Button className="w-full" variant="ghost" onClick={signOut}>
+                  {t("auth.signOut")}
+                </Button>
               ) : (
-                <Button className="w-full" variant="glow">Get Started</Button>
+                <Button className="w-full" variant="glow">
+                  {t("auth.getStarted")}
+                </Button>
               )}
             </div>
           </nav>

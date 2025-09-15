@@ -1,0 +1,19 @@
+{
+  "brand": {
+    "user": "Saúde",
+    "patient": "Portal do Paciente",
+    "doctor": "Portal do Médico"
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "appointments": "Consultas",
+    "chatbot": "Chatbot",
+    "schedule": "Agenda",
+    "about": "Sobre",
+    "news": "Notícias",
+    "progress": "Progresso",
+    "learning": "Hub de Aprendizagem",
+    "aiAssistant": "Assistente IA"
+  },
+  "auth": {"getStarted": "Começar", "signOut": "Sair"}
+}

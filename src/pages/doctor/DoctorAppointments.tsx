@@ -23,7 +23,7 @@ import {
 interface UIAppointment extends Appointment {
   patient_name?: string;
   username?: string;
-  details?: string;
+  reason?: string;
   doctor_name?: string;
   specialization?: string;
 }
@@ -125,6 +125,14 @@ const DoctorAppointments = () => {
     });
   const formatTime = (t: string) => t.substring(0, 5);
 
+  // Extract only the "Details:" line if the reason contains a multi-line note
+  const extractDetails = (reason?: string) => {
+    if (!reason) return "";
+    const match = reason.match(/Details:\s*(.*)/i);
+    if (match && match[1]) return match[1].trim();
+    return reason.trim();
+  };
+
   if (loading)
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -223,20 +231,20 @@ const DoctorAppointments = () => {
                         Reason for Visit
                       </h4>
                       <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                        {a.details}
+                        {extractDetails(a.reason)}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex gap-2 mt-4">
-                    {a.status === "pending" && (
+                    {(a.status === "pending" || a.status === "scheduled") && (
                       <Button
                         size="sm"
                         onClick={() => onUpdateStatus(a.id, "confirmed")}
                         className="bg-green-600 hover:bg-green-700"
                       >
                         <CheckCircle className="size-4 mr-2" />
-                        Confirm
+                        Accept
                       </Button>
                     )}
                     {(a.status === "pending" || a.status === "confirmed") && (

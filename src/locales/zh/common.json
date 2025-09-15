@@ -1,0 +1,15 @@
+{
+  "brand": {"user": "健康护理", "patient": "患者门户", "doctor": "医生门户"},
+  "nav": {
+    "dashboard": "仪表盘",
+    "appointments": "预约",
+    "chatbot": "聊天助手",
+    "schedule": "日程",
+    "about": "关于",
+    "news": "新闻",
+    "progress": "进度",
+    "learning": "学习中心",
+    "aiAssistant": "AI 助手"
+  },
+  "auth": {"getStarted": "开始使用", "signOut": "退出登录"}
+}

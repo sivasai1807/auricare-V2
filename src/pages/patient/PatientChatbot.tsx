@@ -5,6 +5,7 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {MessageSquare, Bot, User, Send, Heart, AlertCircle} from "lucide-react";
 import {chatbotApi, ChatMessage} from "@/lib/chatbotApi";
+import {useTranslation} from "react-i18next";
 
 interface Message {
   id: string;
@@ -29,6 +30,7 @@ const PatientChatbot = () => {
     "checking" | "connected" | "error"
   >("checking");
   const [error, setError] = useState<string | null>(null);
+  const {t} = useTranslation();
 
   const suggestions = [
     "What are the early signs of autism?",
@@ -68,6 +70,7 @@ const PatientChatbot = () => {
       timestamp: new Date(),
     };
 
+    // Optimistically render the user's message
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
@@ -75,7 +78,9 @@ const PatientChatbot = () => {
 
     try {
       // Convert messages to the format expected by the API
-      const chatHistory: ChatMessage[] = messages.map((msg) => ({
+      // IMPORTANT: include the just-sent userMessage (state is stale in this tick)
+      const historySource = [...messages, userMessage];
+      const chatHistory: ChatMessage[] = historySource.map((msg) => ({
         role: msg.role,
         content: msg.content,
         timestamp: msg.timestamp,
@@ -84,10 +89,22 @@ const PatientChatbot = () => {
       const response = await chatbotApi.patientChat(input.trim(), chatHistory);
 
       if (response.success) {
+        // Normalize response to avoid duplicate long boilerplate
+        const normalized = (response.response || "").trim();
+        const last = historySource
+          .slice()
+          .reverse()
+          .find((m) => m.role === "assistant");
+        if (last && last.content.trim() === normalized) {
+          // Skip adding duplicate consecutive assistant message
+          setLoading(false);
+          return;
+        }
+
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: response.response,
+          content: normalized,
           timestamp: new Date(),
         };
 
@@ -128,12 +145,9 @@ const PatientChatbot = () => {
     >
       <div className="text-center">
         <h1 className="text-3xl font-heading font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-          Autism Awareness & Support Assistant
+          {t("patient.assistantHeading")}
         </h1>
-        <p className="text-gray-600 mt-2">
-          Get information, resources, and support about autism spectrum
-          disorders
-        </p>
+        <p className="text-gray-600 mt-2">{t("patient.assistantSubtitle")}</p>
 
         {/* API Status Indicator */}
         <div className="mt-4 flex justify-center">
@@ -162,7 +176,7 @@ const PatientChatbot = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="size-5 text-green-600" />
-            Your Health Companion
+            {t("patient.healthCompanion")}
           </CardTitle>
         </CardHeader>
         <CardContent>

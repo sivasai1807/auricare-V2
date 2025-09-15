@@ -1,0 +1,58 @@
+{
+  "brand": {
+    "user": "HealthCare",
+    "patient": "Patient Portal",
+    "doctor": "Doctor Portal"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "appointments": "Appointments",
+    "chatbot": "Chatbot",
+    "schedule": "Schedule",
+    "about": "About",
+    "news": "News",
+    "progress": "Progress",
+    "learning": "Learning Hub",
+    "aiAssistant": "AI Assistant"
+  },
+  "auth": {"getStarted": "Get Started", "signOut": "Sign Out"},
+  "headings": {
+    "userWelcome": "Welcome back, {{name}}!",
+    "doctorWelcome": "Welcome, Dr. {{name}}!",
+    "userSubtitle": "Manage your health and appointments",
+    "doctorSubtitle": "Manage your patients and appointments",
+    "patientWelcome": "Welcome, {{name}}!",
+    "patientSubtitle": "Track your health progress and manage your care"
+  },
+  "patient": {
+    "healthOverview": "Health Progress Overview",
+    "currentHealthScore": "Current Health Score",
+    "averageHealthScore": "Average Health Score",
+    "noProgress": "No progress data available",
+    "personalizedGuidance": "Get personalized health guidance",
+    "viewAppointments": "View Appointments",
+    "viewAppointmentsDesc": "View your scheduled appointments and history",
+    "healthMetrics": "Health Metrics",
+    "monitorVitals": "Monitor your vital signs and health data",
+    "viewMetrics": "View Metrics",
+    "recentProgress": "Recent Progress",
+    "noRecentProgress": "No recent progress data",
+    "recentProgressHint": "Your health progress updates will appear here",
+    "reportsNotifications": "Recent Reports & Notifications",
+    "noRecentReports": "No recent reports",
+    "reportsHint": "Your health reports and progress updates will appear here",
+    "weekX": "Week {{week}}",
+    "symptomCount": "{{count}} symptoms",
+    "assistantHeading": "Autism Awareness & Support Assistant",
+    "assistantSubtitle": "Get information, resources, and support about autism spectrum disorders",
+    "healthCompanion": "Your Health Companion"
+  },
+  "doctor": {
+    "aiSubtitle": "Advanced AI support for clinical decision making"
+  },
+  "common": {
+    "loadingProgress": "Loading progress...",
+    "loadingRecent": "Loading recent progress...",
+    "chatNow": "Chat Now"
+  }
+}

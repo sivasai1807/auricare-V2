@@ -9,6 +9,12 @@ export type Appointment = {
   time: string; // HH:MM:SS
   created_at: string;
   updated_at: string;
+  // Enriched fields for UI
+  patient_name?: string;
+  username?: string;
+  reason?: string;
+  doctor_name?: string;
+  specialization?: string;
 };
 
 export async function createAppointment(payload: {
@@ -36,9 +42,12 @@ export async function createAppointment(payload: {
 }
 
 export async function listDoctorAppointments(doctor_id: string) {
+  // Prefer the enriched view if present; falls back to base table
   const {data, error} = await supabase
-    .from("appointments")
-    .select("*")
+    .from("v_doctor_appointments")
+    .select(
+      "id, patient_id, therapist_id, status, appointment_date, appointment_day, appointment_time, created_at, updated_at, display_patient_name, display_username, reason, doctor_name, specialization"
+    )
     .eq("therapist_id", doctor_id)
     .order("appointment_date", {ascending: true});
   if (error) throw error;
@@ -88,13 +97,22 @@ export function subscribeToDoctorAppointments(
 }
 
 function normalizeAppointment(row: any): Appointment {
-  const ts = row.appointment_date as string | null;
-  let date = "";
-  let time = "";
-  if (ts) {
-    const d = new Date(ts);
-    date = d.toISOString().slice(0, 10);
-    time = d.toISOString().slice(11, 19);
+  // Prefer server-generated day/time if available; otherwise compute in local time
+  const day = row.appointment_day as string | null;
+  const t = row.appointment_time as string | null;
+  let date = day || "";
+  let time = t || "";
+  if ((!date || !time) && row.appointment_date) {
+    const d = new Date(row.appointment_date);
+    // Local date/time strings
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    const ss = String(d.getSeconds()).padStart(2, "0");
+    date = `${y}-${m}-${dd}`;
+    time = `${hh}:${mm}:${ss}`;
   }
   return {
     id: String(row.id),
@@ -105,5 +123,10 @@ function normalizeAppointment(row: any): Appointment {
     time,
     created_at: row.created_at,
     updated_at: row.updated_at,
+    patient_name: row.display_patient_name || row.patient_name || undefined,
+    username: row.display_username || row.patient_username || undefined,
+    reason: row.reason || row.notes || undefined,
+    doctor_name: row.doctor_name || undefined,
+    specialization: row.specialization || undefined,
   };
 }
