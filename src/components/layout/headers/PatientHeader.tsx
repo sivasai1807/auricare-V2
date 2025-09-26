@@ -17,7 +17,6 @@ const navItems = [
   {to: "/patient/progress", key: "nav.progress"},
   {to: "/patient/appointments", key: "nav.appointments"},
   {to: "/patient/chatbot", key: "nav.chatbot"},
-  {to: "/patient/schedule", key: "nav.schedule"},
   {to: "/about", key: "nav.about"},
   {to: "/news", key: "nav.news"},
 ];
