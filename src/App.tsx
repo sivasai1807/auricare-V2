@@ -35,6 +35,8 @@ import DoctorSchedule from "./pages/doctor/DoctorSchedule";
 
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
+import UserLearningHub from "./pages/user/UserLearningHub";
+import PatientLearningHub from "./pages/patient/PatientLearningHub";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +81,8 @@ function AppRoutes() {
             <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/user/dashboard" element={<UserDashboard />} />
             <Route path="/user/appointments" element={<UserAppointments />} />
+            <Route path="/user/learning" element={<UserLearningHub />} />{" "}
+            {/* ✅ NEW */}
             <Route path="/user/chatbot" element={<UserChatbot />} />
             <Route path="/user/schedule" element={<UserSchedule />} />
           </>
@@ -93,6 +97,8 @@ function AppRoutes() {
               path="/patient/appointments"
               element={<PatientAppointments />}
             />
+            <Route path="/patient/learning" element={<PatientLearningHub />} />{" "}
+            {/* ✅ NEW */}
             <Route path="/patient/chatbot" element={<PatientChatbot />} />
             {/* Patients cannot manage schedules */}
             <Route

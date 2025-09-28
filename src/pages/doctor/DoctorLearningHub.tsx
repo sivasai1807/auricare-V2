@@ -1,7 +1,7 @@
-import { LearningHub } from '@/components/ui/learning-hub';
+import {LearningHub} from "@/components/ui/learning-hub";
 
 const DoctorLearningHub = () => {
-  return <LearningHub />;
+  return <LearningHub readOnly={false} />;
 };
 
 export default DoctorLearningHub;

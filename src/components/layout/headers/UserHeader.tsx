@@ -17,6 +17,7 @@ const navItems = [
   {to: "/user/appointments", key: "nav.appointments"},
   {to: "/user/chatbot", key: "nav.chatbot"},
   {to: "/user/schedule", key: "nav.schedule"},
+  {to: "/user/learning", key: "nav.learning"}, // ✅ Added Learning Hub
   {to: "/about", key: "nav.about"},
   {to: "/news", key: "nav.news"},
 ];
@@ -39,6 +40,7 @@ export default function UserHeader() {
           </span>
         </Link>
 
+        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm">
           {navItems.map((item) => (
             <NavLink
@@ -55,6 +57,7 @@ export default function UserHeader() {
           ))}
         </nav>
 
+        {/* User Menu */}
         <div className="hidden md:flex items-center gap-3">
           <LanguageSelector />
           {user ? (
@@ -91,6 +94,7 @@ export default function UserHeader() {
           )}
         </div>
 
+        {/* Mobile Menu Button */}
         <button
           className="md:hidden p-2"
           aria-label="Toggle menu"
@@ -100,6 +104,7 @@ export default function UserHeader() {
         </button>
       </div>
 
+      {/* Mobile Nav */}
       {open && (
         <div className="md:hidden border-t bg-white/90 backdrop-blur">
           <nav className="container py-3 grid grid-cols-2 gap-3 px-4">

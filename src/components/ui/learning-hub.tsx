@@ -85,8 +85,7 @@ const generateVideoThumbnail = (file: File): Promise<string> => {
     video.addEventListener("error", (e) => reject(e));
   });
 };
-
-export function LearningHub() {
+export function LearningHub({readOnly = false}: {readOnly?: boolean}) {
   const [videos, setVideos] = useState<LearningVideo[]>([]);
   const [filteredVideos, setFilteredVideos] = useState<LearningVideo[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -120,11 +119,13 @@ export function LearningHub() {
     setVideos([...ytVideos, ...savedVideos]);
   }, []);
 
-  // Save manual videos to localStorage
+  // Save manual videos only if not read-only
   useEffect(() => {
-    const localVideos = videos.filter((v) => v.manual_file);
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(localVideos));
-  }, [videos]);
+    if (!readOnly) {
+      const localVideos = videos.filter((v) => v.manual_file);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(localVideos));
+    }
+  }, [videos, readOnly]);
 
   // Filter videos
   useEffect(() => {
@@ -211,7 +212,7 @@ export function LearningHub() {
         </h1>
       </div>
 
-      {/* Search + Filter + Upload */}
+      {/* Search + Filter */}
       <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
@@ -241,75 +242,80 @@ export function LearningHub() {
             </div>
           </div>
 
-          {/* Upload Section */}
-          <div className="mt-4">
-            <div className="flex gap-2 mb-2">
-              <Button
-                size="sm"
-                variant={uploadType === "manual" ? "default" : "outline"}
-                onClick={() => setUploadType("manual")}
-              >
-                Manual Upload
-              </Button>
-              <Button
-                size="sm"
-                variant={uploadType === "youtube" ? "default" : "outline"}
-                onClick={() => setUploadType("youtube")}
-              >
-                YouTube Upload
-              </Button>
-            </div>
-
-            {uploadType === "manual" ? (
-              <div className="grid gap-2 sm:grid-cols-3">
-                <Input
-                  placeholder="Title"
-                  value={newVideo.title}
-                  onChange={(e) =>
-                    setNewVideo((v) => ({...v, title: e.target.value}))
-                  }
-                />
-                <Input
-                  placeholder="Description"
-                  value={newVideo.description}
-                  onChange={(e) =>
-                    setNewVideo((v) => ({...v, description: e.target.value}))
-                  }
-                />
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={(e) =>
-                    setNewVideo((v) => ({
-                      ...v,
-                      file: e.target.files?.[0] || null,
-                    }))
-                  }
-                />
-                <Button onClick={handleAddManualVideo}>Add Video</Button>
-              </div>
-            ) : (
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Input
-                  placeholder="YouTube URL"
-                  value={newVideo.youtube_url}
-                  onChange={(e) =>
-                    setNewVideo((v) => ({...v, youtube_url: e.target.value}))
-                  }
-                />
-                <Input
-                  placeholder="Title"
-                  value={newVideo.title}
-                  onChange={(e) =>
-                    setNewVideo((v) => ({...v, title: e.target.value}))
-                  }
-                />
-                <Button onClick={handleAddYouTubeVideo}>
-                  Add YouTube Video
+          {/* Upload Section - hidden in readOnly mode */}
+          {!readOnly && (
+            <div className="mt-4">
+              <div className="flex gap-2 mb-2">
+                <Button
+                  size="sm"
+                  variant={uploadType === "manual" ? "default" : "outline"}
+                  onClick={() => setUploadType("manual")}
+                >
+                  Manual Upload
+                </Button>
+                <Button
+                  size="sm"
+                  variant={uploadType === "youtube" ? "default" : "outline"}
+                  onClick={() => setUploadType("youtube")}
+                >
+                  YouTube Upload
                 </Button>
               </div>
-            )}
-          </div>
+
+              {uploadType === "manual" ? (
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <Input
+                    placeholder="Title"
+                    value={newVideo.title}
+                    onChange={(e) =>
+                      setNewVideo((v) => ({...v, title: e.target.value}))
+                    }
+                  />
+                  <Input
+                    placeholder="Description"
+                    value={newVideo.description}
+                    onChange={(e) =>
+                      setNewVideo((v) => ({...v, description: e.target.value}))
+                    }
+                  />
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) =>
+                      setNewVideo((v) => ({
+                        ...v,
+                        file: e.target.files?.[0] || null,
+                      }))
+                    }
+                  />
+                  <Button onClick={handleAddManualVideo}>Add Video</Button>
+                </div>
+              ) : (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <Input
+                    placeholder="YouTube URL"
+                    value={newVideo.youtube_url}
+                    onChange={(e) =>
+                      setNewVideo((v) => ({
+                        ...v,
+                        youtube_url: e.target.value,
+                      }))
+                    }
+                  />
+                  <Input
+                    placeholder="Title"
+                    value={newVideo.title}
+                    onChange={(e) =>
+                      setNewVideo((v) => ({...v, title: e.target.value}))
+                    }
+                  />
+                  <Button onClick={handleAddYouTubeVideo}>
+                    Add YouTube Video
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -371,20 +377,26 @@ export function LearningHub() {
                     ) : null}
                   </div>
 
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => {
-                      if (confirm("Delete this video?")) {
-                        setVideos((prev) =>
-                          prev.filter((v) => v.id !== video.id)
-                        );
-                        toast({title: "Deleted", description: "Video removed"});
-                      }
-                    }}
-                  >
-                    Delete
-                  </Button>
+                  {/* Delete only visible if not readOnly */}
+                  {!readOnly && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        if (confirm("Delete this video?")) {
+                          setVideos((prev) =>
+                            prev.filter((v) => v.id !== video.id)
+                          );
+                          toast({
+                            title: "Deleted",
+                            description: "Video removed",
+                          });
+                        }
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
