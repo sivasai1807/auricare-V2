@@ -13,18 +13,21 @@ import "@/i18n";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import News from "./pages/News";
+import Home from "./pages/Home"; // ✅ NEW Landing Page
 
 // User pages
 import UserDashboard from "./pages/user/UserDashboard";
 import UserAppointments from "./pages/user/UserAppointments";
 import UserChatbot from "./pages/user/UserChatbot";
 import UserSchedule from "./pages/user/UserSchedule";
+import UserLearningHub from "./pages/user/UserLearningHub";
 
 // Patient pages
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import PatientAppointments from "./pages/patient/PatientAppointments";
 import PatientChatbot from "./pages/patient/PatientChatbot";
-import PatientProgress from "./pages/patient/PatientProgress"; // ✅ NEW
+import PatientProgress from "./pages/patient/PatientProgress";
+import PatientLearningHub from "./pages/patient/PatientLearningHub";
 
 // Doctor pages
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
@@ -35,8 +38,6 @@ import DoctorSchedule from "./pages/doctor/DoctorSchedule";
 
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
-import UserLearningHub from "./pages/user/UserLearningHub";
-import PatientLearningHub from "./pages/patient/PatientLearningHub";
 
 const queryClient = new QueryClient();
 
@@ -64,10 +65,18 @@ function AppRoutes() {
     );
   }
 
+  // ✅ If no user -> Show Landing Page + Auth routes
   if (!user) {
-    return <RoleBasedAuth />;
+    return (
+      <Routes>
+        <Route path="/" element={<Home />} /> {/* Landing Page */}
+        <Route path="/auth" element={<RoleBasedAuth />} /> {/* Login/Signup */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    );
   }
 
+  // ✅ If user is logged in -> Role-based dashboards
   return (
     <RoleBasedLayout>
       <Routes>
@@ -81,8 +90,7 @@ function AppRoutes() {
             <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/user/dashboard" element={<UserDashboard />} />
             <Route path="/user/appointments" element={<UserAppointments />} />
-            <Route path="/user/learning" element={<UserLearningHub />} />{" "}
-            {/* ✅ NEW */}
+            <Route path="/user/learning" element={<UserLearningHub />} />
             <Route path="/user/chatbot" element={<UserChatbot />} />
             <Route path="/user/schedule" element={<UserSchedule />} />
           </>
@@ -97,15 +105,9 @@ function AppRoutes() {
               path="/patient/appointments"
               element={<PatientAppointments />}
             />
-            <Route path="/patient/learning" element={<PatientLearningHub />} />{" "}
-            {/* ✅ NEW */}
+            <Route path="/patient/learning" element={<PatientLearningHub />} />
             <Route path="/patient/chatbot" element={<PatientChatbot />} />
-            {/* Patients cannot manage schedules */}
-            <Route
-              path="/patient/progress"
-              element={<PatientProgress />}
-            />{" "}
-            {/* ✅ NEW */}
+            <Route path="/patient/progress" element={<PatientProgress />} />
           </>
         )}
 
@@ -126,7 +128,6 @@ function AppRoutes() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {/* Chatbot is embedded on dedicated AI Assistant pages only */}
     </RoleBasedLayout>
   );
 }
