@@ -9,8 +9,10 @@ import {
   FaFacebook,
   FaTwitter,
   FaInstagram,
+  FaArrowLeft,
+  FaArrowRight,
+  FaArrowUp,
 } from "react-icons/fa";
-import {FaArrowLeft, FaArrowRight} from "react-icons/fa";
 import {MdCampaign} from "react-icons/md";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -52,16 +54,18 @@ const Home = () => {
   const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
   const heroImgRef = useRef<HTMLImageElement>(null);
-  const sectionRefs = useRef<HTMLDivElement[]>([]);
+  const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const autoSlideInterval = useRef<NodeJS.Timeout | null>(null);
+  const [showTop, setShowTop] = useState(false);
 
+  // Hero & sections animation
   useEffect(() => {
     gsap.fromTo(
       heroRef.current,
       {opacity: 0, y: -60},
       {opacity: 1, y: 0, duration: 1.5, ease: "power3.out"}
     );
-
     gsap.fromTo(
       heroImgRef.current,
       {opacity: 0, scale: 0.9},
@@ -69,51 +73,66 @@ const Home = () => {
     );
 
     sectionRefs.current.forEach((section) => {
-      gsap.from(section, {
-        scrollTrigger: {
-          trigger: section,
-          start: "top 80%",
-        },
-        opacity: 0,
-        y: 60,
-        duration: 1.2,
-        ease: "power3.out",
-      });
+      if (section) {
+        gsap.from(section, {
+          scrollTrigger: {trigger: section, start: "top 80%"},
+          opacity: 0,
+          y: 60,
+          duration: 1.2,
+          ease: "power3.out",
+        });
+      }
     });
+
+    return () => {
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
   }, []);
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? testimonials.length - 1 : prev - 1
+  // Auto slide
+  useEffect(() => {
+    if (autoSlideInterval.current) clearInterval(autoSlideInterval.current);
+    autoSlideInterval.current = setInterval(
+      () => slideTo(currentIndex + 1),
+      5000
     );
+    return () =>
+      autoSlideInterval.current && clearInterval(autoSlideInterval.current);
+  }, [currentIndex]);
+
+  const slideTo = (index: number) => {
+    const newIndex = (index + testimonials.length) % testimonials.length;
+    setCurrentIndex(newIndex);
   };
 
-  const visibleTestimonials = [
-    testimonials[
-      (currentIndex - 1 + testimonials.length) % testimonials.length
-    ],
-    testimonials[currentIndex],
-    testimonials[(currentIndex + 1) % testimonials.length],
-  ];
+  const handlePrev = () => slideTo(currentIndex - 1);
+  const handleNext = () => slideTo(currentIndex + 1);
 
-  // External destinations
+  // Show Go-to-top button on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({top: 0, behavior: "smooth"});
+  };
+
+  // External Links
   const LINKS = {
     learnMore: "https://www.autismspeaks.org/what-autism",
     supportUs: "https://www.autismspeaks.org/ways-give",
-    getInvolved: "https://www.autism-society.org/get-involved/",
+    getInvolved: "https://www.autismspeaks.org/get-involved",
   };
-
-  const openExternal = (url: string) => {
+  const openExternal = (url: string) =>
     window.open(url, "_blank", "noopener,noreferrer");
-  };
 
   return (
     <div className="bg-gradient-to-b from-blue-50 via-white to-purple-50 text-gray-800">
-      {/* Hero Section */}
+      {/* Hero */}
       <section
         ref={heroRef}
         className="h-screen flex flex-col md:flex-row justify-center items-center text-center md:text-left px-6 md:px-20"
@@ -129,8 +148,7 @@ const Home = () => {
           <p className="text-md md:text-lg max-w-2xl text-gray-600 mb-8">
             At AuriCare, we provide therapy sessions, interactive learning hubs,
             and parent workshops that create a holistic environment for children
-            with autism to thrive. Our mission is to build a world where every
-            child feels included and celebrated.
+            with autism to thrive.
           </p>
           <div className="flex gap-4 justify-center md:justify-start">
             <button
@@ -147,8 +165,6 @@ const Home = () => {
             </button>
           </div>
         </div>
-
-        {/* Hero Image */}
         <div className="flex-1 mt-10 md:mt-0">
           <img
             ref={heroImgRef}
@@ -161,17 +177,14 @@ const Home = () => {
 
       {/* Programs */}
       <section
-        ref={(el: HTMLDivElement | null) => {
-          if (el) sectionRefs.current.push(el);
-        }}
+        ref={(el) => (sectionRefs.current[0] = el)}
         className="py-16 px-6 md:px-20 text-center"
       >
         <h2 className="text-3xl font-bold text-purple-700 mb-6">
           Our Programs
         </h2>
         <p className="max-w-3xl mx-auto text-gray-600 mb-10">
-          Personalized programs designed to nurture children with autism,
-          including therapy, interactive learning, and social development.
+          Personalized programs designed to nurture children with autism.
         </p>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="p-6 bg-white shadow-lg rounded-2xl flex flex-col items-center hover:scale-105 transition">
@@ -194,7 +207,7 @@ const Home = () => {
 
       {/* Campaigns */}
       <section
-        ref={(el: HTMLDivElement | null) => el && sectionRefs.current.push(el)}
+        ref={(el) => (sectionRefs.current[1] = el)}
         className="py-16 bg-purple-50 px-6 md:px-20 text-center"
       >
         <h2 className="text-3xl font-bold text-purple-700 mb-6">
@@ -204,15 +217,11 @@ const Home = () => {
           Join our awareness drives, fundraising initiatives, and community
           engagement programs to support autism inclusion and acceptance.
         </p>
-
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Awareness Drive */}
           {/* Awareness Drive */}
           <div className="p-6 bg-white shadow-lg rounded-2xl hover:scale-105 transition flex flex-col">
             <MdCampaign className="text-purple-600 text-5xl mb-4 mx-auto" />
             <h3 className="text-xl font-semibold mb-2">Awareness Drive</h3>
-
-            {/* Image box */}
             <div className="w-full h-64 rounded-xl mb-3 bg-gray-100 flex items-center justify-center overflow-hidden">
               <img
                 src="/campaigns/c1.png"
@@ -221,13 +230,12 @@ const Home = () => {
                 loading="lazy"
               />
             </div>
-
             <p className="text-gray-600 text-sm mb-3">
               We organize workshops, roadshows, and school/community programs to
               spread knowledge about autism and reduce stigma.
             </p>
             <a
-              href="https://www.autismspeaks.org/what-autism"
+              href={LINKS.learnMore}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-auto px-4 py-2 rounded-xl bg-purple-600 text-white font-semibold hover:scale-105 transition inline-block text-center"
@@ -288,50 +296,68 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Testimonials Slider */}
+      {/* Testimonials Carousel */}
       <section
-        ref={(el: HTMLDivElement | null) => el && sectionRefs.current.push(el)}
-        className="py-16 px-6 md:px-20 text-center"
+        ref={(el) => (sectionRefs.current[2] = el)}
+        className="py-16 px-6 md:px-20 text-center relative"
       >
         <h2 className="text-3xl font-bold text-purple-700 mb-6">
           What People Say
         </h2>
-        <div className="flex justify-center items-center gap-6">
-          {/* Prev Button */}
+        <div className="flex items-center justify-center relative w-full max-w-5xl mx-auto">
+          {/* Prev */}
           <button
             onClick={handlePrev}
-            className="p-3 bg-purple-200 rounded-full hover:bg-purple-300 transition transform hover:scale-110 hover:rotate-[-10deg]"
+            className="absolute left-0 z-20 p-3 bg-purple-200 rounded-full hover:bg-purple-300 transition transform hover:scale-110 hover:rotate-[-10deg]"
           >
             <FaArrowLeft className="text-purple-700 text-xl" />
           </button>
 
-          {/* Testimonials */}
-          <div className="flex gap-6 w-full max-w-5xl justify-center">
-            {visibleTestimonials.map((t, i) => (
-              <div
-                key={i}
-                className={`p-6 bg-white shadow-lg rounded-2xl flex flex-col items-center transition-transform duration-300 ${
-                  i === 1 ? "scale-110 z-10" : "scale-90 opacity-70"
-                }`}
-              >
-                <img
-                  src={t.img}
-                  alt={`avatar${i}`}
-                  className="w-20 h-20 rounded-full mb-4 object-cover shadow-md"
-                />
-                <p className="italic mb-4 text-gray-600">"{t.text}"</p>
-                <span className="font-semibold text-purple-700">
-                  {t.author}
-                </span>
-                <span className="text-sm text-gray-500">{t.role}</span>
-              </div>
-            ))}
+          {/* Carousel */}
+          <div className="relative w-full h-96 flex items-center justify-center overflow-hidden">
+            {testimonials.map((t, i) => {
+              let pos = i - currentIndex;
+              if (pos < -2) pos += testimonials.length;
+              if (pos > 2) pos -= testimonials.length;
+
+              const scale =
+                pos === 0 ? 1 : pos === 1 || pos === -1 ? 0.85 : 0.7;
+              const opacity =
+                pos === 0 ? 1 : pos === 1 || pos === -1 ? 0.6 : 0.3;
+              const zIndex = pos === 0 ? 20 : pos === 1 || pos === -1 ? 10 : 1;
+              const xOffset = pos * 250;
+
+              return (
+                <div
+                  key={i}
+                  className="absolute transition-all duration-700 ease-out p-6 bg-white shadow-lg rounded-2xl flex flex-col items-center w-72 md:w-96"
+                  style={{
+                    transform: `translateX(${xOffset}px) scale(${scale})`,
+                    opacity,
+                    zIndex,
+                  }}
+                >
+                  <img
+                    src={t.img}
+                    alt={`avatar${i}`}
+                    className="w-20 h-20 rounded-full mb-4 object-cover shadow-md"
+                  />
+                  <p className="italic mb-4 text-gray-600 text-center">
+                    "{t.text}"
+                  </p>
+                  <span className="font-semibold text-purple-700">
+                    {t.author}
+                  </span>
+                  <span className="text-sm text-gray-500">{t.role}</span>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Next Button */}
+          {/* Next */}
           <button
             onClick={handleNext}
-            className="p-3 bg-purple-200 rounded-full hover:bg-purple-300 transition transform hover:scale-110 hover:rotate-[10deg]"
+            className="absolute right-0 z-20 p-3 bg-purple-200 rounded-full hover:bg-purple-300 transition transform hover:scale-110 hover:rotate-[10deg]"
           >
             <FaArrowRight className="text-purple-700 text-xl" />
           </button>
@@ -344,11 +370,30 @@ const Home = () => {
           &copy; {new Date().getFullYear()} AuriCare. All rights reserved.
         </p>
         <div className="flex justify-center gap-6 text-2xl">
-          <FaFacebook className="hover:text-blue-300 cursor-pointer" />
-          <FaTwitter className="hover:text-blue-300 cursor-pointer" />
-          <FaInstagram className="hover:text-blue-300 cursor-pointer" />
+          <FaFacebook className="hover:text-purple-300 cursor-pointer" />
+          <FaTwitter className="hover:text-purple-300 cursor-pointer" />
+          <FaInstagram className="hover:text-purple-300 cursor-pointer" />
         </div>
       </footer>
+
+      {/* Go-to-top button */}
+      {showTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 p-4 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 transition transform animate-[float_3s_ease-in-out_infinite]"
+        >
+          <FaArrowUp className="text-xl" />
+        </button>
+      )}
+
+      {/* Floating animation keyframes */}
+      <style>{`
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+          100% { transform: translateY(0px); }
+        }
+      `}</style>
     </div>
   );
 };
