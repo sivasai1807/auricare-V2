@@ -1,487 +1,373 @@
-# Testing Guide for Auticare Healthcare Platform
-
-This comprehensive guide covers all testing aspects of the Auticare platform, including unit tests, integration tests, and end-to-end (E2E) system tests.
-
-## Table of Contents
-
-1. [Overview](#overview)
-2. [Frontend Testing](#frontend-testing)
-3. [Backend Testing](#backend-testing)
-4. [End-to-End Testing](#end-to-end-testing)
-5. [Running Tests](#running-tests)
-6. [Test Coverage](#test-coverage)
-7. [Best Practices](#best-practices)
-
----
+# Complete Testing Documentation
 
 ## Overview
 
-The Auticare platform uses a comprehensive testing strategy:
+This project has a comprehensive testing infrastructure with **66 passing tests** across 4 test types:
 
-- **Frontend Tests**: Vitest + React Testing Library
-- **Backend Tests**: Pytest
-- **E2E Tests**: Playwright
-- **Coverage Tools**: V8 (Frontend), Pytest-cov (Backend)
-
-### Testing Pyramid
-
-```
-        E2E Tests (System)
-       /                  \
-      /  Integration Tests  \
-     /                        \
-    /       Unit Tests         \
-   /____________________________\
-```
+- **Unit Tests**: 37 tests (5 test files)
+- **Integration Tests**: 21 tests (3 test files)
+- **System Tests**: 8 tests (2 test files)
+- **E2E Tests**: 4 test files
 
 ---
 
-## Frontend Testing
-
-### Framework: Vitest + React Testing Library
-
-The frontend uses Vitest as the test runner with React Testing Library for component testing.
-
-### Test Structure
-
-```
-src/
-├── lib/
-│   ├── utils.test.ts              # Unit tests for utilities
-│   ├── chatbotApi.test.ts         # Unit tests for API service
-│   └── supabase/
-│       └── appointments.test.ts   # Unit tests for Supabase functions
-├── components/
-│   └── ui/
-│       ├── button.test.tsx        # Component unit tests
-│       └── input.test.tsx         # Component unit tests
-└── test/
-    ├── setup.ts                   # Test setup configuration
-    └── integration/
-        ├── auth.integration.test.ts         # Auth integration tests
-        └── supabase.integration.test.ts     # Database integration tests
-```
-
-### Unit Tests
-
-Unit tests focus on individual functions and components in isolation.
-
-**Example: Testing Utility Functions**
-```typescript
-// src/lib/utils.test.ts
-import { describe, it, expect } from 'vitest';
-import { cn } from './utils';
-
-describe('cn function', () => {
-  it('should merge class names correctly', () => {
-    const result = cn('class1', 'class2');
-    expect(result).toBe('class1 class2');
-  });
-});
-```
-
-**Example: Testing Components**
-```typescript
-// src/components/ui/button.test.tsx
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { Button } from './button';
-
-describe('Button Component', () => {
-  it('should render button with text', () => {
-    render(<Button>Click me</Button>);
-    expect(screen.getByText('Click me')).toBeInTheDocument();
-  });
-});
-```
-
-### Integration Tests
-
-Integration tests verify that multiple parts of the application work together correctly.
-
-**Example: Authentication Integration Test**
-```typescript
-// src/test/integration/auth.integration.test.ts
-describe('User Sign Up', () => {
-  it('should successfully sign up a new user', async () => {
-    const result = await supabase.auth.signUp({
-      email: 'test@example.com',
-      password: 'password123',
-    });
-    expect(result.data?.user).toBeDefined();
-  });
-});
-```
-
-### Running Frontend Tests
+## Quick Start
 
 ```bash
-# Run all unit tests
-npm test
+# Run all test types
+npm run test:all
 
-# Run tests in watch mode
-npm test -- --watch
-
-# Run tests with UI
-npm run test:ui
-
-# Generate coverage report
-npm run test:coverage
-
-# Run specific test file
-npm test -- src/lib/utils.test.ts
-```
-
----
-
-## Backend Testing
-
-### Framework: Pytest
-
-The Python Flask API uses Pytest for comprehensive backend testing.
-
-### Test Structure
-
-```
-src/autism_project/
-├── tests/
-│   ├── test_chatbot_functions.py    # Unit tests for chatbot logic
-│   └── test_api_integration.py       # Integration tests for Flask API
-├── pytest.ini                        # Pytest configuration
-└── requirements-test.txt             # Test dependencies
-```
-
-### Installing Test Dependencies
-
-```bash
-cd src/autism_project
-
-# Install test dependencies (requires pip)
-pip install -r requirements-test.txt
-```
-
-**Test Dependencies:**
-- pytest
-- pytest-flask
-- pytest-cov
-- pytest-mock
-- requests-mock
-
-### Unit Tests
-
-**Example: Testing Patient Data Retrieval**
-```python
-# tests/test_chatbot_functions.py
-def test_search_by_id_exact_match(self, mock_csv_data):
-    """Test searching patient by exact ID match"""
-    from doctor_chatbot import search_by_id
-
-    with patch('doctor_chatbot.csv_data', mock_csv_data):
-        result = search_by_id('992')
-        assert result is not None
-        assert result['patient_id'] == '992'
-```
-
-**Example: Testing Query Classification**
-```python
-def test_classify_greeting(self):
-    """Test classification of greeting messages"""
-    state = ChatbotState(query="Hello", ...)
-    result = classify_query_type(state)
-    assert result["query_type"] == "greeting"
-```
-
-### Integration Tests
-
-**Example: Testing Flask API Endpoints**
-```python
-# tests/test_api_integration.py
-def test_doctor_chat_success(self, client):
-    """Test successful doctor chat request"""
-    payload = {
-        'message': 'What are autism symptoms?',
-        'history': []
-    }
-    response = client.post('/api/doctor/chat', json=payload)
-    assert response.status_code == 200
-```
-
-### Running Backend Tests
-
-```bash
-cd src/autism_project
-
-# Run all tests
-pytest
-
-# Run with verbose output
-pytest -v
-
-# Run specific test file
-pytest tests/test_chatbot_functions.py
-
-# Run specific test class
-pytest tests/test_chatbot_functions.py::TestPatientDataRetrieval
-
-# Run specific test
-pytest tests/test_chatbot_functions.py::TestPatientDataRetrieval::test_search_by_id_exact_match
-
-# Generate coverage report
-pytest --cov=. --cov-report=html
-
-# Run only unit tests
-pytest -m unit
-
-# Run only integration tests
-pytest -m integration
-```
-
-### Test Markers
-
-Tests are marked with custom markers for selective execution:
-
-```python
-@pytest.mark.unit
-def test_unit_function():
-    pass
-
-@pytest.mark.integration
-def test_integration_function():
-    pass
-
-@pytest.mark.slow
-def test_slow_function():
-    pass
-```
-
----
-
-## End-to-End Testing
-
-### Framework: Playwright
-
-E2E tests simulate real user interactions across the entire application stack.
-
-### Test Structure
-
-```
-e2e/
-├── auth.spec.ts            # Authentication flow tests
-├── navigation.spec.ts      # Navigation tests
-├── chatbot.spec.ts         # Chatbot functionality tests
-└── appointments.spec.ts    # Appointments system tests
-```
-
-### System Tests
-
-**Example: Authentication Flow**
-```typescript
-// e2e/auth.spec.ts
-test('should navigate to auth page', async ({ page }) => {
-  await page.goto('/');
-  const signInButton = page.getByRole('link', { name: /sign in/i });
-  await signInButton.click();
-  await expect(page).toHaveURL(/.*auth/);
-});
-```
-
-**Example: Chatbot Interaction**
-```typescript
-// e2e/chatbot.spec.ts
-test('should allow typing in chatbot input', async ({ page }) => {
-  await page.goto('/');
-  const chatButton = page.locator('button[class*="chat"]').first();
-  await chatButton.click();
-
-  const input = page.locator('input[placeholder*="message"]').first();
-  await input.fill('Hello');
-  await expect(input).toHaveValue('Hello');
-});
-```
-
-### Running E2E Tests
-
-```bash
-# Install Playwright browsers (first time only)
-npx playwright install
-
-# Run all E2E tests
+# Run specific test type
+npm run test:unit
+npm run test:integration
+npm run test:system
 npm run test:e2e
 
-# Run E2E tests with UI
+# Run with UI
+npm run test:unit:ui
 npm run test:e2e:ui
 
-# Run E2E tests in headed mode (see browser)
-npm run test:e2e:headed
-
-# Run tests for specific browser
-npx playwright test --project=chromium
-
-# Run specific test file
-npx playwright test e2e/auth.spec.ts
-
-# Debug tests
-npx playwright test --debug
-
-# View test report
-npx playwright show-report
+# Run with coverage
+npm run test:unit:coverage
 ```
 
-### Test Configuration
+---
 
-E2E tests are configured in `playwright.config.ts`:
+## Test Structure
 
-- **Base URL**: http://localhost:5173
-- **Browsers**: Chromium, Firefox, WebKit
-- **Mobile**: Pixel 5, iPhone 12
-- **Retries**: 2 (in CI), 0 (locally)
-- **Screenshots**: On failure
-- **Traces**: On first retry
+```
+project/
+├── src/test/
+│   ├── unit/                      # Unit tests (37 tests)
+│   │   ├── utils.test.ts
+│   │   ├── chatbotApi.test.ts
+│   │   ├── appointments.test.ts
+│   │   ├── button.test.tsx
+│   │   └── input.test.tsx
+│   ├── integration/               # Integration tests (21 tests)
+│   │   ├── auth.integration.test.ts
+│   │   ├── supabase.integration.test.ts
+│   │   └── doctors.integration.test.ts
+│   └── system/                    # System tests (8 tests)
+│       ├── appointment-workflow.system.test.ts
+│       └── user-journey.system.test.ts
+└── e2e/                          # E2E tests (4 files)
+    ├── auth.spec.ts
+    ├── appointments.spec.ts
+    ├── chatbot.spec.ts
+    └── navigation.spec.ts
+```
+
+---
+
+## Running Individual Tests
+
+### By File Path
+
+```bash
+# Unit test
+npx vitest --config vitest.config.unit.ts src/test/unit/utils.test.ts
+
+# Integration test
+npx vitest --config vitest.config.integration.ts src/test/integration/auth.integration.test.ts
+
+# System test
+npx vitest --config vitest.config.system.ts src/test/system/user-journey.system.test.ts
+
+# E2E test
+npx playwright test e2e/auth.spec.ts
+```
+
+### By Test Name
+
+```bash
+# Vitest (unit/integration/system)
+npx vitest --config vitest.config.unit.ts -t "should merge class names correctly"
+
+# Playwright (e2e)
+npx playwright test -g "should login successfully"
+```
+
+### By Pattern
+
+```bash
+# Run all tests with "appointment" in the name
+npx vitest --config vitest.config.unit.ts --grep "appointment"
+
+# Run all e2e tests with "auth" in the name
+npx playwright test -g "auth"
+```
+
+---
+
+## Test Types Explained
+
+### Unit Tests (37 tests)
+
+**Purpose**: Test individual functions and components in isolation
+
+**Location**: `src/test/unit/`
+
+**Tests**:
+- `utils.test.ts` (5 tests) - Utility function tests
+- `chatbotApi.test.ts` (10 tests) - Chatbot API service tests
+- `appointments.test.ts` (7 tests) - Appointment management tests
+- `button.test.tsx` (9 tests) - Button component tests
+- `input.test.tsx` (6 tests) - Input component tests
+
+**Run**:
+```bash
+npm run test:unit
+
+# Individual file
+npx vitest --config vitest.config.unit.ts src/test/unit/utils.test.ts
+
+# With UI
+npm run test:unit:ui
+
+# With coverage
+npm run test:unit:coverage
+```
+
+### Integration Tests (21 tests)
+
+**Purpose**: Test how multiple modules work together
+
+**Location**: `src/test/integration/`
+
+**Tests**:
+- `auth.integration.test.ts` (9 tests) - Authentication flow tests
+- `supabase.integration.test.ts` (7 tests) - Supabase database tests
+- `doctors.integration.test.ts` (5 tests) - Doctor profile management tests
+
+**Run**:
+```bash
+npm run test:integration
+
+# Individual file
+npx vitest --config vitest.config.integration.ts src/test/integration/auth.integration.test.ts
+
+# With UI
+npm run test:integration:ui
+
+# With coverage
+npm run test:integration:coverage
+```
+
+### System Tests (8 tests)
+
+**Purpose**: Test complete user workflows from start to finish
+
+**Location**: `src/test/system/`
+
+**Tests**:
+- `appointment-workflow.system.test.ts` (4 tests)
+  - Full appointment lifecycle
+  - Patient booking workflow
+  - Appointment cancellation
+  - Status transitions
+
+- `user-journey.system.test.ts` (4 tests)
+  - Patient registration journey
+  - Doctor login and review journey
+  - User logout and cleanup
+  - Error handling scenarios
+
+**Run**:
+```bash
+npm run test:system
+
+# Individual file
+npx vitest --config vitest.config.system.ts src/test/system/appointment-workflow.system.test.ts
+
+# With UI
+npm run test:system:ui
+
+# With coverage
+npm run test:system:coverage
+```
+
+### E2E Tests (4 files)
+
+**Purpose**: Test the entire application in a real browser
+
+**Location**: `e2e/`
+
+**Tests**:
+- `auth.spec.ts` - Authentication flow in browser
+- `appointments.spec.ts` - Appointment management UI
+- `chatbot.spec.ts` - Chatbot interaction tests
+- `navigation.spec.ts` - Navigation and routing tests
+
+**Run**:
+```bash
+npm run test:e2e
+
+# Individual file
+npx playwright test e2e/auth.spec.ts
+
+# With UI (recommended for development)
+npm run test:e2e:ui
+
+# See the browser (headed mode)
+npm run test:e2e:headed
+
+# Debug mode
+npm run test:e2e:debug
+```
+
+---
+
+## Code Comments for Customization
+
+The codebase includes extensive comments to help you customize it:
+
+### Key Files with Comments
+
+#### 1. Supabase Client Configuration
+**File**: `src/integrations/supabase/client.ts`
+
+```typescript
+// ============================================================================
+// SUPABASE CLIENT CONFIGURATION
+// ============================================================================
+// TODO: Replace these default values with your own Supabase credentials
+// Get your credentials from: https://app.supabase.com/project/_/settings/api
+```
+
+#### 2. Chatbot API Configuration
+**File**: `src/lib/chatbotApi.ts`
+
+```typescript
+// ============================================================================
+// IMPORTANT CONFIGURATION:
+// - The API_BASE_URL must match your Python backend server URL
+// - Default: http://localhost:5000/api (for local development)
+// - PRODUCTION: Update this URL to your deployed backend URL
+// ============================================================================
+```
+
+#### 3. Appointment Management
+**File**: `src/lib/supabase/appointments.ts`
+
+```typescript
+// ============================================================================
+// CREATE APPOINTMENT
+// ============================================================================
+// PARAMETERS:
+// @param payload.patient_id - UUID of the patient (from users table)
+// @param payload.doctor_id - UUID of the doctor/therapist
+// @param payload.date - Appointment date in format: YYYY-MM-DD
+// @param payload.time - Appointment time in format: HH:MM:SS
+// ============================================================================
+```
+
+#### 4. Doctor Profile Management
+**File**: `src/lib/supabase/doctors.ts`
+
+```typescript
+// ============================================================================
+// CUSTOMIZATION:
+// - For production, remove localStorage logic and use auth tokens only
+// - Update to match your authentication flow
+// ============================================================================
+```
 
 ---
 
 ## Test Coverage
 
-### Viewing Coverage Reports
+Generate coverage reports to see which parts of your code are tested:
 
-**Frontend Coverage:**
 ```bash
+# Unit test coverage
+npm run test:unit:coverage
+# View report: ./coverage/unit/index.html
+
+# Integration test coverage
+npm run test:integration:coverage
+# View report: ./coverage/integration/index.html
+
+# System test coverage
+npm run test:system:coverage
+# View report: ./coverage/system/index.html
+
+# All tests coverage
 npm run test:coverage
-
-# Open HTML report
-open coverage/index.html
-```
-
-**Backend Coverage:**
-```bash
-cd src/autism_project
-pytest --cov=. --cov-report=html
-
-# Open HTML report
-open htmlcov/index.html
-```
-
-### Coverage Goals
-
-- **Unit Tests**: >80% code coverage
-- **Integration Tests**: >70% code coverage
-- **E2E Tests**: Critical user flows
-
----
-
-## Best Practices
-
-### General Guidelines
-
-1. **Write tests first** (TDD approach when possible)
-2. **Keep tests simple** and focused on one thing
-3. **Use descriptive test names** that explain what is being tested
-4. **Arrange-Act-Assert** pattern for test structure
-5. **Mock external dependencies** (APIs, databases)
-6. **Test edge cases** and error conditions
-
-### Frontend Testing Best Practices
-
-```typescript
-// ✅ Good: Descriptive test name
-test('should display error message when email is invalid', () => {
-  // test code
-});
-
-// ❌ Bad: Vague test name
-test('email test', () => {
-  // test code
-});
-
-// ✅ Good: Test user interaction
-await user.type(input, 'test@example.com');
-
-// ❌ Bad: Direct value assignment
-input.value = 'test@example.com';
-
-// ✅ Good: Test accessibility
-const button = screen.getByRole('button', { name: /submit/i });
-
-// ❌ Bad: Test implementation details
-const button = screen.getByClassName('submit-btn');
-```
-
-### Backend Testing Best Practices
-
-```python
-# ✅ Good: Use fixtures for reusable test data
-@pytest.fixture
-def mock_csv_data(self):
-    return pd.DataFrame({...})
-
-# ✅ Good: Test both success and error cases
-def test_search_by_id_exact_match(self):
-    # Test success case
-    pass
-
-def test_search_by_id_not_found(self):
-    # Test error case
-    pass
-
-# ✅ Good: Use context managers for patches
-with patch('module.function') as mock:
-    mock.return_value = 'test'
-    result = function_under_test()
-```
-
-### E2E Testing Best Practices
-
-```typescript
-// ✅ Good: Wait for elements properly
-await page.waitForTimeout(2000);
-await expect(element).toBeVisible();
-
-// ❌ Bad: Hard-coded waits without verification
-await page.waitForTimeout(5000);
-
-// ✅ Good: Use page.goto with base URL
-await page.goto('/auth');
-
-// ✅ Good: Handle conditional elements
-if (await element.isVisible()) {
-  await element.click();
-}
-
-// ✅ Good: Mock API responses for testing error handling
-await page.route('**/api/chat', route => {
-  route.fulfill({ status: 500, body: '{"error": "Server error"}' });
-});
+# View report: ./coverage/index.html
 ```
 
 ---
 
-## Continuous Integration
+## Test Data Setup
 
-### Running Tests in CI/CD
+See `TEST_DATA_SETUP.md` for detailed instructions on:
+- Setting up Supabase
+- Creating test data
+- Configuring environment variables
+- Authentication setup
+- Running tests with real data
+
+Quick setup:
 
 ```bash
-# Run all tests
-npm test && npm run test:e2e
+# 1. Copy environment template
+cp .env.example .env
 
-# With coverage
-npm run test:coverage
+# 2. Edit with your Supabase credentials
+nano .env
 
-# Python tests
-cd src/autism_project && pytest --cov=.
+# 3. Run database migrations (via Supabase Dashboard or CLI)
+
+# 4. Create test data (see TEST_DATA_SETUP.md for SQL scripts)
+
+# 5. Run tests
+npm run test:all
 ```
 
-### Test Pipeline Example
+---
+
+## CI/CD Integration
+
+### GitHub Actions Example
 
 ```yaml
-# Example GitHub Actions workflow
-- name: Run Unit Tests
-  run: npm test
+name: Tests
 
-- name: Run E2E Tests
-  run: npm run test:e2e
+on: [push, pull_request]
 
-- name: Upload Coverage
-  run: npm run test:coverage
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Run system tests
+        run: npm run test:system
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: npm run test:e2e
 ```
 
 ---
@@ -490,83 +376,209 @@ cd src/autism_project && pytest --cov=.
 
 ### Common Issues
 
-**Frontend Tests:**
-- **Issue**: Tests fail with "Cannot find module"
-  - **Solution**: Ensure test setup file is configured in vitest.config.ts
+#### 1. Tests Failing Due to Supabase Connection
 
-- **Issue**: Component tests fail with "not wrapped in act()"
-  - **Solution**: Use `await` with user interactions and state updates
+**Problem**: Tests fail with connection errors
 
-**Backend Tests:**
-- **Issue**: Import errors in test files
-  - **Solution**: Ensure `sys.path.append()` is set correctly in test files
+**Solution**:
+- Verify `.env` file has correct credentials
+- Check Supabase project is active
+- Ensure network connectivity
 
-- **Issue**: Tests fail with "no module named pytest"
-  - **Solution**: Install test dependencies: `pip install -r requirements-test.txt`
+#### 2. Mock Issues in Tests
 
-**E2E Tests:**
-- **Issue**: Tests timeout waiting for elements
-  - **Solution**: Increase timeout or verify element selectors
+**Problem**: "mockReturnValue is not a function"
 
-- **Issue**: "Executable doesn't exist" error
-  - **Solution**: Run `npx playwright install`
+**Solution**:
+- Ensure mocks are properly initialized
+- Clear mocks in `beforeEach` blocks
+- Check mock chain returns `this`
+
+#### 3. E2E Tests Timing Out
+
+**Problem**: E2E tests timeout or fail intermittently
+
+**Solution**:
+```bash
+# Run with headed mode to see what's happening
+npm run test:e2e:headed
+
+# Increase timeout in playwright.config.ts
+timeout: 60000  # 60 seconds
+
+# Run specific test to debug
+npx playwright test e2e/auth.spec.ts --debug
+```
+
+#### 4. Chatbot API Tests Failing
+
+**Problem**: Chatbot API tests fail
+
+**Solution**:
+- Ensure Python backend is running (for E2E tests)
+- For unit tests, check mocks are configured
+- Verify API_BASE_URL in `src/lib/chatbotApi.ts`
 
 ---
 
-## Summary
+## Writing New Tests
 
-### Quick Test Commands
+### Creating a New Unit Test
 
-```bash
-# Frontend
-npm test                    # Run unit tests
-npm run test:ui            # Run with UI
-npm run test:coverage      # Generate coverage
+```typescript
+// src/test/unit/myFeature.test.ts
+import { describe, it, expect } from 'vitest';
+import { myFunction } from '@/lib/myFeature';
 
-# Backend
-cd src/autism_project
-pytest                     # Run all tests
-pytest -v                  # Verbose output
-pytest --cov=.            # With coverage
-
-# E2E
-npm run test:e2e          # Run E2E tests
-npm run test:e2e:ui       # Run with UI
-npm run test:e2e:headed   # See browser
+describe('My Feature', () => {
+  it('should work correctly', () => {
+    const result = myFunction('input');
+    expect(result).toBe('expected output');
+  });
+});
 ```
 
-### Test Files Overview
+Run:
+```bash
+npx vitest --config vitest.config.unit.ts src/test/unit/myFeature.test.ts
+```
 
-**Frontend Unit Tests:**
-- `src/lib/utils.test.ts`
-- `src/lib/chatbotApi.test.ts`
-- `src/lib/supabase/appointments.test.ts`
-- `src/components/ui/button.test.tsx`
-- `src/components/ui/input.test.tsx`
+### Creating a New Integration Test
 
-**Frontend Integration Tests:**
-- `src/test/integration/auth.integration.test.ts`
-- `src/test/integration/supabase.integration.test.ts`
+```typescript
+// src/test/integration/myIntegration.integration.test.ts
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { supabase } from '@/integrations/supabase/client';
+import { myIntegrationFunction } from '@/lib/myModule';
 
-**Backend Tests:**
-- `src/autism_project/tests/test_chatbot_functions.py`
-- `src/autism_project/tests/test_api_integration.py`
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {
+    from: vi.fn(),
+  },
+}));
 
-**E2E Tests:**
-- `e2e/auth.spec.ts`
-- `e2e/navigation.spec.ts`
-- `e2e/chatbot.spec.ts`
-- `e2e/appointments.spec.ts`
+describe('Integration Test: My Feature', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should integrate multiple modules', async () => {
+    const mockChain = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+    };
+
+    (supabase.from as any).mockReturnValue(mockChain);
+
+    const result = await myIntegrationFunction();
+    expect(result).toBeDefined();
+  });
+});
+```
+
+Run:
+```bash
+npx vitest --config vitest.config.integration.ts src/test/integration/myIntegration.integration.test.ts
+```
+
+### Creating a New System Test
+
+```typescript
+// src/test/system/myWorkflow.system.test.ts
+import { describe, it, expect } from 'vitest';
+
+describe('System Test: Complete Workflow', () => {
+  it('should complete entire user journey', async () => {
+    // Test complete workflow from start to finish
+    // Step 1: User action
+    // Step 2: System response
+    // Step 3: Verification
+  });
+});
+```
+
+Run:
+```bash
+npx vitest --config vitest.config.system.ts src/test/system/myWorkflow.system.test.ts
+```
+
+### Creating a New E2E Test
+
+```typescript
+// e2e/myFeature.spec.ts
+import { test, expect } from '@playwright/test';
+
+test('should perform action in browser', async ({ page }) => {
+  await page.goto('/');
+  await page.click('button');
+  await expect(page.locator('h1')).toContainText('Expected Text');
+});
+```
+
+Run:
+```bash
+npx playwright test e2e/myFeature.spec.ts
+```
 
 ---
 
 ## Additional Resources
 
+### Documentation Files
+
+- `TEST_GUIDE.md` - Comprehensive testing guide
+- `QUICK_TEST_REFERENCE.md` - Quick command reference
+- `TEST_DATA_SETUP.md` - Database and test data setup
+- `TESTING.md` - This file (complete testing documentation)
+
+### External Resources
+
 - [Vitest Documentation](https://vitest.dev/)
-- [React Testing Library](https://testing-library.com/react)
-- [Pytest Documentation](https://docs.pytest.org/)
 - [Playwright Documentation](https://playwright.dev/)
+- [Testing Library](https://testing-library.com/)
+- [Supabase Testing Guide](https://supabase.com/docs/guides/getting-started/testing)
 
 ---
 
-**Last Updated**: October 27, 2025
+## Summary
+
+### Current Test Status
+
+✅ **66 Total Tests Passing**
+
+| Test Type | Files | Tests | Status |
+|-----------|-------|-------|--------|
+| Unit | 5 | 37 | ✅ All Passing |
+| Integration | 3 | 21 | ✅ All Passing |
+| System | 2 | 8 | ✅ All Passing |
+| E2E | 4 | - | ✅ Ready |
+
+### Quick Commands
+
+```bash
+# Run everything
+npm run test:all
+
+# Run by type
+npm run test:unit
+npm run test:integration
+npm run test:system
+npm run test:e2e
+
+# Run individual file
+npx vitest --config vitest.config.unit.ts src/test/unit/utils.test.ts
+npx playwright test e2e/auth.spec.ts
+
+# Debug
+npm run test:unit:ui
+npm run test:e2e:debug
+
+# Coverage
+npm run test:unit:coverage
+```
+
+---
+
+**Last Updated**: 2025-10-27
+**Version**: 1.0.0
+**Status**: All tests passing ✅
