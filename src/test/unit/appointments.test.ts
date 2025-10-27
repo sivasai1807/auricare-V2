@@ -4,7 +4,7 @@ import {
   listDoctorAppointments,
   listPatientAppointments,
   updateAppointmentStatus
-} from './appointments';
+} from '@/lib/supabase/appointments';
 import { supabase } from '@/integrations/supabase/client';
 
 vi.mock('@/integrations/supabase/client', () => ({

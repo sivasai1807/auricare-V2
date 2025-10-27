@@ -10,11 +10,22 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
+    "test:unit": "vitest --config vitest.config.unit.ts",
+    "test:unit:ui": "vitest --config vitest.config.unit.ts --ui",
+    "test:unit:coverage": "vitest --config vitest.config.unit.ts --coverage",
+    "test:integration": "vitest --config vitest.config.integration.ts",
+    "test:integration:ui": "vitest --config vitest.config.integration.ts --ui",
+    "test:integration:coverage": "vitest --config vitest.config.integration.ts --coverage",
+    "test:system": "vitest --config vitest.config.system.ts",
+    "test:system:ui": "vitest --config vitest.config.system.ts --ui",
+    "test:system:coverage": "vitest --config vitest.config.system.ts --coverage",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:system && npm run test:e2e",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",

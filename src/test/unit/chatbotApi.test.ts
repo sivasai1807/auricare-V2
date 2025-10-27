@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { chatbotApi } from './chatbotApi';
+import { chatbotApi } from '@/lib/chatbotApi';
 
 global.fetch = vi.fn();
 
