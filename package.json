@@ -12,9 +12,19 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "test:unit": "vitest --run src/lib/utils.test.ts src/components/ui/button.test.tsx src/components/ui/input.test.tsx src/test/unit/",
+    "test:integration": "vitest --run src/test/integration/",
+    "test:watch": "vitest --watch",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:backend": "cd src/autism_project && pytest",
+    "test:backend:unit": "cd src/autism_project && pytest -m unit",
+    "test:backend:integration": "cd src/autism_project && pytest -m integration",
+    "test:backend:coverage": "cd src/autism_project && pytest --cov=. --cov-report=html",
+    "test:install-deps": "npm install && cd src/autism_project && pip install -r requirements.txt && pip install -r requirements-test.txt"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
