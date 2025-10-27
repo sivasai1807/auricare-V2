@@ -1,4 +1,20 @@
-// Chatbot API service for React frontend
+// ============================================================================
+// CHATBOT API SERVICE
+// ============================================================================
+// This service handles all communication with the Python chatbot backend API
+// located in src/autism_project/
+//
+// IMPORTANT CONFIGURATION:
+// - The API_BASE_URL must match your Python backend server URL
+// - Default: http://localhost:5000/api (for local development)
+// - PRODUCTION: Update this URL to your deployed backend URL
+//
+// TO CUSTOMIZE:
+// 1. Change API_BASE_URL to your backend URL (e.g., https://your-api.com/api)
+// 2. Ensure CORS is properly configured in your Python backend
+// 3. Update environment variables if needed
+// ============================================================================
+
 const API_BASE_URL = "http://localhost:5000/api";
 
 export interface ChatMessage {

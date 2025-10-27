@@ -1,3 +1,24 @@
+// ============================================================================
+// APPOINTMENT MANAGEMENT MODULE
+// ============================================================================
+// This module handles all appointment-related operations with Supabase
+//
+// KEY FEATURES:
+// - Create appointments between patients and doctors
+// - List appointments for doctors and patients
+// - Update appointment status (pending → confirmed → completed)
+// - Real-time subscription to appointment changes
+//
+// DATABASE TABLES USED:
+// - appointments: Main appointment storage
+// - v_doctor_appointments: View with enriched appointment data
+//
+// IMPORTANT NOTES:
+// - Uses therapist_id internally (maps to doctor_id in the frontend)
+// - Appointment dates are stored as timestamps
+// - Status flow: pending → confirmed → completed → cancelled
+// ============================================================================
+
 import {supabase} from "@/integrations/supabase/client";
 
 export type Appointment = {
@@ -17,6 +38,27 @@ export type Appointment = {
   specialization?: string;
 };
 
+// ============================================================================
+// CREATE APPOINTMENT
+// ============================================================================
+// Creates a new appointment in the database
+//
+// PARAMETERS:
+// @param payload.patient_id - UUID of the patient (from users table)
+// @param payload.doctor_id - UUID of the doctor/therapist
+// @param payload.date - Appointment date in format: YYYY-MM-DD
+// @param payload.time - Appointment time in format: HH:MM:SS
+//
+// RETURNS: Normalized appointment object with frontend-friendly field names
+//
+// USAGE EXAMPLE:
+// const appointment = await createAppointment({
+//   patient_id: "uuid-patient-123",
+//   doctor_id: "uuid-doctor-456",
+//   date: "2025-10-30",
+//   time: "14:00:00"
+// });
+// ============================================================================
 export async function createAppointment(payload: {
   patient_id: string;
   doctor_id: string;
