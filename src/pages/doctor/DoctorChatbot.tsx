@@ -49,25 +49,26 @@ const DoctorChatbot = () => {
     "Tell me about patient John",
     "Latest autism research",
   ];
+  +(
+    // Check API connection on component mount
+    useEffect(() => {
+      const checkApiConnection = async () => {
+        try {
+          await chatbotApi.healthCheck();
+          setApiStatus("connected");
+          setError(null);
+        } catch (err) {
+          setApiStatus("error");
+          setError(
+            "Unable to connect to AI service. Please make sure the Python API server is running on port 5000."
+          );
+          console.error("API connection failed:", err);
+        }
+      };
 
-  // Check API connection on component mount
-  useEffect(() => {
-    const checkApiConnection = async () => {
-      try {
-        await chatbotApi.healthCheck();
-        setApiStatus("connected");
-        setError(null);
-      } catch (err) {
-        setApiStatus("error");
-        setError(
-          "Unable to connect to AI service. Please make sure the Python API server is running on port 5000."
-        );
-        console.error("API connection failed:", err);
-      }
-    };
-
-    checkApiConnection();
-  }, []);
+      checkApiConnection();
+    }, [])
+  );
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
