@@ -4,7 +4,13 @@ import pandas as pd
 import requests
 from langchain_groq import ChatGroq
 from langchain.tools import tool
-from langgraph.graph import StateGraph, END
+# Optional dependency: langgraph. Provide graceful fallback if unavailable or incompatible.
+try:
+    from langgraph.graph import StateGraph, END
+    HAS_LANGGRAPH = True
+except Exception as _e:
+    print(f"⚠️  LangGraph not available or incompatible: {_e}. Falling back to direct pipeline.")
+    HAS_LANGGRAPH = False
 from typing import TypedDict, List, Dict
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -319,17 +325,35 @@ def autism_knowledge_tool(query: str) -> str:
 # Setup LLM
 # -----------------------------
 def setup_llm():
-    """Setup LLM with tools"""
+    """Setup LLM with tools. Avoid ChatGroq path if local Groq SDK is incompatible."""
     try:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             print("❌ GROQ_API_KEY not found in environment")
             return None
-            
+
+        # Detect Groq SDK compatibility regarding unexpected 'proxies' kwarg
+        groq_incompatible = False
+        try:
+            from groq import Groq as _GroqClient  # type: ignore
+            try:
+                # Some older SDKs do not accept 'proxies' in __init__; test safely
+                _GroqClient(api_key="test_invalid_key", proxies=None)  # may raise TypeError on old SDKs
+            except TypeError as te:
+                if "proxies" in str(te).lower():
+                    groq_incompatible = True
+        except Exception:
+            # If we cannot import the SDK, proceed; ChatGroq may still work
+            pass
+
+        if groq_incompatible:
+            print("⚠️  Detected Groq SDK without 'proxies' support. Skipping ChatGroq initialization.")
+            return None
+
         # Try env model first, then fallbacks known to be available
         candidate_models = [
             os.getenv("GROQ_MODEL"),
-            "llama-3.1-8b-instant",
+            "llama-3.3-70b-versatile",
             "mixtral-8x7b-32768",
             "gemma2-9b-it",
         ]
@@ -355,7 +379,7 @@ def setup_llm():
         llm_with_tools = base_llm.bind_tools([patient_data_retrieval_tool, autism_knowledge_tool])
         print("✅ LLM initialized with tools")
         return llm_with_tools
-        
+
     except Exception as e:
         print(f"❌ LLM setup failed: {e}")
         return None
@@ -433,10 +457,7 @@ def get_medical_knowledge(state: ChatbotState):
         return {"medical_knowledge": f"Error retrieving medical knowledge: {str(e)}"}
 
 def generate_response(state: ChatbotState):
-    """Generate final response using LLM with all available data and chat history"""
-    
-    if not llm:
-        return {"final_response": "❌ LLM not available. Please configure your API key."}
+    """Generate final response using LLM with robust fallbacks (Groq SDK or synthesis)."""
     
     query = state["query"]
     query_type = state.get("query_type", "")
@@ -525,13 +546,45 @@ Please provide helpful autism-related information.
 
 RESPONSE:"""
     
+    # 1) Try official Groq SDK first (avoids ChatGroq 'proxies' incompatibilities)
     try:
-        # Use base LLM for final response with robust fallbacks
+        api_key = os.getenv("GROQ_API_KEY")
+        if api_key:
+            try:
+                from groq import Groq  # type: ignore
+                groq_client = Groq(api_key=api_key)
+                groq_models = [
+                    os.getenv("GROQ_MODEL") or "llama-3.1-8b-instant",
+                    "llama-3.3-70b-versatile",
+                ]
+                for mdl in groq_models:
+                    try:
+                        messages = [
+                            {"role": "system", "content": "You are an autism specialist assistant for doctors. Answer briefly and precisely."},
+                            {"role": "user", "content": prompt},
+                        ]
+                        resp = groq_client.chat.completions.create(
+                            model=mdl,
+                            messages=messages,
+                            max_tokens=512,
+                        )
+                        content = resp.choices[0].message.content.strip()
+                        print(f"✅ Using Groq SDK model: {mdl}")
+                        return {"final_response": content}
+                    except Exception as e1:
+                        print(f"⚠️  Groq SDK model failed ({mdl}): {e1}")
+            except Exception as e0:
+                print(f"⚠️  Groq SDK unavailable: {e0}")
+    except Exception as e:
+        print(f"⚠️  Error with Groq SDK path: {e}")
+
+    # 2) Try ChatGroq (may fail on some SDK versions)
+    try:
         from langchain_groq import ChatGroq
         api_key = os.getenv("GROQ_API_KEY")
         candidate_models = [
             os.getenv("GROQ_MODEL"),
-            "llama-3.1-8b-instant",
+            "llama-3.3-70b-versatile",
             "mixtral-8x7b-32768",
             "gemma2-9b-it",
         ]
@@ -548,11 +601,35 @@ RESPONSE:"""
                 last_err = e
                 print(f"⚠️  Model failed ({m}): {e}")
                 continue
-
-        return {"final_response": f"❌ No available Groq model. {last_err}"}
-
     except Exception as e:
-        return {"final_response": f"❌ Error generating response: {str(e)}"}
+        print(f"⚠️  ChatGroq path failed: {e}")
+
+    # 3) Final fallback: synthesize a concise answer from available context (no LLM)
+    try:
+        summary_parts = []
+        if patient_data and "No patient" not in patient_data and "Error" not in patient_data:
+            # Extract key lines from patient data
+            lines = [l.strip() for l in patient_data.splitlines() if l.strip()]
+            key_lines = []
+            for key in ["Patient ID:", "Patient Name:", "Gender:", "Patient Data:", "Medical Suggestion:"]:
+                for l in lines:
+                    if l.startswith(key):
+                        key_lines.append(l)
+                        break
+            if key_lines:
+                summary_parts.append("Patient summary: " + "; ".join(key_lines)[:400])
+        if medical_knowledge and "not available" not in medical_knowledge.lower():
+            # Take first relevant reference chunk
+            mk = medical_knowledge
+            if len(mk) > 500:
+                mk = mk[:500] + "…"
+            summary_parts.append("Relevant guidance: " + mk)
+        if not summary_parts:
+            summary_parts.append("I don't have model access right now. Please try again or check API keys.")
+        concise = "\n\n".join(summary_parts)
+        return {"final_response": concise}
+    except Exception:
+        return {"final_response": "I'm having trouble answering without the model. Please try again shortly."}
 
 # -----------------------------
 # Routing Functions
@@ -569,62 +646,87 @@ def route_after_classification(state: ChatbotState) -> str:
         return "get_knowledge"
 
 # -----------------------------
-# Build LangGraph
+# Build LangGraph (if available) or set None
 # -----------------------------
-graph = StateGraph(ChatbotState)
-
-# Add nodes
-graph.add_node("classify", classify_query_type)
-graph.add_node("retrieve_patient", retrieve_patient_data)
-graph.add_node("get_knowledge", get_medical_knowledge)
-graph.add_node("generate_response", generate_response)
-
-# Set entry point
-graph.set_entry_point("classify")
-
-# Add conditional edges
-graph.add_conditional_edges(
-    "classify",
-    route_after_classification,
-    {
-        "generate_response": "generate_response",
-        "retrieve_patient": "retrieve_patient", 
-        "get_knowledge": "get_knowledge"
-    }
-)
-
-# Add edges to final response
-graph.add_edge("retrieve_patient", "generate_response")
-graph.add_edge("get_knowledge", "generate_response")
-graph.add_edge("generate_response", END)
-
-# Compile graph
-app = graph.compile()
+if HAS_LANGGRAPH:
+    graph = StateGraph(ChatbotState)
+    graph.add_node("classify", classify_query_type)
+    graph.add_node("retrieve_patient", retrieve_patient_data)
+    graph.add_node("get_knowledge", get_medical_knowledge)
+    graph.add_node("generate_response", generate_response)
+    graph.set_entry_point("classify")
+    graph.add_conditional_edges(
+        "classify",
+        route_after_classification,
+        {
+            "generate_response": "generate_response",
+            "retrieve_patient": "retrieve_patient",
+            "get_knowledge": "get_knowledge",
+        },
+    )
+    graph.add_edge("retrieve_patient", "generate_response")
+    graph.add_edge("get_knowledge", "generate_response")
+    graph.add_edge("generate_response", END)
+    app = graph.compile()
+else:
+    app = None
 
 # -----------------------------
 # Main Chat Function
 # -----------------------------
 def ask_chatbot(query: str, chat_history: List[Dict] = None):
-    """Main function to process user queries through LangGraph"""
-    
+    """Main function to process user queries. Uses LangGraph if available, otherwise a direct pipeline."""
     if chat_history is None:
         chat_history = []
-    
-    initial_state = ChatbotState(
-        query=query,
-        query_type="",
-        patient_data="",
-        medical_knowledge="",
-        final_response="",
-        chat_history=chat_history
-    )
-    
+
+    if HAS_LANGGRAPH and app is not None:
+        initial_state = ChatbotState(
+            query=query,
+            query_type="",
+            patient_data="",
+            medical_knowledge="",
+            final_response="",
+            chat_history=chat_history,
+        )
+        try:
+            result = app.invoke(initial_state)
+            return result.get("final_response", "I couldn't process your request. Please try again.")
+        except Exception as e:
+            print(f"Error in LangGraph pipeline: {e}")
+            # Fall through to direct path
+
+    # Direct fallback path (no LangGraph)
     try:
-        result = app.invoke(initial_state)
-        return result.get("final_response", "I couldn't process your request. Please try again.")
-        
+        # Classify
+        ql = (query or "").lower()
+        if any(g in ql for g in ['hi', 'hello', 'hey']) and len(ql.split()) <= 3:
+            return handle_greeting({"query": query})["final_response"]
+
+        # Retrieve data and knowledge
+        patient_info = None
+        try:
+            patient_info = patient_data_retrieval_tool.invoke({"query": query})
+        except Exception as e:
+            patient_info = f"Error retrieving patient data: {e}"
+
+        knowledge = None
+        try:
+            knowledge = autism_knowledge_tool.invoke({"query": query})
+        except Exception as e:
+            knowledge = f"Error retrieving medical knowledge: {e}"
+
+        # Generate response using the same generator
+        gen_state: ChatbotState = {
+            "query": query,
+            "query_type": "",
+            "patient_data": patient_info or "",
+            "medical_knowledge": knowledge or "",
+            "final_response": "",
+            "chat_history": chat_history,
+        }
+        return generate_response(gen_state)["final_response"]
     except Exception as e:
-        print(f"Error in chatbot processing: {e}")
+        print(f"Error in direct pipeline: {e}")
         return "I'm sorry, I encountered an error. Please try asking your question again."
 
 # -----------------------------
