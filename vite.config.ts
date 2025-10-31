@@ -9,21 +9,26 @@ export default defineConfig(({mode}) => ({
     host: "::",
     port: 8080,
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(
-    Boolean
-  ),
+
+  plugins: [
+    react(),
+    // Load lovable-tagger only in development
+    mode === "development" ? componentTagger() : undefined,
+  ].filter(Boolean),
 
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"), // ✅ supports @/ imports
+      "@": path.resolve(__dirname, "./src"), // ✅ Enables @ imports
     },
   },
 
-  // 🧩 Vitest configuration
   test: {
-    environment: "happy-dom", // ✅ fixes jsdom/parse5 ESM error
-    globals: true, // optional, enables global `describe`, `it`, etc.
+    globals: true, // ✅ allows global test functions like describe/it
+    environment: "happy-dom", // ✅ lightweight DOM for React testing
+    setupFiles: "./src/setupTests.ts", // optional setup for Vitest
     exclude: ["node_modules", "dist", "e2e"], // ✅ skip Playwright tests
-    setupFiles: "./src/setupTests.ts", // optional (if you want setup)
+    coverage: {
+      reporter: ["text", "json", "html"], // optional: nice coverage reports
+    },
   },
 }));

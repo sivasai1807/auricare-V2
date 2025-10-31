@@ -22,8 +22,9 @@ def init_clients():
         # Try import Gemini client, skip if not available
         import google.generativeai as genai
         genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-        # Use a fast, widely available model
-        gemini_client = genai.GenerativeModel("gemini-1.5-flash")
+        # Use a supported model identifier compatible with current API versions
+        # "gemini-1.5-flash-latest" resolves to a valid, supported variant
+        gemini_client = genai.GenerativeModel("gemini-1.5-flash-latest")
     except Exception as e:
         print("Error initializing Gemini:", e)
     return groq_client, gemini_client
@@ -58,7 +59,9 @@ class AutismAwarenessBot:
             for page in reader.pages:
                 text = page.extract_text()
                 if text:
-                    self.autism_knowledge += text
+                    # Normalize whitespace to prevent broken line-by-line output
+                    normalized = " ".join(text.split())
+                    self.autism_knowledge += (" " + normalized)
         except Exception as e:
             print("Error reading Autism PDF:", e)
             self.autism_knowledge = ""
@@ -152,29 +155,17 @@ class AutismAwarenessBot:
         return answer, sum(score for score, _ in scored[:3])
 
     def system_prompt(self):
+        # Keep system prompt concise to avoid token overuse; do not inline the entire PDF
         prompt = (
             f"You are {self.name}, an Autism Advisor: warm, concise, and evidence-informed.\n"
-            f"Your goals: help users understand autism, provide practical strategies, and point to support resources.\n\n"
+            f"Goals: explain autism clearly, suggest practical next steps, and point to resources.\n\n"
             f"Style:\n"
-            f"- Friendly, encouraging, and easy to read.\n"
-            f"- Keep answers short and structured with bullets when helpful.\n"
-            f"- Avoid repeating long headers or disclaimers.\n"
-            f"- If the user greets you (hi/hello/hey), reply with a brief greeting and 3 suggested follow-ups.\n\n"
-            f"Scope (focus on):\n"
-            f"  * Autism spectrum disorders (ASD)\n"
-            f"  * Early signs and symptoms of autism\n"
-            f"  * Autism diagnosis and assessment\n"
-            f"  * Therapies and interventions for autism\n"
-            f"  * Supporting individuals with autism\n"
-            f"  * Autism awareness and acceptance\n"
-            f"  * Resources for families and caregivers\n"
-            f"  * Educational strategies for autism\n"
-            f"  * Daily living skills and independence\n"
-            f"  * Sensory processing and autism\n"
-            f"Use the autism PDF knowledge base below as primary context. If the PDF lacks details, you may reason concisely or say you can search for current info.\n"
-            f"End actionable answers with one short supportive nudge to seek local professional help when appropriate.\n"
-            f"Be respectful of neurodiversity and avoid language that suggests autism needs to be 'cured' or 'fixed'.\n\n"
-            f"Autism Knowledge Base: {self.autism_knowledge}..."
+            f"- Friendly and encouraging.\n"
+            f"- Keep answers short; use bullet points when helpful.\n"
+            f"- If user greets you, reply briefly with 3 suggested follow-ups.\n\n"
+            f"Scope:\n"
+            f"- Early signs, diagnosis, therapies, school/home support, resources.\n\n"
+            f"Use concise, evidence-informed guidance. If you lack specific details, say so briefly."
         )
         return prompt
 
@@ -210,29 +201,39 @@ class AutismAwarenessBot:
         else:
             content = None
 
-        # Build messages for LLM call (only if PDF was weak)
+        # Build compact messages for LLM call (only if PDF was weak)
         messages = [{"role": "system", "content": self.system_prompt()}]
-        
-        # Add previous conversation history
-        for msg in history:
-            if msg["role"] == "user":
-                messages.append({"role": "user", "content": msg["content"]})
-            else:
-                messages.append({"role": "assistant", "content": msg["content"]})
-        
-        # Add current user message
-        messages.append({"role": "user", "content": message})
+        # Keep only the last few turns to stay under token limits
+        trimmed_history = history[-4:] if isinstance(history, list) else []
+        for msg in trimmed_history:
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            # Hard truncate long history entries
+            if len(content) > 1200:
+                content = content[:1200] + "…"
+            messages.append({"role": role, "content": content})
+        # Add current user message (truncate if excessively long)
+        user_msg = message if len(message) <= 2000 else (message[:2000] + "…")
+        messages.append({"role": "user", "content": user_msg})
 
-        # 1) Try Groq with the requested model only
+        # 1) Try Groq with fallbacks and conservative token usage
         if not content and groq_client:
-            try:
-                response = groq_client.chat.completions.create(
-                    model="llama-3.1-8b-instant",
-                    messages=messages,
-                )
-                content = response.choices[0].message.content.strip()
-            except Exception as groq_err:
-                print("Groq model failed (llama-3.1-8b-instant):", groq_err)
+            groq_models = [
+                "llama-3.1-8b-instant",
+                "llama-3.3-70b-versatile",
+            ]
+            for mdl in groq_models:
+                try:
+                    response = groq_client.chat.completions.create(
+                        model=mdl,
+                        messages=messages,
+                        max_tokens=512,
+                    )
+                    content = response.choices[0].message.content.strip()
+                    break
+                except Exception as groq_err:
+                    print(f"Groq model failed ({mdl}):", groq_err)
+                    content = None
 
         # 2) Fallback to Gemini if Groq unavailable or all candidates failed
         if not content:
@@ -246,6 +247,9 @@ class AutismAwarenessBot:
                         prefix = "System:" if role == "system" else ("User:" if role == "user" else "Assistant:")
                         joined_messages.append(f"{prefix} {text}")
                     prompt_text = "\n\n".join(joined_messages)
+                    # Truncate to stay within input limits
+                    if len(prompt_text) > 12000:
+                        prompt_text = prompt_text[-12000:]
 
                     gemini_response = gemini_client.generate_content(prompt_text)
                     # google-generativeai returns a text property for convenience
@@ -291,6 +295,29 @@ class AutismAwarenessBot:
             for marker in [long_header, "Important Disclaimer for Caregivers and Medical Practitioners"]:
                 content = content.replace(marker, "")
             content = content.strip()
+        except Exception:
+            pass
+
+        # Guard: if the model echoed the user query (or returned an empty/near-empty string),
+        # replace with a concise PDF-based answer to avoid parroting in the UI.
+        try:
+            user_clean = (message or "").strip().lower()
+            bot_clean = (content or "").strip().lower()
+            if (
+                not bot_clean
+                or bot_clean == user_clean
+                or bot_clean.endswith(": " + user_clean)
+                or bot_clean.startswith("patientbot:")
+                or bot_clean.startswith("assistant:")
+            ):
+                fallback = self._fallback_answer_from_pdf(message)
+                if fallback:
+                    content = fallback
+                else:
+                    content = (
+                        "I didn't find details to answer that directly. Try asking about early signs, therapies, "
+                        "or support at home and school."
+                    )
         except Exception:
             pass
 

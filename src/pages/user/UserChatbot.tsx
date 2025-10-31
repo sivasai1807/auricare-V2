@@ -4,7 +4,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {MessageSquare, Bot, User, Send} from "lucide-react";
-import {chatbotApi} from "@/lib/chatbotApi";
+import {chatbotApi, ChatMessage} from "@/lib/chatbotApi";
 import {useTranslation} from "react-i18next";
 
 interface Message {
@@ -44,7 +44,7 @@ const UserChatbot = () => {
   ];
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -57,24 +57,47 @@ const UserChatbot = () => {
     setInput("");
     setLoading(true);
     try {
-      const history = messages.map((m) => ({
+      // Include the just-sent message in history for the API
+      const historySource = [...messages, userMessage];
+      const history: ChatMessage[] = historySource.map((m) => ({
         role: m.role,
         content: m.content,
         timestamp: m.timestamp,
       }));
-      const resp = await chatbotApi.userChat(
-        userMessage.content,
-        history as any
-      );
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: resp.success
-          ? resp.response
-          : (resp as any).error || "Sorry, I could not respond.",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+
+      const resp = await chatbotApi.userChat(userMessage.content, history);
+
+      if (resp.success) {
+        const normalized = (resp.response || "").trim();
+        const lastAssistant = historySource
+          .slice()
+          .reverse()
+          .find((m) => m.role === "assistant");
+        if (lastAssistant && lastAssistant.content.trim() === normalized) {
+          // Avoid consecutive duplicate bot messages
+          return;
+        }
+
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: normalized.length
+            ? normalized
+            : "I couldn't generate a response right now. Please try again.",
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content:
+            (resp as any).error ||
+            "I couldn't generate a response right now. Please try again.",
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+      }
     } catch (e) {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
