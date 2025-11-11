@@ -1,3 +1,4 @@
+import {useState, useEffect} from "react";
 import {Toaster} from "@/components/ui/toaster";
 import {Toaster as Sonner} from "@/components/ui/sonner";
 import {TooltipProvider} from "@/components/ui/tooltip";
@@ -43,6 +44,20 @@ const queryClient = new QueryClient();
 
 function AppRoutes() {
   const {user, userRole, loading} = useRoleAuth();
+  const [showConsoleMessage, setShowConsoleMessage] = useState(true);
+
+  useEffect(() => {
+    if (loading) {
+      // Show console message for 2-5 seconds
+      const timeout = setTimeout(() => {
+        setShowConsoleMessage(false);
+      }, Math.random() * 3000 + 2000); // Random between 2-5 seconds
+
+      return () => clearTimeout(timeout);
+    } else {
+      setShowConsoleMessage(false);
+    }
+  }, [loading]);
 
   if (loading) {
     return (
@@ -60,6 +75,11 @@ function AppRoutes() {
             ></div>
           </div>
           <p className="mt-2">Loading your dashboard...</p>
+          {showConsoleMessage && (
+            <p className="mt-2 text-xs text-gray-400">
+              (Check browser console for Supabase)
+            </p>
+          )}
         </div>
       </div>
     );

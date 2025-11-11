@@ -1,6 +1,7 @@
 import {useState, useEffect, useRef} from "react";
 import {motion} from "framer-motion";
 import {gsap} from "gsap";
+import {useSearchParams} from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -24,6 +25,7 @@ import {useRoleAuth} from "@/hooks/useRoleAuth";
 import {UserRole} from "@/types/roles";
 
 const RoleBasedAuth = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -32,7 +34,28 @@ const RoleBasedAuth = () => {
   const [role, setRole] = useState<UserRole>("user");
   const [doctorId, setDoctorId] = useState("");
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("signin");
+  const [rememberEmail, setRememberEmail] = useState(false);
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get("tab") === "signup" ? "signup" : "signin"
+  );
+
+  // Load remembered email from localStorage
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
+    if (rememberedEmail) {
+      setEmail(rememberedEmail);
+      setRememberEmail(true);
+    }
+  }, []);
+
+  // Save email when remember is checked
+  useEffect(() => {
+    if (rememberEmail && email) {
+      localStorage.setItem("rememberedEmail", email);
+    } else if (!rememberEmail) {
+      localStorage.removeItem("rememberedEmail");
+    }
+  }, [rememberEmail, email]);
 
   const {signUp, signIn, doctorSignIn} = useRoleAuth();
 
@@ -188,21 +211,39 @@ const RoleBasedAuth = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <Label>Password</Label>
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                <form onSubmit={handleSignIn} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Email</Label>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Password</Label>
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="rememberEmail"
+                      checked={rememberEmail}
+                      onChange={(e) => setRememberEmail(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <Label htmlFor="rememberEmail" className="text-sm font-normal cursor-pointer">
+                      Remember email
+                    </Label>
+                  </div>
                   <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white"
@@ -225,62 +266,75 @@ const RoleBasedAuth = () => {
                 <CardDescription>Join as a user or patient</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <Label>Role</Label>
-                  <Select
-                    value={role}
-                    onValueChange={(value: UserRole) => setRole(value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">
-                        <User className="size-4" /> User
-                      </SelectItem>
-                      <SelectItem value="patient">
-                        <Heart className="size-4" /> Patient
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                <form onSubmit={handleSignUp} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Role</Label>
+                    <Select
+                      value={role}
+                      onValueChange={(value: UserRole) => setRole(value)}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">
+                          <User className="size-4" /> User
+                        </SelectItem>
+                        <SelectItem value="patient">
+                          <Heart className="size-4" /> Patient
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>First Name</Label>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">First Name</Label>
                       <Input
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
+                        className="mt-1"
                       />
                     </div>
-                    <div>
-                      <Label>Last Name</Label>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Last Name</Label>
                       <Input
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
+                        className="mt-1"
                       />
                     </div>
                   </div>
-                  <Label>Username</Label>
-                  <Input
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                  />
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <Label>Password</Label>
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Username</Label>
+                    <Input
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Email</Label>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Password</Label>
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="mt-1"
+                    />
+                  </div>
                   <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white"

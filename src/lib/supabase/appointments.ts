@@ -65,20 +65,56 @@ export async function createAppointment(payload: {
   date: string;
   time: string;
 }) {
-  // Map to existing columns: therapist_id, appointment_date (timestamp)
+  // Try newer schema first (doctor_id with separate date/time columns)
   const appointment_date = `${payload.date}T${payload.time}`;
-  const {data, error} = await supabase
+  
+  // First try with doctor_id and separate date/time columns (newer schema)
+  let {data, error} = await supabase
     .from("appointments")
     .insert([
       {
         patient_id: payload.patient_id,
-        therapist_id: payload.doctor_id,
-        appointment_date,
+        doctor_id: payload.doctor_id,
+        date: payload.date,
+        time: payload.time,
         status: "pending",
       },
     ])
     .select("*")
     .single();
+  
+  // If that fails, try with appointment_date timestamp (older schema with doctor_id)
+  if (error) {
+    ({data, error} = await supabase
+      .from("appointments")
+      .insert([
+        {
+          patient_id: payload.patient_id,
+          doctor_id: payload.doctor_id,
+          appointment_date,
+          status: "pending",
+        },
+      ])
+      .select("*")
+      .single());
+  }
+  
+  // If that fails, try with therapist_id (oldest schema)
+  if (error) {
+    ({data, error} = await supabase
+      .from("appointments")
+      .insert([
+        {
+          patient_id: payload.patient_id,
+          therapist_id: payload.doctor_id,
+          appointment_date,
+          status: "pending",
+        },
+      ])
+      .select("*")
+      .single());
+  }
+  
   if (error) throw error;
   return normalizeAppointment(data);
 }
@@ -104,6 +140,92 @@ export async function listPatientAppointments(patient_id: string) {
     .order("appointment_date", {ascending: true});
   if (error) throw error;
   return (data ?? []).map(normalizeAppointment);
+}
+
+// ============================================================================
+// LIST USER APPOINTMENTS
+// ============================================================================
+// Fetches all appointments for patients associated with a user
+// This is used by the user portal to see appointments for all their patients
+//
+// PARAMETERS:
+// @param userId - UUID of the user (from auth.users)
+//
+// RETURNS: Array of normalized appointment objects
+// ============================================================================
+export async function listUserAppointments(userId: string) {
+  // First, find all patients associated with this user
+  const {data: patientData, error: patientError} = await supabase
+    .from("patients")
+    .select("id")
+    .eq("user_id", userId);
+
+  if (patientError || !patientData || patientData.length === 0) {
+    return [];
+  }
+
+  const patientIds = patientData.map(p => p.id);
+
+  // Then, find all appointments for these patients
+  const {data: appointmentData, error: appointmentError} = await supabase
+    .from("appointments")
+    .select("*")
+    .in("patient_id", patientIds)
+    .order("appointment_date", {ascending: true});
+
+  if (appointmentError) throw appointmentError;
+
+  // Get doctor information for each appointment (try both doctor_id and therapist_id)
+  const uniqueDoctorIds = [
+    ...new Set(
+      (appointmentData ?? [])
+        .map(a => a.doctor_id || a.therapist_id)
+        .filter(Boolean)
+    )
+  ];
+  
+  let doctorMap = new Map();
+  if (uniqueDoctorIds.length > 0) {
+    const {data: doctorData} = await supabase
+      .from("doctors")
+      .select("id, name, specialization")
+      .in("id", uniqueDoctorIds);
+
+    if (doctorData) {
+      doctorMap = new Map(doctorData.map(d => [d.id, d]));
+    }
+  }
+
+  // Get patient information for each appointment
+  const uniquePatientIds = [...new Set((appointmentData ?? []).map(a => a.patient_id).filter(Boolean))];
+  
+  let patientMap = new Map();
+  if (uniquePatientIds.length > 0) {
+    const {data: patientData} = await supabase
+      .from("patients")
+      .select("id, name")
+      .in("id", uniquePatientIds);
+
+    if (patientData) {
+      patientMap = new Map(patientData.map(p => [p.id, p]));
+    }
+  }
+
+  // Normalize appointments and enrich with doctor and patient information
+  const appointments = (appointmentData ?? []).map(row => {
+    const normalized = normalizeAppointment(row);
+    const doctorId = row.doctor_id || row.therapist_id;
+    const doctor = doctorMap.get(doctorId);
+    const patient = patientMap.get(row.patient_id);
+    return {
+      ...normalized,
+      patient_name: patient?.name || normalized.patient_name || "Unknown",
+      doctor_name: doctor?.name || undefined,
+      specialization: doctor?.specialization || undefined,
+    };
+  });
+
+  return appointments;
 }
 
 export async function updateAppointmentStatus(

@@ -16,9 +16,9 @@ import {getCurrentDoctor} from "@/lib/supabase/doctors";
 import {
   listDoctorAppointments,
   updateAppointmentStatus,
-  subscribeToDoctorAppointments,
   type Appointment,
 } from "@/lib/supabase/appointments";
+import {supabase} from "@/integrations/supabase/client";
 
 interface UIAppointment extends Appointment {
   patient_name?: string;
@@ -42,6 +42,8 @@ const DoctorAppointments = () => {
 
   useEffect(() => {
     if (!user) return;
+    let unsubscribe: (() => void) | null = null;
+    
     (async () => {
       setLoading(true);
       try {
@@ -50,12 +52,36 @@ const DoctorAppointments = () => {
         setDoctorId(doctor.id);
         const data = await listDoctorAppointments(doctor.id);
         setAppointments(data);
+        
+        // Save to localStorage for persistence
+        localStorage.setItem(`doctor_appointments_${doctor.id}`, JSON.stringify(data));
 
-        // Subscribe to new appointments
-        const channel = subscribeToDoctorAppointments(doctor.id, (row) => {
-          setAppointments((prev) => [row, ...prev]);
-        });
-        return () => {
+        // Subscribe to real-time appointment updates - use therapist_id for filter (matches database schema)
+        const channel = supabase
+          .channel(`appointments-doctor-${doctor.id}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "appointments",
+              filter: `therapist_id=eq.${doctor.id}`,
+            },
+            async () => {
+              // Refetch appointments on any change
+              try {
+                const updatedData = await listDoctorAppointments(doctor.id);
+                setAppointments(updatedData);
+                // Update localStorage
+                localStorage.setItem(`doctor_appointments_${doctor.id}`, JSON.stringify(updatedData));
+              } catch (err) {
+                console.error("Error refetching appointments:", err);
+              }
+            }
+          )
+          .subscribe();
+
+        unsubscribe = () => {
           try {
             channel.unsubscribe();
           } catch {}
@@ -63,6 +89,22 @@ const DoctorAppointments = () => {
       } catch (e: any) {
         // eslint-disable-next-line no-console
         console.error("Error loading doctor appointments:", e?.message || e);
+        // Try to load from localStorage on error
+        try {
+          const doctor = await getCurrentDoctor();
+          if (doctor) {
+            const savedAppointments = localStorage.getItem(`doctor_appointments_${doctor.id}`);
+            if (savedAppointments) {
+              try {
+                setAppointments(JSON.parse(savedAppointments));
+              } catch (parseErr) {
+                console.error("Error parsing saved appointments:", parseErr);
+              }
+            }
+          }
+        } catch (loadErr) {
+          console.error("Error loading from localStorage:", loadErr);
+        }
         toast({
           title: "Error",
           description: "Failed to load appointments",
@@ -72,6 +114,10 @@ const DoctorAppointments = () => {
         setLoading(false);
       }
     })();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [user]);
 
   // removed legacy fetchAppointments
@@ -81,20 +127,30 @@ const DoctorAppointments = () => {
     newStatus: UIAppointment["status"]
   ) => {
     try {
-      await updateAppointmentStatus(appointmentId, newStatus);
+      // Update in database - handle both old and new schema
+      const {error} = await supabase
+        .from("appointments")
+        .update({status: newStatus})
+        .eq("id", appointmentId);
+      
+      if (error) throw error;
+      
+      // Update local state immediately
       setAppointments((prev) =>
         prev.map((a) =>
           a.id === appointmentId ? {...a, status: newStatus} : a
         )
       );
+      
       toast({
         title: "Status Updated",
         description: `Appointment status changed to ${newStatus}`,
       });
-    } catch (e) {
+    } catch (e: any) {
+      console.error("Error updating status:", e);
       toast({
         title: "Error",
-        description: "Failed to update appointment status",
+        description: e.message || "Failed to update appointment status",
         variant: "destructive",
       });
     }
@@ -237,6 +293,7 @@ const DoctorAppointments = () => {
                   </div>
 
                   <div className="flex gap-2 mt-4">
+                    {/* Show Accept button for pending or scheduled appointments */}
                     {(a.status === "pending" || a.status === "scheduled") && (
                       <Button
                         size="sm"
@@ -247,7 +304,8 @@ const DoctorAppointments = () => {
                         Accept
                       </Button>
                     )}
-                    {(a.status === "pending" || a.status === "confirmed") && (
+                    {/* Show Mark Complete for confirmed appointments */}
+                    {a.status === "confirmed" && (
                       <Button
                         size="sm"
                         variant="outline"
@@ -257,6 +315,7 @@ const DoctorAppointments = () => {
                         Mark Complete
                       </Button>
                     )}
+                    {/* Show Cancel for pending, scheduled, or confirmed (not completed) */}
                     {a.status !== "cancelled" && a.status !== "completed" && (
                       <Button
                         size="sm"
@@ -266,6 +325,19 @@ const DoctorAppointments = () => {
                         <XCircle className="size-4 mr-2" />
                         Cancel
                       </Button>
+                    )}
+                    {/* Show status message for completed/cancelled */}
+                    {a.status === "completed" && (
+                      <div className="text-sm text-blue-600 flex items-center gap-1">
+                        <CheckCircle className="size-4" />
+                        Appointment Completed
+                      </div>
+                    )}
+                    {a.status === "cancelled" && (
+                      <div className="text-sm text-red-600 flex items-center gap-1">
+                        <XCircle className="size-4" />
+                        Appointment Cancelled
+                      </div>
                     )}
                   </div>
                 </CardContent>
