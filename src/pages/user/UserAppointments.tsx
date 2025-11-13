@@ -1,123 +1,197 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Plus, User, Calendar, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { useRoleAuth } from '@/hooks/useRoleAuth';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { listUserAppointments, createAppointment, type Appointment } from '@/lib/supabase/appointments';
-import { upsertPatient } from '@/lib/supabase/patients';
+import {useState, useEffect} from "react";
+import {motion} from "framer-motion";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {Badge} from "@/components/ui/badge";
+import {Calendar, Clock, Stethoscope} from "lucide-react";
+import {toast} from "@/hooks/use-toast";
+import {useRoleAuth} from "@/hooks/useRoleAuth";
+import {supabase} from "@/integrations/supabase/client";
+import {
+  createAppointment,
+  listUserAppointments,
+} from "@/lib/supabase/appointments";
+import {upsertPatient} from "@/lib/supabase/patients";
 
 const UserAppointments = () => {
-  const { user } = useRoleAuth();
-  const [formData, setFormData] = useState({
-    patientName: '',
-    username: '',
-    appointmentDate: '',
-    appointmentTime: '',
-    details: '',
-    doctorId: ''
-  });
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [doctors, setDoctors] = useState<{id: string; name: string; specialization: string; is_available?: boolean}[]>([]);
+  const {user} = useRoleAuth();
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [form, setForm] = useState({
+    patientName: "",
+    doctorId: "",
+    date: "",
+    time: "",
+    details: "",
+  });
+
+  // 🩺 Fetch doctors & appointments
   useEffect(() => {
     if (user) {
-      // Load from localStorage first for quick display
-      const savedAppointments = localStorage.getItem(`user_appointments_${user.id}`);
-      if (savedAppointments) {
-        try {
-          setAppointments(JSON.parse(savedAppointments));
-        } catch (e) {
-          console.error("Error parsing saved appointments:", e);
-        }
-      }
-      
-      fetchAppointments();
       fetchDoctors();
+      fetchAppointments();
     }
   }, [user]);
 
   const fetchDoctors = async () => {
-    const { data, error } = await supabase
-      .from('doctors')
-      .select('id, name, specialization, is_available');
-
-    if (!error && data) {
-      // Filter available doctors (if is_available column exists, otherwise show all)
-      const availableDoctors = data.filter(d => d.is_available !== false);
-      setDoctors(availableDoctors);
+    const {data, error} = await supabase
+      .from("doctors")
+      .select("id, name, specialization");
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load doctors.",
+        variant: "destructive",
+      });
+      return;
     }
+    setDoctors(data || []);
   };
 
   const fetchAppointments = async () => {
     if (!user) return;
     try {
-      const userAppointments = await listUserAppointments(user.id);
-      setAppointments(userAppointments);
-      
-      // Save to localStorage for persistence
-      localStorage.setItem(`user_appointments_${user.id}`, JSON.stringify(userAppointments));
-    } catch (error) {
-      console.error("Error fetching appointments:", error);
-      // Fallback to localStorage on error
-      const savedAppointments = localStorage.getItem(`user_appointments_${user.id}`);
-      if (savedAppointments) {
-        try {
-          setAppointments(JSON.parse(savedAppointments));
-        } catch (e) {
-          console.error("Error parsing saved appointments:", e);
-        }
-      }
+      const data = await listUserAppointments(user.id);
+      setAppointments(data);
+    } catch {
       toast({
         title: "Error",
-        description: "Failed to load appointments",
+        description: "Failed to fetch appointments.",
         variant: "destructive",
       });
     }
   };
 
+  // 🔁 Real-time sync
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`appointments-user-${user.id}`)
+      .on(
+        "postgres_changes",
+        {event: "*", schema: "public", table: "appointments"},
+        () => fetchAppointments()
+      )
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, [user]);
+
+  // ✅ FIXED handleSubmit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+
+    if (!form.date || !form.time) {
+      toast({
+        title: "Error",
+        description: "Please select both date and time before booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!form.doctorId || !form.patientName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please fill in patient name and select a doctor.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
-
     try {
-      if (!formData.doctorId) throw new Error('Select a doctor');
+      // ✅ Step 1: Parse DD-MM-YYYY safely
+      let formattedDate = form.date;
+      if (form.date.includes("-")) {
+        const parts = form.date.split("-");
+        // If format looks like DD-MM-YYYY, reverse it
+        if (parts[0].length === 2) {
+          formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+      }
 
-      // Upsert patient record
-      const patientData = await upsertPatient({
-        name: formData.patientName,
-        email: undefined,
-        phone: undefined,
+      // ✅ Step 2: Normalize time to 24-hour
+      let timeValue = form.time.trim();
+      if (
+        timeValue.toLowerCase().includes("am") ||
+        timeValue.toLowerCase().includes("pm")
+      ) {
+        const [time, modifier] = timeValue.split(" ");
+        let [hours, minutes] = time.split(":");
+        let h = parseInt(hours, 10);
+        if (modifier.toLowerCase() === "pm" && h < 12) h += 12;
+        if (modifier.toLowerCase() === "am" && h === 12) h = 0;
+        timeValue = `${String(h).padStart(2, "0")}:${minutes}`;
+      }
+
+      // ✅ Step 3: Combine and validate
+      const localDateTime = `${formattedDate}T${timeValue}`;
+      const appointmentDate = new Date(localDateTime);
+
+      if (isNaN(appointmentDate.getTime())) {
+        toast({
+          title: "Error",
+          description: "Invalid date or time format. Please re-enter.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      const isoTimestamp = appointmentDate.toISOString();
+
+      // ✅ Step 4: Upsert patient
+      const patient = await upsertPatient({
+        patient_name: form.patientName.trim(),
+        username: form.patientName.toLowerCase().trim(),
+        user_id: user?.id,
       });
 
-      if (!patientData) throw new Error('Failed to create patient record');
+      // ✅ Step 5: Create appointment
+      const {error} = await createAppointment({
+        patient_id: patient.id,
+        therapist_id: form.doctorId,
+        appointment_date: isoTimestamp,
+        reason: form.details.trim(),
+      });
+      if (error) throw error;
 
-      // Create appointment using the appointments module
-      await createAppointment({
-        patient_id: patientData.id,
-        doctor_id: formData.doctorId,
-        date: formData.appointmentDate,
-        time: formData.appointmentTime,
+      toast({
+        title: "Success",
+        description: "Appointment booked successfully!",
       });
 
-      toast({ title: 'Appointment Booked!', description: 'Your appointment has been scheduled.' });
-
-      setFormData({ patientName: '', username: '', appointmentDate: '', appointmentTime: '', details: '', doctorId: '' });
+      setForm({
+        patientName: "",
+        doctorId: "",
+        date: "",
+        time: "",
+        details: "",
+      });
       fetchAppointments();
-
     } catch (err: any) {
-      console.error("Error booking appointment:", err);
-      toast({ title: 'Error', description: err.message || 'Failed to book appointment', variant: 'destructive' });
+      toast({
+        title: "Error",
+        description: err.message || "Something went wrong.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -125,233 +199,150 @@ const UserAppointments = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': case 'scheduled': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "confirmed":
+        return "bg-green-100 text-green-800";
+      case "completed":
+        return "bg-blue-100 text-blue-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  // Subscribe to real-time appointment updates
-  useEffect(() => {
-    if (!user) return;
-
-    // Get patient IDs for this user to filter appointments
-    const setupSubscription = async () => {
-      try {
-        const {data: patientData} = await supabase
-          .from("patients")
-          .select("id")
-          .eq("user_id", user.id);
-
-        if (!patientData || patientData.length === 0) return;
-
-        const patientIds = patientData.map(p => p.id);
-
-        // Subscribe to appointments for all patients
-        const channel = supabase
-          .channel(`appointments-user-${user.id}`)
-          .on(
-            "postgres_changes",
-            {
-              event: "*",
-              schema: "public",
-              table: "appointments",
-            },
-            (payload) => {
-              // Check if this appointment belongs to one of our patients
-              if (payload.new && patientIds.includes(payload.new.patient_id)) {
-                console.log("Appointment update received:", payload);
-                // Refetch appointments to get latest status
-                fetchAppointments();
-              }
-            }
-          )
-          .subscribe();
-
-        return () => {
-          channel.unsubscribe();
-        };
-      } catch (error) {
-        console.error("Error setting up subscription:", error);
-      }
-    };
-
-    const cleanup = setupSubscription();
-    return () => {
-      cleanup.then(unsub => unsub && unsub());
-    };
-  }, [user]);
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "N/A";
-    // Handle both date format (YYYY-MM-DD) and datetime format
-    const date = dateString.includes('T') ? new Date(dateString) : new Date(dateString + 'T00:00:00');
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+  const formatDateTime = (ts: string) => {
+    if (!ts) return "N/A";
+    const d = new Date(ts);
+    return d.toLocaleString("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
     });
   };
 
-  const formatTime = (dateString: string) => {
-    if (!dateString) return "N/A";
-    // Handle both time format (HH:MM:SS) and datetime format
-    if (dateString.includes('T')) {
-      const date = new Date(dateString);
-      return date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } else {
-      // Assume it's a time string (HH:MM:SS)
-      const [hours, minutes] = dateString.split(':');
-      return `${hours}:${minutes}`;
-    }
-  };
-
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto space-y-8">
+    <motion.div
+      initial={{opacity: 0}}
+      animate={{opacity: 1}}
+      className="max-w-5xl mx-auto space-y-8 p-4"
+    >
+      {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-heading font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
           My Appointments
         </h1>
-        <p className="text-gray-600 mt-2">
-          Book new appointments and view your scheduled appointments
-        </p>
+        <p className="text-gray-500 mt-2">Book and view your appointments</p>
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>New Appointment</CardTitle></CardHeader>
+      {/* Booking Form */}
+      <Card className="bg-gradient-to-br from-blue-50 to-green-50 border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Stethoscope className="size-5 text-blue-600" />
+            Book Appointment
+          </CardTitle>
+          <CardDescription>
+            Fill out the form below to schedule an appointment
+          </CardDescription>
+        </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input placeholder="Patient Name" value={formData.patientName} onChange={e => setFormData({...formData, patientName: e.target.value})} required />
-            <Input placeholder="Username" value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} required />
-
-            <Select value={formData.doctorId} onValueChange={v => setFormData({...formData, doctorId: v})}>
-              <SelectTrigger><SelectValue placeholder="Select Doctor" /></SelectTrigger>
+          <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-4">
+            <Input
+              placeholder="Patient Name"
+              value={form.patientName}
+              onChange={(e) => setForm({...form, patientName: e.target.value})}
+              required
+            />
+            <Select
+              value={form.doctorId}
+              onValueChange={(v) => setForm({...form, doctorId: v})}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Doctor" />
+              </SelectTrigger>
               <SelectContent>
-                {doctors.length === 0 ? (
-                  <SelectItem value="" disabled>No available doctors</SelectItem>
-                ) : (
-                  doctors.map(d => (
-                    <SelectItem key={d.id} value={d.id}>
-                      {d.name} - {d.specialization} {d.is_available === false ? "(Unavailable)" : ""}
-                    </SelectItem>
-                  ))
-                )}
+                {doctors.map((d) => (
+                  <SelectItem key={d.id} value={d.id}>
+                    {d.name} - {d.specialization}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+            <Input
+              type="date"
+              value={form.date}
+              onChange={(e) => setForm({...form, date: e.target.value})}
+              required
+            />
+            <Input
+              type="time"
+              step="60"
+              value={form.time}
+              onChange={(e) => setForm({...form, time: e.target.value})}
+              required
+            />
 
-            <Input type="date" value={formData.appointmentDate} onChange={e => setFormData({...formData, appointmentDate: e.target.value})} required />
-            <Input type="time" value={formData.appointmentTime} onChange={e => setFormData({...formData, appointmentTime: e.target.value})} required />
-            <Textarea placeholder="Details" value={formData.details} onChange={e => setFormData({...formData, details: e.target.value})} required />
-            <Button type="submit" disabled={loading}>{loading ? 'Booking...' : 'Book Appointment'}</Button>
+            <Textarea
+              className="md:col-span-2"
+              placeholder="Reason for visit"
+              value={form.details}
+              onChange={(e) => setForm({...form, details: e.target.value})}
+            />
+            <Button
+              type="submit"
+              disabled={loading}
+              className="md:col-span-2 bg-blue-600 hover:bg-blue-700"
+            >
+              {loading ? "Booking..." : "Book Appointment"}
+            </Button>
           </form>
         </CardContent>
       </Card>
 
-      {/* Booked Appointments Section */}
-      <Card>
+      {/* Appointment List */}
+      <Card className="bg-white/80 backdrop-blur-sm shadow-lg border-0">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="size-5" />
-            Booked Appointments
-          </CardTitle>
-          <CardDescription>
-            View the status of appointments you've booked
-          </CardDescription>
+          <CardTitle>My Appointments</CardTitle>
+          <CardDescription>Track your appointment status below</CardDescription>
         </CardHeader>
         <CardContent>
           {appointments.length === 0 ? (
-            <div className="text-center py-12">
-              <Calendar className="size-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">
-                No Appointments Booked
-              </h3>
-              <p className="text-gray-500">
-                Book an appointment using the form above
-              </p>
+            <div className="text-center text-gray-500 py-8">
+              No appointments yet
             </div>
           ) : (
-            <div className="space-y-4">
-              {appointments.map((appointment) => (
-                <Card key={appointment.id} className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          <User className="size-5 text-blue-600" />
-                          {appointment.patient_name}
-                        </CardTitle>
-                        <CardDescription className="mt-1">
-                          {appointment.username && (
-                            <span className="block">Username: {appointment.username}</span>
-                          )}
-                          {appointment.doctor_name && (
-                            <span className="block">
-                              Doctor: {appointment.doctor_name}
-                              {appointment.specialization && ` - ${appointment.specialization}`}
-                            </span>
-                          )}
-                        </CardDescription>
-                      </div>
-                      <Badge className={getStatusColor(appointment.status)}>
-                        {appointment.status === "confirmed" ? "Accepted" : 
-                         appointment.status === "scheduled" ? "Scheduled" :
-                         appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                      </Badge>
+            <div className="grid gap-4">
+              {appointments.map((a) => (
+                <Card
+                  key={a.id}
+                  className="shadow-md border-0 bg-gradient-to-r from-gray-50 to-white"
+                >
+                  <CardHeader className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="text-lg">
+                        {a.doctor_name || "Doctor"}
+                      </CardTitle>
+                      <CardDescription>
+                        {formatDateTime(a.appointment_date)}
+                      </CardDescription>
                     </div>
+                    <Badge className={getStatusColor(a.status)}>
+                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                    </Badge>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Calendar className="size-4" />
-                          <span>{formatDate(appointment.date)}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Clock className="size-4" />
-                          <span>{formatTime(appointment.time)}</span>
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2">
-                          Appointment Details
-                        </h4>
-                        <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                          {appointment.reason || "No details provided"}
-                        </p>
-                        {/* Status feedback */}
-                        <div className="flex items-center gap-2 mt-2">
-                          {appointment.status === "confirmed" && (
-                            <div className="flex items-center gap-1 text-green-600 text-sm">
-                              <CheckCircle className="size-4" />
-                              <span>Doctor has accepted this appointment</span>
-                            </div>
-                          )}
-                          {appointment.status === "completed" && (
-                            <div className="flex items-center gap-1 text-blue-600 text-sm">
-                              <CheckCircle className="size-4" />
-                              <span>Appointment completed</span>
-                            </div>
-                          )}
-                          {appointment.status === "cancelled" && (
-                            <div className="flex items-center gap-1 text-red-600 text-sm">
-                              <XCircle className="size-4" />
-                              <span>Appointment cancelled</span>
-                            </div>
-                          )}
-                          {(appointment.status === "pending" || appointment.status === "scheduled") && (
-                            <div className="flex items-center gap-1 text-yellow-600 text-sm">
-                              <AlertCircle className="size-4" />
-                              <span>Waiting for doctor's response</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                    <p className="text-gray-600 bg-gray-50 p-2 rounded-lg mb-2">
+                      {a.reason || "No details provided"}
+                    </p>
+                    <div className="text-sm text-gray-500 flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      {new Date(a.appointment_date).toLocaleDateString()}
+                      <Clock className="w-4 h-4" />
+                      {new Date(a.appointment_date).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </div>
                   </CardContent>
                 </Card>

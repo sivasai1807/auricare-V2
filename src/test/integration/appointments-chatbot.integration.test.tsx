@@ -1,14 +1,12 @@
-import React from "react";
 import {describe, it, expect, vi, beforeEach} from "vitest";
 import {render, screen, waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {BrowserRouter} from "react-router-dom";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import PatientAppointments from "@/pages/patient/PatientAppointments";
-import DoctorAppointments from "@/pages/doctor/DoctorAppointments";
-import PatientChatbot from "@/pages/patient/PatientChatbot";
-import DoctorChatbot from "@/pages/doctor/DoctorChatbot";
-import {RoleAuthProvider} from "@/hooks/useRoleAuth";
+import {PatientAppointments} from "@/pages/patient/PatientAppointments";
+import {DoctorAppointments} from "@/pages/doctor/DoctorAppointments";
+import {PatientChatbot} from "@/pages/patient/PatientChatbot";
+import {DoctorChatbot} from "@/pages/doctor/DoctorChatbot";
 
 // Mock Supabase - use vi.hoisted() to ensure it's available when vi.mock is hoisted
 const { mockSupabase } = vi.hoisted(() => {
