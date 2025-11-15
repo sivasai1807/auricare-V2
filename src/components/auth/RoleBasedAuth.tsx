@@ -20,12 +20,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {UserPlus, LogIn, Stethoscope, User, Heart} from "lucide-react";
+import {
+  UserPlus,
+  LogIn,
+  Stethoscope,
+  User,
+  Heart,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import {useRoleAuth} from "@/hooks/useRoleAuth";
 import {UserRole} from "@/types/roles";
 
 const RoleBasedAuth = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -39,7 +47,12 @@ const RoleBasedAuth = () => {
     searchParams.get("tab") === "signup" ? "signup" : "signin"
   );
 
-  // Load remembered email from localStorage
+  // 👁 Password visibility states
+  const [showSignInPwd, setShowSignInPwd] = useState(false);
+  const [showSignUpPwd, setShowSignUpPwd] = useState(false);
+  const [showDoctorPwd, setShowDoctorPwd] = useState(false);
+
+  // Load remembered email
   useEffect(() => {
     const rememberedEmail = localStorage.getItem("rememberedEmail");
     if (rememberedEmail) {
@@ -48,7 +61,7 @@ const RoleBasedAuth = () => {
     }
   }, []);
 
-  // Save email when remember is checked
+  // Save email toggle
   useEffect(() => {
     if (rememberEmail && email) {
       localStorage.setItem("rememberedEmail", email);
@@ -62,7 +75,7 @@ const RoleBasedAuth = () => {
   const bubblesRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
 
-  // Animate bubbles
+  // Animate background bubbles
   useEffect(() => {
     if (bubblesRef.current) {
       const bubbles = bubblesRef.current.querySelectorAll(".bubble");
@@ -81,7 +94,7 @@ const RoleBasedAuth = () => {
     }
   }, []);
 
-  // Animate slider under active tab
+  // Animate slider
   useEffect(() => {
     if (sliderRef.current) {
       const index = ["signin", "signup", "doctor"].indexOf(activeTab);
@@ -192,14 +205,14 @@ const RoleBasedAuth = () => {
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
               <TabsTrigger value="doctor">Doctor</TabsTrigger>
             </TabsList>
-            {/* Animated slider bar */}
+
             <div
               ref={sliderRef}
               className="absolute bottom-0 left-0 h-1 w-1/3 bg-gradient-to-r from-blue-600 to-purple-600"
             />
           </div>
 
-          {/* Sign In */}
+          {/* SIGN IN */}
           <TabsContent value="signin">
             <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
               <CardHeader>
@@ -210,40 +223,51 @@ const RoleBasedAuth = () => {
                   Access your Auricare dashboard
                 </CardDescription>
               </CardHeader>
+
               <CardContent>
                 <form onSubmit={handleSignIn} className="space-y-5">
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Email</Label>
+                    <Label>Email</Label>
                     <Input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="mt-1"
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Password</Label>
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="mt-1"
-                    />
+                    <Label>Password</Label>
+                    <div className="relative">
+                      <Input
+                        type={showSignInPwd ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-2 top-2 text-gray-500"
+                        onClick={() => setShowSignInPwd(!showSignInPwd)}
+                      >
+                        {showSignInPwd ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </button>
+                    </div>
                   </div>
+
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      id="rememberEmail"
                       checked={rememberEmail}
                       onChange={(e) => setRememberEmail(e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <Label htmlFor="rememberEmail" className="text-sm font-normal cursor-pointer">
-                      Remember email
-                    </Label>
+                    <Label>Remember email</Label>
                   </div>
+
                   <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white"
@@ -256,7 +280,7 @@ const RoleBasedAuth = () => {
             </Card>
           </TabsContent>
 
-          {/* Sign Up */}
+          {/* SIGN UP */}
           <TabsContent value="signup">
             <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
               <CardHeader>
@@ -265,15 +289,17 @@ const RoleBasedAuth = () => {
                 </CardTitle>
                 <CardDescription>Join as a user or patient</CardDescription>
               </CardHeader>
+
               <CardContent>
                 <form onSubmit={handleSignUp} className="space-y-5">
+                  {/* Role */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Role</Label>
+                    <Label>Role</Label>
                     <Select
                       value={role}
-                      onValueChange={(value: UserRole) => setRole(value)}
+                      onValueChange={(v: UserRole) => setRole(v)}
                     >
-                      <SelectTrigger className="mt-1">
+                      <SelectTrigger>
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
@@ -286,55 +312,129 @@ const RoleBasedAuth = () => {
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* Names */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">First Name</Label>
+                      <Label>First Name</Label>
                       <Input
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
-                        className="mt-1"
                       />
                     </div>
+
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">Last Name</Label>
+                      <Label>Last Name</Label>
                       <Input
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
-                        className="mt-1"
                       />
                     </div>
                   </div>
+
+                  {/* Username */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Username</Label>
+                    <Label>Username</Label>
                     <Input
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
-                      className="mt-1"
                     />
                   </div>
+
+                  {/* Email */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Email</Label>
+                    <Label>Email</Label>
                     <Input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="mt-1"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-red-500">*</span> Required — We'll
+                      use this to verify your account.
+                    </p>
                   </div>
+
+                  {/* Password + strength meter */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Password</Label>
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="mt-1"
-                    />
+                    <Label>Password</Label>
+
+                    {/* Input with eye toggle */}
+                    <div className="relative">
+                      <Input
+                        type={showSignUpPwd ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-2 top-2 text-gray-500"
+                        onClick={() => setShowSignUpPwd(!showSignUpPwd)}
+                      >
+                        {showSignUpPwd ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Password strength block (your original logic) */}
+                    {(() => {
+                      let score = 0;
+                      if (password.length >= 8) score++;
+                      if (/[A-Z]/.test(password)) score++;
+                      if (/[0-9]/.test(password)) score++;
+                      if (/[^A-Za-z0-9]/.test(password)) score++;
+
+                      const percent = (score / 4) * 100;
+                      const color =
+                        score <= 1
+                          ? "bg-red-500"
+                          : score === 2
+                          ? "bg-yellow-400"
+                          : "bg-green-500";
+
+                      const labels = [
+                        "Very weak",
+                        "Weak",
+                        "Fair",
+                        "Good",
+                        "Strong",
+                      ];
+                      const label = labels[score];
+
+                      return (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm text-muted-foreground">
+                            <span>Password strength</span>
+                            <span className="font-medium text-xs">{label}</span>
+                          </div>
+
+                          <div className="w-full bg-gray-200 h-2 rounded overflow-hidden">
+                            <div
+                              className={`${color} h-2`}
+                              style={{
+                                width: `${percent}%`,
+                                transition: "width 200ms ease",
+                              }}
+                            ></div>
+                          </div>
+
+                          <p className="text-xs text-muted-foreground">
+                            Use 8+ characters including uppercase, numbers, and
+                            symbols for a strong password.
+                          </p>
+                        </div>
+                      );
+                    })()}
                   </div>
+
                   <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white"
@@ -347,7 +447,7 @@ const RoleBasedAuth = () => {
             </Card>
           </TabsContent>
 
-          {/* Doctor Login */}
+          {/* DOCTOR LOGIN */}
           <TabsContent value="doctor">
             <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
               <CardHeader>
@@ -358,22 +458,33 @@ const RoleBasedAuth = () => {
                   Access with your unique doctor credentials
                 </CardDescription>
               </CardHeader>
+
               <CardContent>
                 <form onSubmit={handleDoctorSignIn} className="space-y-4">
                   <Label>Doctor ID</Label>
                   <Input
                     value={doctorId}
                     onChange={(e) => setDoctorId(e.target.value)}
-                    placeholder="DOC001"
                     required
                   />
+
                   <Label>Password</Label>
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showDoctorPwd ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-2 top-2 text-gray-500"
+                      onClick={() => setShowDoctorPwd(!showDoctorPwd)}
+                    >
+                      {showDoctorPwd ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+
                   <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white"
@@ -382,6 +493,7 @@ const RoleBasedAuth = () => {
                     {loading ? "Signing In..." : "Doctor Sign In"}
                   </Button>
                 </form>
+
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                   <p className="text-xs text-blue-600">
                     Demo: DOC001/doctor123, DOC002/doctor456, DOC003/doctor789
