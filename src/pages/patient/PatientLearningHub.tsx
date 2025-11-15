@@ -16,19 +16,12 @@ import {getCurrentPatient} from "@/lib/supabase/patients";
 import {listPatientDoctorVideos, type Video} from "@/lib/supabase/videos";
 import {supabase} from "@/integrations/supabase/client";
 
-const getYouTubeEmbedURL = (url: string) => {
-  const videoIdMatch = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
-  return videoIdMatch
-    ? `https://www.youtube.com/embed/${videoIdMatch[1]}`
-    : url;
-};
-
 const getYouTubeThumbnail = (url: string) => {
   const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
   return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : "";
 };
 
-const getCategoryColor = (category: string) => {
+const getCategoryColor = (category?: string) => {
   switch (category) {
     case "Medical Education":
       return "bg-blue-100 text-blue-800";
@@ -56,30 +49,26 @@ const PatientLearningHub = () => {
 
   useEffect(() => {
     if (!user) return;
-    
+
     const loadVideos = async () => {
       setLoading(true);
       try {
         const patient = await getCurrentPatient();
-        if (patient) {
-          const doctorVideos = await listPatientDoctorVideos(patient.id);
-          setVideos(doctorVideos);
-          
-          // Save to localStorage as backup
-          localStorage.setItem("patient_learning_videos", JSON.stringify(doctorVideos));
+        if (!patient) {
+          setVideos([]);
+          setLoading(false);
+          return;
         }
-      } catch (error) {
-        console.error("Error fetching videos:", error);
-        // Fallback to localStorage
-        const savedVideosStr = localStorage.getItem("patient_learning_videos");
-        if (savedVideosStr) {
-          try {
-            const savedVideos = JSON.parse(savedVideosStr);
-            setVideos(savedVideos);
-          } catch (e) {
-            console.error("Error parsing saved videos:", e);
-          }
-        }
+        const doctorVideos = await listPatientDoctorVideos(patient.id);
+        setVideos(doctorVideos);
+        localStorage.setItem(
+          "patient_learning_videos",
+          JSON.stringify(doctorVideos)
+        );
+      } catch (err) {
+        console.error(err);
+        const saved = localStorage.getItem("patient_learning_videos");
+        if (saved) setVideos(JSON.parse(saved));
       } finally {
         setLoading(false);
       }
@@ -87,29 +76,18 @@ const PatientLearningHub = () => {
 
     loadVideos();
 
-    // Subscribe to real-time video updates
     const channel = supabase
       .channel(`patient-videos-${user.id}`)
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "learning_videos",
-        },
-        () => {
-          // Reload videos when doctor uploads new video
-          loadVideos();
-        }
+        {event: "*", schema: "public", table: "learning_videos"},
+        () => loadVideos()
       )
       .subscribe();
 
-    return () => {
-      channel.unsubscribe();
-    };
+    return () => channel.unsubscribe();
   }, [user]);
 
-  // Filter videos
   useEffect(() => {
     let filtered = videos;
     if (searchTerm) {
@@ -129,14 +107,12 @@ const PatientLearningHub = () => {
     "All",
     ...Array.from(new Set(videos.map((v) => v.category || "General"))),
   ];
-
-  if (loading) {
+  if (loading)
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-pulse text-gray-500">Loading videos...</div>
       </div>
     );
-  }
 
   return (
     <motion.div
@@ -144,17 +120,13 @@ const PatientLearningHub = () => {
       animate={{opacity: 1, y: 0}}
       className="space-y-6"
     >
-      {/* Header */}
       <div className="text-center">
         <h1 className="text-3xl font-heading font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
           Learning Hub
         </h1>
-        <p className="text-gray-600 mt-2">
-          Videos uploaded by your doctor
-        </p>
+        <p className="text-gray-600 mt-2">Videos uploaded by your doctor</p>
       </div>
 
-      {/* Search + Filter */}
       <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
@@ -168,17 +140,15 @@ const PatientLearningHub = () => {
               />
             </div>
             <div className="flex gap-2 flex-wrap">
-              {categories.map((category) => (
+              {categories.map((c) => (
                 <Button
-                  key={category}
-                  variant={
-                    selectedCategory === category ? "default" : "outline"
-                  }
+                  key={c}
+                  variant={selectedCategory === c ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedCategory(category)}
+                  onClick={() => setSelectedCategory(c)}
                   className="bg-white/50"
                 >
-                  {category}
+                  {c}
                 </Button>
               ))}
             </div>
@@ -186,7 +156,6 @@ const PatientLearningHub = () => {
         </CardContent>
       </Card>
 
-      {/* Videos Grid */}
       {filteredVideos.length === 0 ? (
         <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
           <CardContent className="text-center py-12">
@@ -211,9 +180,7 @@ const PatientLearningHub = () => {
               <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
                 <CardHeader>
                   <div className="flex justify-between items-start mb-2">
-                    <Badge
-                      className={getCategoryColor(video.category || "General")}
-                    >
+                    <Badge className={getCategoryColor(video.category)}>
                       {video.category || "General"}
                     </Badge>
                     <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -244,7 +211,8 @@ const PatientLearningHub = () => {
                           <Play className="text-white size-10" />
                         </div>
                       </>
-                    ) : video.video_url && video.video_url.includes("youtube") ? (
+                    ) : video.video_url &&
+                      video.video_url.includes("youtube") ? (
                       <>
                         <img
                           src={getYouTubeThumbnail(video.video_url)}
@@ -268,7 +236,6 @@ const PatientLearningHub = () => {
         </div>
       )}
 
-      {/* Modal */}
       {modalVideo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="bg-white rounded-md max-w-3xl w-full p-4 relative">
@@ -282,26 +249,32 @@ const PatientLearningHub = () => {
             </Button>
             <h2 className="text-xl font-semibold mb-4">{modalVideo.title}</h2>
             <p className="mb-4">{modalVideo.description || "No description"}</p>
-            {modalVideo.video_url ? (
-              modalVideo.video_url.includes("youtube") ? (
-                <div className="relative pt-[56.25%] w-full">
-                  <iframe
-                    className="absolute top-0 left-0 w-full h-full rounded-md"
-                    src={getYouTubeEmbedURL(modalVideo.video_url)}
-                    title={modalVideo.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-              ) : (
-                <video
-                  className="w-full rounded-md"
-                  src={modalVideo.video_url}
-                  controls
-                  autoPlay
+            {modalVideo.video_url?.includes("youtube") ? (
+              <div className="relative pt-[56.25%] w-full">
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full rounded-md"
+                  src={
+                    modalVideo.video_url.includes("youtube")
+                      ? `https://www.youtube.com/embed/${
+                          (modalVideo.video_url.match(
+                            /(?:v=|\/)([0-9A-Za-z_-]{11})/
+                          ) || [])[1]
+                        }`
+                      : modalVideo.video_url
+                  }
+                  title={modalVideo.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
                 />
-              )
-            ) : null}
+              </div>
+            ) : (
+              <video
+                className="w-full rounded-md"
+                src={modalVideo.video_url || undefined}
+                controls
+                autoPlay
+              />
+            )}
           </div>
         </div>
       )}

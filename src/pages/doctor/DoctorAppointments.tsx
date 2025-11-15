@@ -201,9 +201,9 @@ const DoctorAppointments = () => {
                   <CardContent className="space-y-3 text-gray-700">
                     <p>
                       <strong>Patient:</strong> {a.patient_name}{" "}
-                      <span className="text-gray-500">
+                      {/* <span className="text-gray-500">
                         ({a.patient_username || "No username"})
-                      </span>
+                      </span> */}
                     </p>
                     <p>
                       <strong>Reason:</strong> {a.reason || "Not provided"}

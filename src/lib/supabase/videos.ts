@@ -9,13 +9,18 @@ export type Video = {
   thumbnail_url?: string | null;
   duration?: string | null;
   views?: number | null;
-  uploaded_by?: string | null;
+  uploaded_by?: string | null; // doctor.id (UUID)
   created_at: string;
   updated_at: string;
 };
 
+/**
+ * uploadDoctorVideo
+ * - Assumes doctor's auth.user.id === doctors.id
+ * - Stores uploaded_by = auth.user.id (doctor.id)
+ */
 export async function uploadDoctorVideo(
-  ownerFolder: string,
+  doctorId: string,
   file: File,
   title: string,
   description?: string,
@@ -23,142 +28,139 @@ export async function uploadDoctorVideo(
 ) {
   const auth = await supabase.auth.getUser();
   if (!auth.data.user) throw new Error("Supabase Auth session not found");
-  const path = `${ownerFolder}/${Date.now()}_${file.name}`;
+
+  const userId = auth.data.user.id;
+
+  const path = `${userId}/${Date.now()}_${file.name}`;
+
   const {error: uploadError} = await supabase.storage
     .from("doctor-videos")
-    .upload(path, file, {upsert: false});
+    .upload(path, file);
+
   if (uploadError) throw uploadError;
 
-  const {data: publicURL} = supabase.storage
-    .from("doctor-videos")
-    .getPublicUrl(path);
+  const {data: url} = supabase.storage.from("doctor-videos").getPublicUrl(path);
+
+  const videoUrl = url.publicUrl;
+
   const {data, error} = await supabase
     .from("learning_videos")
     .insert([
       {
         title,
-        description: description ?? null,
+        description,
         category,
-        video_url: publicURL.publicUrl,
-        duration: "--:--",
-        views: 0,
-        uploaded_by: auth.data.user.id,
+        video_url: videoUrl,
+        uploaded_by: userId, // IMPORTANT
       },
     ])
-    .select("*")
+    .select()
     .single();
+
   if (error) throw error;
-  return data as Video;
+  return data;
 }
 
+/**
+ * listDoctorVideosByUploader
+ * - Returns videos uploaded by the logged-in doctor.
+ */
 export async function listDoctorVideosByUploader() {
   const auth = await supabase.auth.getUser();
   if (!auth.data.user) throw new Error("Supabase Auth session not found");
+
+  const doctorId = auth.data.user.id;
+
   const {data, error} = await supabase
     .from("learning_videos")
     .select("*")
-    .eq("uploaded_by", auth.data.user.id)
+    .eq("uploaded_by", doctorId)
     .order("created_at", {ascending: false});
+
   if (error) throw error;
   return (data ?? []) as Video[];
 }
 
-// List videos uploaded by a specific doctor (for patients to view their doctor's videos)
-export async function listVideosByDoctorUserId(doctorUserId: string) {
+/**
+ * listVideosByDoctorId
+ * - Helper: get videos by doctor.profile id
+ */
+export async function listVideosByDoctorId(doctorId: string) {
   const {data, error} = await supabase
     .from("learning_videos")
     .select("*")
-    .eq("uploaded_by", doctorUserId)
+    .eq("uploaded_by", doctorId)
     .order("created_at", {ascending: false});
+
   if (error) throw error;
   return (data ?? []) as Video[];
 }
 
-// List all videos for patients (videos uploaded by their assigned doctor)
+/**
+ * listPatientDoctorVideos
+ * - Gets the patient's latest appointment doctor_id and returns videos uploaded by that doctor.
+ */
 export async function listPatientDoctorVideos(patientId: string) {
-  // Get patient's doctor from appointments
-  const {data: appointmentData, error: appointmentError} = await supabase
+  const {data: appointment, error: appointmentErr} = await supabase
     .from("appointments")
     .select("doctor_id")
     .eq("patient_id", patientId)
     .order("created_at", {ascending: false})
     .limit(1)
     .maybeSingle();
-  
-  if (appointmentError || !appointmentData) {
-    return [];
-  }
 
-  // Get doctor's user_id
-  const {data: doctorData, error: doctorError} = await supabase
-    .from("doctors")
-    .select("user_id")
-    .eq("id", appointmentData.doctor_id)
-    .maybeSingle();
+  if (appointmentErr || !appointment) return [];
 
-  if (doctorError || !doctorData?.user_id) {
-    return [];
-  }
-
-  // Get videos uploaded by this doctor
-  return listVideosByDoctorUserId(doctorData.user_id);
+  const doctorId = appointment.doctor_id;
+  return listVideosByDoctorId(doctorId);
 }
 
-// List videos for users (videos uploaded by doctors they have appointments with)
+/**
+ * listUserDoctorVideos
+ * - For a logged-in user: find all patients linked to the user,
+ *   get their appointments' doctor_ids, and return videos from those doctors.
+ */
 export async function listUserDoctorVideos(userId: string) {
-  // Get all appointments for this user's patients
-  const {data: patientData, error: patientError} = await supabase
+  // get patient's ids for this user
+  const {data: patients, error: patientsErr} = await supabase
     .from("patients")
     .select("id")
     .eq("user_id", userId);
-  
-  if (patientError || !patientData || patientData.length === 0) {
-    return [];
-  }
 
-  const patientIds = patientData.map(p => p.id);
+  if (patientsErr || !patients || patients.length === 0) return [];
 
-  // Get unique doctor IDs from appointments
-  const {data: appointmentData, error: appointmentError} = await supabase
+  const patientIds = patients.map((p) => p.id);
+
+  // get appointments for those patientIds
+  const {data: appointments, error: appointmentsErr} = await supabase
     .from("appointments")
     .select("doctor_id")
     .in("patient_id", patientIds);
-  
-  if (appointmentError || !appointmentData || appointmentData.length === 0) {
-    return [];
+
+  if (appointmentsErr || !appointments || appointments.length === 0) return [];
+
+  const doctorIds = [...new Set(appointments.map((a) => a.doctor_id))];
+
+  let collected: Video[] = [];
+  for (const docId of doctorIds) {
+    const videos = await listVideosByDoctorId(docId);
+    collected.push(...videos);
   }
 
-  const uniqueDoctorIds = [...new Set(appointmentData.map(a => a.doctor_id))];
-
-  // Get all doctor user_ids
-  const {data: doctorData, error: doctorError} = await supabase
-    .from("doctors")
-    .select("user_id")
-    .in("id", uniqueDoctorIds);
-  
-  if (doctorError || !doctorData || doctorData.length === 0) {
-    return [];
-  }
-
-  // Get all videos from these doctors
-  const allVideos: Video[] = [];
-  for (const doctor of doctorData) {
-    if (doctor.user_id) {
-      const videos = await listVideosByDoctorUserId(doctor.user_id);
-      allVideos.push(...videos);
-    }
-  }
-
-  // Remove duplicates and sort by created_at
-  const uniqueVideos = allVideos.filter((v, index, self) => 
-    index === self.findIndex(t => t.id === v.id)
+  // dedupe by id and sort newest-first
+  const unique = collected.filter(
+    (v, idx, self) => idx === self.findIndex((t) => t.id === v.id)
   );
-  
-  return uniqueVideos.sort((a, b) => 
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+
+  return unique.sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 }
 
+/**
+ * updateVideo
+ */
 export async function updateVideo(
   id: string,
   changes: Partial<Pick<Video, "title" | "description" | "category">>
@@ -167,19 +169,26 @@ export async function updateVideo(
     .from("learning_videos")
     .update(changes)
     .eq("id", id);
+
   if (error) throw error;
 }
 
+/**
+ * deleteVideo
+ */
 export async function deleteVideo(id: string, video_url: string) {
-  // delete db row
   const {error} = await supabase.from("learning_videos").delete().eq("id", id);
   if (error) throw error;
 
-  // best-effort delete file
-  const path = new URL(video_url).pathname.split(
-    "/object/public/doctor-videos/"
-  )[1];
-  if (path) {
-    await supabase.storage.from("doctor-videos").remove([path]);
+  // best-effort delete from storage
+  try {
+    const path = new URL(video_url).pathname.split(
+      "/object/public/doctor-videos/"
+    )[1];
+    if (path) {
+      await supabase.storage.from("doctor-videos").remove([path]);
+    }
+  } catch (e) {
+    // ignore
   }
 }

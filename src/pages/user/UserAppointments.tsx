@@ -1,3 +1,4 @@
+// pages/UserAppointments.tsx
 import {useState, useEffect} from "react";
 import {motion} from "framer-motion";
 import {
@@ -25,12 +26,13 @@ import {supabase} from "@/integrations/supabase/client";
 import {
   createAppointment,
   listUserAppointments,
+  Appointment,
 } from "@/lib/supabase/appointments";
 import {upsertPatient} from "@/lib/supabase/patients";
 
 const UserAppointments = () => {
   const {user} = useRoleAuth();
-  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -42,7 +44,6 @@ const UserAppointments = () => {
     details: "",
   });
 
-  // 🩺 Fetch doctors & appointments
   useEffect(() => {
     if (user) {
       fetchDoctors();
@@ -70,16 +71,11 @@ const UserAppointments = () => {
     try {
       const data = await listUserAppointments(user.id);
       setAppointments(data);
-    } catch {
-      toast({
-        title: "Error",
-        description: "Failed to fetch appointments.",
-        variant: "destructive",
-      });
+    } catch (err: any) {
+      toast({title: "Error", description: err.message, variant: "destructive"});
     }
   };
 
-  // 🔁 Real-time sync
   useEffect(() => {
     if (!user) return;
     const channel = supabase
@@ -93,23 +89,25 @@ const UserAppointments = () => {
     return () => supabase.removeChannel(channel);
   }, [user]);
 
-  // ✅ FIXED handleSubmit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!form.date || !form.time) {
+    if (!user) {
       toast({
         title: "Error",
-        description: "Please select both date and time before booking.",
+        description: "Not authenticated",
         variant: "destructive",
       });
       return;
     }
-
-    if (!form.doctorId || !form.patientName.trim()) {
+    if (
+      !form.patientName.trim() ||
+      !form.doctorId ||
+      !form.date ||
+      !form.time
+    ) {
       toast({
         title: "Error",
-        description: "Please fill in patient name and select a doctor.",
+        description: "Please fill all required fields.",
         variant: "destructive",
       });
       return;
@@ -117,79 +115,34 @@ const UserAppointments = () => {
 
     setLoading(true);
     try {
-      // ✅ Step 1: Parse DD-MM-YYYY safely
-      let formattedDate = form.date;
-      if (form.date.includes("-")) {
-        const parts = form.date.split("-");
-        // If format looks like DD-MM-YYYY, reverse it
-        if (parts[0].length === 2) {
-          formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-        }
-      }
-
-      // ✅ Step 2: Normalize time to 24-hour
-      let timeValue = form.time.trim();
-      if (
-        timeValue.toLowerCase().includes("am") ||
-        timeValue.toLowerCase().includes("pm")
-      ) {
-        const [time, modifier] = timeValue.split(" ");
-        let [hours, minutes] = time.split(":");
-        let h = parseInt(hours, 10);
-        if (modifier.toLowerCase() === "pm" && h < 12) h += 12;
-        if (modifier.toLowerCase() === "am" && h === 12) h = 0;
-        timeValue = `${String(h).padStart(2, "0")}:${minutes}`;
-      }
-
-      // ✅ Step 3: Combine and validate
-      const localDateTime = `${formattedDate}T${timeValue}`;
-      const appointmentDate = new Date(localDateTime);
-
-      if (isNaN(appointmentDate.getTime())) {
-        toast({
-          title: "Error",
-          description: "Invalid date or time format. Please re-enter.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      const isoTimestamp = appointmentDate.toISOString();
-
-      // ✅ Step 4: Upsert patient
+      // upsert patient (one-per-user)
       const patient = await upsertPatient({
+        user_id: user.id,
         patient_name: form.patientName.trim(),
         username: form.patientName.toLowerCase().trim(),
-        user_id: user?.id,
       });
 
-      // ✅ Step 5: Create appointment
-      const {error} = await createAppointment({
+      // build ISO timestamp from date + time
+      const iso = new Date(`${form.date}T${form.time}`).toISOString();
+
+      // create appointment - save patient snapshot fields
+      await createAppointment({
         patient_id: patient.id,
         therapist_id: form.doctorId,
-        appointment_date: isoTimestamp,
-        reason: form.details.trim(),
-      });
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Appointment booked successfully!",
+        appointment_date: iso,
+        patient_name: patient.patient_name,
+        patient_username: patient.username ?? null,
+        reason: form.details.trim() || null,
       });
 
-      setForm({
-        patientName: "",
-        doctorId: "",
-        date: "",
-        time: "",
-        details: "",
-      });
+      toast({title: "Success", description: "Appointment booked!"});
+
+      setForm({patientName: "", doctorId: "", date: "", time: "", details: ""});
       fetchAppointments();
     } catch (err: any) {
       toast({
         title: "Error",
-        description: err.message || "Something went wrong.",
+        description: err.message || "Failed",
         variant: "destructive",
       });
     } finally {
@@ -212,13 +165,10 @@ const UserAppointments = () => {
     }
   };
 
-  const formatDateTime = (ts: string) => {
-    if (!ts) return "N/A";
-    const d = new Date(ts);
-    return d.toLocaleString("en-US", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
+  const formatDate = (iso?: string | null) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    return d.toLocaleString("en-US", {dateStyle: "medium", timeStyle: "short"});
   };
 
   return (
@@ -227,24 +177,17 @@ const UserAppointments = () => {
       animate={{opacity: 1}}
       className="max-w-5xl mx-auto space-y-8 p-4"
     >
-      {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-          My Appointments
-        </h1>
-        <p className="text-gray-500 mt-2">Book and view your appointments</p>
+        <h1 className="text-3xl font-bold">My Appointments</h1>
+        <p className="text-gray-500">Book and view your appointments</p>
       </div>
 
-      {/* Booking Form */}
       <Card className="bg-gradient-to-br from-blue-50 to-green-50 border-0 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Stethoscope className="size-5 text-blue-600" />
-            Book Appointment
+            <Stethoscope /> Book Appointment
           </CardTitle>
-          <CardDescription>
-            Fill out the form below to schedule an appointment
-          </CardDescription>
+          <CardDescription>Fill out the form below</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-4">
@@ -277,30 +220,23 @@ const UserAppointments = () => {
             />
             <Input
               type="time"
-              step="60"
               value={form.time}
               onChange={(e) => setForm({...form, time: e.target.value})}
               required
             />
-
             <Textarea
               className="md:col-span-2"
               placeholder="Reason for visit"
               value={form.details}
               onChange={(e) => setForm({...form, details: e.target.value})}
             />
-            <Button
-              type="submit"
-              disabled={loading}
-              className="md:col-span-2 bg-blue-600 hover:bg-blue-700"
-            >
+            <Button type="submit" disabled={loading} className="md:col-span-2">
               {loading ? "Booking..." : "Book Appointment"}
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      {/* Appointment List */}
       <Card className="bg-white/80 backdrop-blur-sm shadow-lg border-0">
         <CardHeader>
           <CardTitle>My Appointments</CardTitle>
@@ -321,28 +257,46 @@ const UserAppointments = () => {
                   <CardHeader className="flex justify-between items-center">
                     <div>
                       <CardTitle className="text-lg">
-                        {a.doctor_name || "Doctor"}
+                        {a.doctor_name}
+                        {a.specialization ? ` (${a.specialization})` : ""}
                       </CardTitle>
                       <CardDescription>
-                        {formatDateTime(a.appointment_date)}
+                        {formatDate(a.appointment_date)}
                       </CardDescription>
                     </div>
                     <Badge className={getStatusColor(a.status)}>
                       {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
                     </Badge>
                   </CardHeader>
+
                   <CardContent>
-                    <p className="text-gray-600 bg-gray-50 p-2 rounded-lg mb-2">
-                      {a.reason || "No details provided"}
-                    </p>
-                    <div className="text-sm text-gray-500 flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(a.appointment_date).toLocaleDateString()}
-                      <Clock className="w-4 h-4" />
-                      {new Date(a.appointment_date).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                    <div className="bg-gray-50 p-3 rounded-lg mb-3 text-sm text-gray-700">
+                      <p>
+                        <strong>Patient:</strong> {a.patient_name ?? "Unknown"}
+                      </p>
+                      <p className="mt-2">
+                        <strong>Doctor:</strong> {a.doctor_name}
+                        {a.specialization ? ` (${a.specialization})` : ""}
+                      </p>
+                      <p className="mt-3">
+                        {a.reason || "No details provided"}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(
+                          a.appointment_date || ""
+                        ).toLocaleDateString()}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        {new Date(a.appointment_date || "").toLocaleTimeString(
+                          [],
+                          {hour: "2-digit", minute: "2-digit"}
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

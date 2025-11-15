@@ -12,7 +12,12 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Search, Eye, BookOpen, X, Play} from "lucide-react";
 import {toast} from "@/hooks/use-toast";
-import {listDoctorVideosByUploader, uploadDoctorVideo, deleteVideo, type Video} from "@/lib/supabase/videos";
+import {
+  listDoctorVideosByUploader,
+  uploadDoctorVideo,
+  deleteVideo,
+  type Video,
+} from "@/lib/supabase/videos";
 import {useRoleAuth} from "@/hooks/useRoleAuth";
 import {supabase} from "@/integrations/supabase/client";
 
@@ -109,57 +114,74 @@ export function LearningHub({readOnly = false}: {readOnly?: boolean}) {
   // Load videos from Supabase on mount (for doctors)
   useEffect(() => {
     if (readOnly) return;
-    
+
     const loadVideos = async () => {
       setLoading(true);
       try {
         // Load from Supabase
         const supabaseVideos = await listDoctorVideosByUploader();
-        
+
         // Convert Supabase videos to LearningVideo format
-        const convertedVideos: LearningVideo[] = supabaseVideos.map((v: Video) => ({
-          id: v.id,
-          title: v.title,
-          description: v.description || "",
-          category: v.category || "General",
-          views: v.views || 0,
-          video_url: v.video_url,
-          thumbnail_url: v.thumbnail_url || undefined,
-          youtube_url: v.video_url?.includes("youtube") ? v.video_url : undefined,
-          thumbnail: v.thumbnail_url || (v.video_url?.includes("youtube") ? getYouTubeThumbnail(v.video_url) : undefined),
-        }));
+        const convertedVideos: LearningVideo[] = supabaseVideos.map(
+          (v: Video) => ({
+            id: v.id,
+            title: v.title,
+            description: v.description || "",
+            category: v.category || "General",
+            views: v.views || 0,
+            video_url: v.video_url,
+            thumbnail_url: v.thumbnail_url || undefined,
+            youtube_url: v.video_url?.includes("youtube")
+              ? v.video_url
+              : undefined,
+            thumbnail:
+              v.thumbnail_url ||
+              (v.video_url?.includes("youtube")
+                ? getYouTubeThumbnail(v.video_url)
+                : undefined),
+          })
+        );
 
         // Save to localStorage as backup
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(convertedVideos));
+        localStorage.setItem(
+          LOCAL_STORAGE_KEY,
+          JSON.stringify(convertedVideos)
+        );
 
         // Add sample YouTube videos
-        const ytVideos: LearningVideo[] = sampleYouTubeVideos.map((item, i) => ({
-          id: `yt-${i}`,
-          title: item.title,
-          description: "Educational video",
-          youtube_url: item.url,
-          category: "YouTube",
-          views: Math.floor(Math.random() * 5000),
-          thumbnail: getYouTubeThumbnail(item.url),
-        }));
+        const ytVideos: LearningVideo[] = sampleYouTubeVideos.map(
+          (item, i) => ({
+            id: `yt-${i}`,
+            title: item.title,
+            description: "Educational video",
+            youtube_url: item.url,
+            category: "YouTube",
+            views: Math.floor(Math.random() * 5000),
+            thumbnail: getYouTubeThumbnail(item.url),
+          })
+        );
 
         setVideos([...ytVideos, ...convertedVideos]);
       } catch (error) {
         console.error("Error loading videos:", error);
         // Fallback to localStorage if Supabase fails
         const savedVideosStr = localStorage.getItem(LOCAL_STORAGE_KEY);
-        const savedVideos: LearningVideo[] = savedVideosStr ? JSON.parse(savedVideosStr) : [];
-        
+        const savedVideos: LearningVideo[] = savedVideosStr
+          ? JSON.parse(savedVideosStr)
+          : [];
+
         // Fallback to sample videos
-        const ytVideos: LearningVideo[] = sampleYouTubeVideos.map((item, i) => ({
-          id: `yt-${i}`,
-          title: item.title,
-          description: "Educational video",
-          youtube_url: item.url,
-          category: "YouTube",
-          views: Math.floor(Math.random() * 5000),
-          thumbnail: getYouTubeThumbnail(item.url),
-        }));
+        const ytVideos: LearningVideo[] = sampleYouTubeVideos.map(
+          (item, i) => ({
+            id: `yt-${i}`,
+            title: item.title,
+            description: "Educational video",
+            youtube_url: item.url,
+            category: "YouTube",
+            views: Math.floor(Math.random() * 5000),
+            thumbnail: getYouTubeThumbnail(item.url),
+          })
+        );
         setVideos([...ytVideos, ...savedVideos]);
       } finally {
         setLoading(false);
@@ -233,17 +255,21 @@ export function LearningHub({readOnly = false}: {readOnly?: boolean}) {
 
   const handleAddManualVideo = async () => {
     if (!newVideo.title || !newVideo.file || !user) return;
-    
+
     try {
       // Get doctor ID for folder structure
-      const {data: doctorData} = await supabase
+      const {data: doctor} = await supabase
         .from("doctors")
         .select("id")
         .eq("user_id", user.id)
         .maybeSingle();
-      
+
       if (!doctorData) {
-        toast({title: "Error", description: "Doctor profile not found", variant: "destructive"});
+        toast({
+          title: "Error",
+          description: "Doctor profile not found",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -268,11 +294,11 @@ export function LearningHub({readOnly = false}: {readOnly?: boolean}) {
         thumbnail_url: thumbnail,
         thumbnail,
       };
-      
+
       setVideos((prev) => {
         const updated = [...prev, manualVideo];
         // Save to localStorage
-        const supabaseVideos = updated.filter(v => !v.id.startsWith("yt-"));
+        const supabaseVideos = updated.filter((v) => !v.id.startsWith("yt-"));
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(supabaseVideos));
         return updated;
       });
@@ -280,7 +306,11 @@ export function LearningHub({readOnly = false}: {readOnly?: boolean}) {
       toast({title: "Added", description: "Video uploaded successfully"});
     } catch (error: any) {
       console.error("Error uploading video:", error);
-      toast({title: "Error", description: error.message || "Failed to upload video", variant: "destructive"});
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload video",
+        variant: "destructive",
+      });
     }
   };
 
@@ -499,7 +529,8 @@ export function LearningHub({readOnly = false}: {readOnly?: boolean}) {
                           } catch (error: any) {
                             toast({
                               title: "Error",
-                              description: error.message || "Failed to delete video",
+                              description:
+                                error.message || "Failed to delete video",
                               variant: "destructive",
                             });
                           }

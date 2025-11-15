@@ -1,51 +1,51 @@
+// /lib/supabase/patients.ts
 import {supabase} from "@/integrations/supabase/client";
 
+export type Patient = {
+  id: string;
+  user_id: string;
+  patient_name: string;
+  username?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
 /**
- * 🔹 Create or update a patient record
+ * Return the single patient row for the given user_id (or null).
  */
-export const upsertPatient = async ({
-  patient_name,
-  username,
-  user_id,
-}: {
+export async function getCurrentPatient(user_id: string) {
+  const {data, error} = await supabase
+    .from("patients")
+    .select("*")
+    .eq("user_id", user_id)
+    .single();
+
+  if (error && error.code !== "PGRST116") throw error; // PGRST116 = no rows
+  return data as Patient | null;
+}
+
+/**
+ * Upsert a single patient row keyed by user_id (one patient per user).
+ * Returns the inserted/updated patient record.
+ */
+export async function upsertPatient(payload: {
+  user_id: string;
   patient_name: string;
   username?: string;
-  user_id?: string;
-}) => {
+}) {
   const {data, error} = await supabase
     .from("patients")
     .upsert(
       {
-        patient_name,
-        username: username || patient_name.toLowerCase(),
-        user_id,
+        user_id: payload.user_id,
+        patient_name: payload.patient_name,
+        username: payload.username ?? payload.patient_name.toLowerCase(),
       },
-      {onConflict: "user_id"}
+      {onConflict: "user_id", returning: "representation"}
     )
     .select()
     .single();
 
   if (error) throw error;
-  return data;
-};
-
-/**
- * 🔹 Fetch the currently logged-in patient's record
- */
-export const getCurrentPatient = async () => {
-  const {
-    data: {user},
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) throw new Error("User not authenticated");
-
-  const {data, error} = await supabase
-    .from("patients")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
-
-  if (error) throw error;
-  return data;
-};
+  return data as Patient;
+}
