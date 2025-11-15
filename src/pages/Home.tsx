@@ -158,7 +158,7 @@ const Home = () => {
               Login
             </button>
             <button
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate("/auth?tab=signup")}
               className="px-6 py-3 rounded-2xl border border-purple-600 text-purple-700 font-semibold hover:bg-purple-100 hover:scale-105 transition"
             >
               Sign Up

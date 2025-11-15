@@ -3,98 +3,100 @@ import {motion} from "framer-motion";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
-import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
+import {Badge} from "@/components/ui/badge";
 import {Calendar, Clock, User, CheckCircle, XCircle, Users} from "lucide-react";
-import {useRoleAuth} from "@/hooks/useRoleAuth";
+import {supabase} from "@/integrations/supabase/client";
 import {toast} from "@/hooks/use-toast";
 import {getCurrentDoctor} from "@/lib/supabase/doctors";
-import {
-  listDoctorAppointments,
-  updateAppointmentStatus,
-  subscribeToDoctorAppointments,
-  type Appointment,
-} from "@/lib/supabase/appointments";
+import {listDoctorAppointments} from "@/lib/supabase/appointments";
+import {useRoleAuth} from "@/hooks/useRoleAuth";
 
-interface UIAppointment extends Appointment {
-  patient_name?: string;
-  username?: string;
+interface Appointment {
+  id: string;
+  patient_name: string;
+  patient_username?: string;
+  appointment_date: string;
   reason?: string;
+  status: string;
+  patient_id: string;
+  therapist_id: string;
   doctor_name?: string;
   specialization?: string;
 }
 
 const DoctorAppointments = () => {
   const {user} = useRoleAuth();
-  const [appointments, setAppointments] = useState<UIAppointment[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [doctorId, setDoctorId] = useState<string | null>(null);
-
-  // Helper: Validate UUID
-  const isValidUUID = (value: string) =>
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(
-      value
-    );
 
   useEffect(() => {
     if (!user) return;
+    let unsubscribe: (() => void) | null = null;
+
     (async () => {
       setLoading(true);
       try {
         const doctor = await getCurrentDoctor();
         if (!doctor) throw new Error("Doctor profile not found");
-        setDoctorId(doctor.id);
+
         const data = await listDoctorAppointments(doctor.id);
         setAppointments(data);
 
-        // Subscribe to new appointments
-        const channel = subscribeToDoctorAppointments(doctor.id, (row) => {
-          setAppointments((prev) => [row, ...prev]);
-        });
-        return () => {
-          try {
-            channel.unsubscribe();
-          } catch {}
-        };
-      } catch (e: any) {
-        // eslint-disable-next-line no-console
-        console.error("Error loading doctor appointments:", e?.message || e);
+        const channel = supabase
+          .channel(`appointments-doctor-${doctor.id}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "appointments",
+              filter: `therapist_id=eq.${doctor.id}`,
+            },
+            async () => {
+              const updatedData = await listDoctorAppointments(doctor.id);
+              setAppointments(updatedData);
+            }
+          )
+          .subscribe();
+
+        unsubscribe = () => supabase.removeChannel(channel);
+      } catch (err: any) {
         toast({
-          title: "Error",
-          description: "Failed to load appointments",
+          title: "Error loading appointments",
+          description: err.message,
           variant: "destructive",
         });
       } finally {
         setLoading(false);
       }
     })();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [user]);
 
-  // removed legacy fetchAppointments
-
-  const onUpdateStatus = async (
-    appointmentId: string,
-    newStatus: UIAppointment["status"]
-  ) => {
+  const onUpdateStatus = async (id: string, newStatus: string) => {
     try {
-      await updateAppointmentStatus(appointmentId, newStatus);
-      setAppointments((prev) =>
-        prev.map((a) =>
-          a.id === appointmentId ? {...a, status: newStatus} : a
-        )
-      );
+      const {error} = await supabase
+        .from("appointments")
+        .update({status: newStatus})
+        .eq("id", id);
+      if (error) throw error;
+
       toast({
-        title: "Status Updated",
-        description: `Appointment status changed to ${newStatus}`,
+        title: "Appointment Updated",
+        description: `Status changed to ${newStatus}`,
       });
-    } catch (e) {
+    } catch (err: any) {
       toast({
         title: "Error",
-        description: "Failed to update appointment status",
+        description: err.message,
         variant: "destructive",
       });
     }
@@ -103,12 +105,11 @@ const DoctorAppointments = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "confirmed":
-      case "scheduled":
         return "bg-green-100 text-green-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
       case "completed":
         return "bg-blue-100 text-blue-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
       case "cancelled":
         return "bg-red-100 text-red-800";
       default:
@@ -116,164 +117,134 @@ const DoctorAppointments = () => {
     }
   };
 
-  const formatDate = (d: string) =>
-    new Date(`${d}T00:00:00`).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
+  const formatDate = (d: string) => {
+    if (!d) return "Invalid Date";
+    const date = new Date(d);
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
       day: "numeric",
+      year: "numeric",
     });
-  const formatTime = (t: string) => t.substring(0, 5);
+  };
 
-  // Extract only the "Details:" line if the reason contains a multi-line note
-  const extractDetails = (reason?: string) => {
-    if (!reason) return "";
-    const match = reason.match(/Details:\s*(.*)/i);
-    if (match && match[1]) return match[1].trim();
-    return reason.trim();
+  const formatTime = (d: string) => {
+    if (!d) return "Invalid Time";
+    const date = new Date(d);
+    return date.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
   };
 
   if (loading)
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-gray-500">
-          Loading appointments...
-        </div>
+      <div className="flex justify-center items-center h-[400px] text-gray-500 animate-pulse">
+        Loading appointments...
       </div>
     );
-
-  const uniquePatients = new Set(appointments.map((a) => a.patient_id));
 
   return (
     <motion.div
       initial={{opacity: 0, y: 20}}
       animate={{opacity: 1, y: 0}}
-      className="space-y-8"
+      className="max-w-6xl mx-auto space-y-8 p-4"
     >
       <div className="text-center">
-        <h1 className="text-3xl font-heading font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          Patient Appointments
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          Doctor Dashboard
         </h1>
-        <p className="text-gray-600 mt-2">
-          Manage and view all patient appointments
+        <p className="text-gray-500 mt-2">
+          Manage your appointments in real-time
         </p>
       </div>
 
-      <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+      <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-md">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="size-5 text-purple-600" /> Appointment Overview
-            <Badge className="bg-purple-100 text-purple-800 ml-auto">
-              {uniquePatients.size} Patients • {appointments.length}{" "}
-              Appointments
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Users className="size-5 text-purple-600" /> All Appointments
+            </span>
+            <Badge className="bg-purple-100 text-purple-800">
+              {appointments.length} total
             </Badge>
           </CardTitle>
           <CardDescription>
-            Manage patient appointments and update status
+            Accept, complete, or cancel appointments below
           </CardDescription>
         </CardHeader>
-      </Card>
-
-      {appointments.length === 0 ? (
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="text-center py-12">
-            <Calendar className="size-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">
-              No Appointments Yet
-            </h3>
-            <p className="text-gray-500">
-              Patient appointments will appear here once they book
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {appointments.map((a) => (
-            <motion.div
-              key={a.id}
-              initial={{opacity: 0, x: -20}}
-              animate={{opacity: 1, x: 0}}
-            >
-              <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
+        <CardContent>
+          {appointments.length === 0 ? (
+            <div className="text-center text-gray-500 py-10">
+              <Calendar className="mx-auto mb-3 text-gray-400 size-12" />
+              No appointments yet
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {appointments.map((a) => (
+                <Card
+                  key={a.id}
+                  className="shadow-lg border-0 bg-gradient-to-r from-gray-50 to-white hover:shadow-xl transition-all"
+                >
+                  <CardHeader className="flex justify-between items-center">
                     <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <User className="size-5 text-blue-600" />
+                      <CardTitle className="text-lg font-semibold text-gray-800">
                         {a.patient_name}
                       </CardTitle>
-                      <CardDescription className="mt-1">
-                        Username: {a.username}
-                        <span className="block">
-                          Doctor: {a.doctor_name} ({a.specialization})
-                        </span>
+                      <CardDescription className="text-sm text-gray-500">
+                        {formatDate(a.appointment_date)} •{" "}
+                        {formatTime(a.appointment_date)}
                       </CardDescription>
                     </div>
                     <Badge className={getStatusColor(a.status)}>
                       {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
                     </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Calendar className="size-4" />
-                        <span>{formatDate(a.date)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Clock className="size-4" />
-                        <span>{formatTime(a.time)}</span>
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">
-                        Reason for Visit
-                      </h4>
-                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                        {extractDetails(a.reason)}
-                      </p>
-                    </div>
-                  </div>
+                  </CardHeader>
 
-                  <div className="flex gap-2 mt-4">
-                    {(a.status === "pending" || a.status === "scheduled") && (
-                      <Button
-                        size="sm"
-                        onClick={() => onUpdateStatus(a.id, "confirmed")}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        <CheckCircle className="size-4 mr-2" />
-                        Accept
-                      </Button>
-                    )}
-                    {(a.status === "pending" || a.status === "confirmed") && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onUpdateStatus(a.id, "completed")}
-                        className="border-blue-200 hover:bg-blue-50"
-                      >
-                        Mark Complete
-                      </Button>
-                    )}
-                    {a.status !== "cancelled" && a.status !== "completed" && (
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => onUpdateStatus(a.id, "cancelled")}
-                      >
-                        <XCircle className="size-4 mr-2" />
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      )}
+                  <CardContent className="space-y-3 text-gray-700">
+                    <p>
+                      <strong>Patient:</strong> {a.patient_name}{" "}
+                      {/* <span className="text-gray-500">
+                        ({a.patient_username || "No username"})
+                      </span> */}
+                    </p>
+                    <p>
+                      <strong>Reason:</strong> {a.reason || "Not provided"}
+                    </p>
+                    <div className="flex gap-2 flex-wrap pt-2">
+                      {a.status === "pending" && (
+                        <Button
+                          size="sm"
+                          onClick={() => onUpdateStatus(a.id, "confirmed")}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <CheckCircle className="size-4 mr-2" /> Accept
+                        </Button>
+                      )}
+                      {a.status === "confirmed" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onUpdateStatus(a.id, "completed")}
+                          className="border-blue-200 hover:bg-blue-50"
+                        >
+                          <CheckCircle className="size-4 mr-2" /> Mark Complete
+                        </Button>
+                      )}
+                      {a.status !== "cancelled" && a.status !== "completed" && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => onUpdateStatus(a.id, "cancelled")}
+                        >
+                          <XCircle className="size-4 mr-2" /> Cancel
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };

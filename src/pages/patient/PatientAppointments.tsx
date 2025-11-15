@@ -8,13 +8,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
-import {Calendar, Clock, User, MapPin, Stethoscope} from "lucide-react";
+import {Calendar, Clock, User, MapPin, Stethoscope, CheckCircle, XCircle, AlertCircle} from "lucide-react";
 import {useRoleAuth} from "@/hooks/useRoleAuth";
 import {getCurrentPatient} from "@/lib/supabase/patients";
 import {
   listPatientAppointments,
   type Appointment,
 } from "@/lib/supabase/appointments";
+import {supabase} from "@/integrations/supabase/client";
 
 interface UIAppointment extends Appointment {
   doctor_name?: string;
@@ -43,6 +44,41 @@ const PatientAppointments = () => {
         setLoading(false);
       }
     })();
+
+    // Subscribe to real-time appointment updates
+    if (user) {
+      const patientPromise = getCurrentPatient();
+      patientPromise.then((patient) => {
+        if (!patient) return;
+        
+        const channel = supabase
+          .channel(`appointments-patient-${patient.id}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "appointments",
+              filter: `patient_id=eq.${patient.id}`,
+            },
+            () => {
+              // Refetch appointments on any change
+              getCurrentPatient().then((p) => {
+                if (p) {
+                  listPatientAppointments(p.id).then((data) => {
+                    setAppointments(data);
+                  });
+                }
+              });
+            }
+          )
+          .subscribe();
+
+        return () => {
+          channel.unsubscribe();
+        };
+      });
+    }
   }, [user]);
 
   // removed legacy fetchAppointments
@@ -184,9 +220,46 @@ const PatientAppointments = () => {
                       <h4 className="font-semibold text-gray-800 mb-2">
                         Appointment Details
                       </h4>
-                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                        Booked
-                      </p>
+                      <div className="space-y-2">
+                        {appointment.doctor_name && (
+                          <p className="text-sm text-gray-600">
+                            <strong>Doctor:</strong> {appointment.doctor_name}
+                            {appointment.specialization && ` (${appointment.specialization})`}
+                          </p>
+                        )}
+                        {appointment.reason && (
+                          <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                            <strong>Reason:</strong> {appointment.reason}
+                          </p>
+                        )}
+                        {/* Status feedback */}
+                        <div className="flex items-center gap-2 mt-2">
+                          {appointment.status === "confirmed" && (
+                            <div className="flex items-center gap-1 text-green-600 text-sm">
+                              <CheckCircle className="size-4" />
+                              <span>Doctor has accepted this appointment</span>
+                            </div>
+                          )}
+                          {appointment.status === "cancelled" && (
+                            <div className="flex items-center gap-1 text-red-600 text-sm">
+                              <XCircle className="size-4" />
+                              <span>Doctor has cancelled this appointment</span>
+                            </div>
+                          )}
+                          {appointment.status === "pending" && (
+                            <div className="flex items-center gap-1 text-yellow-600 text-sm">
+                              <AlertCircle className="size-4" />
+                              <span>Waiting for doctor's response</span>
+                            </div>
+                          )}
+                          {appointment.status === "completed" && (
+                            <div className="flex items-center gap-1 text-blue-600 text-sm">
+                              <CheckCircle className="size-4" />
+                              <span>Appointment completed</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
